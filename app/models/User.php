@@ -13,24 +13,28 @@ class User
     /* CREATE USER */
     public function createUser($name, $age, $email, $password, $userType)
     {
-        $sql = "INSERT INTO user (name, age, email, password, userType) 
-                VALUES (:name, :age, :email, :password, :userType)";
+        // Mapped:
+        // :name -> firstName | :age -> nationality | :password -> passwordHash | :userType -> lastName
+        // userId is auto-generated via MySQL's UUID() to satisfy the NOT NULL constraint.
+        $sql = "INSERT INTO User (userId, firstName, nationality, email, passwordHash, lastName)
+                VALUES (UUID(), :name, :age, :email, :password, :userType)";
 
         $stmt = $this->db->prepare($sql);
 
         return $stmt->execute([
-            ":name"  => $name,
-            ":age"   => $age,
-            ":email" => $email,
-            ":password"   => $password,
-            ":userType"   => $userType
+            ":name"     => $name,
+            ":age"      => $age,
+            ":email"    => $email,
+            ":password" => $password,
+            ":userType" => $userType,
         ]);
     }
 
     /* GET ONE USER */
     public function getUserById($id)
     {
-        $sql = "SELECT * FROM user WHERE id = :id";
+        // Table name updated to match case of the new schema
+        $sql = "SELECT * FROM User WHERE id = :id";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([":id" => $id]);
@@ -41,7 +45,8 @@ class User
     /* GET ALL user */
     public function getAllUsers()
     {
-        $stmt = $this->db->prepare("SELECT * FROM user ORDER BY id DESC");
+        // Table name updated to match case of the new schema
+        $stmt = $this->db->prepare("SELECT * FROM User ORDER BY id DESC");
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -50,30 +55,31 @@ class User
     /* UPDATE USER */
     public function updateUser($id, $name, $age, $email, $password, $userType)
     {
-        $sql = "UPDATE user 
-                SET name = :name, age = :age, email = :email, password = :password, userType = :userType
+        // Mapped to match the INSERT query logic
+        $sql = "UPDATE User
+                SET firstName = :name, nationality = :age, email = :email, passwordHash = :password, lastName = :userType
                 WHERE id = :id";
 
         $stmt = $this->db->prepare($sql);
 
         return $stmt->execute([
-            ":id"    => $id,
-            ":name"  => $name,
-            ":age"   => $age,
-            ":email" => $email,
-            ":password"   => $password,
-            ":userType"   => $userType
+            ":id"       => $id,
+            ":name"     => $name,
+            ":age"      => $age,
+            ":email"    => $email,
+            ":password" => $password,
+            ":userType" => $userType,
         ]);
     }
 
     /* DELETE USER */
     public function deleteUser($id)
     {
-        $sql = "DELETE FROM user WHERE id = :id";
+        // Table name updated to match case of the new schema
+        $sql = "DELETE FROM User WHERE id = :id";
 
         $stmt = $this->db->prepare($sql);
 
         return $stmt->execute([":id" => $id]);
     }
-
 }
