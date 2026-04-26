@@ -1,0 +1,30 @@
+{
+  "name": "itinerary-planner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "watch": "npx @tailwindcss/cli -i ./public/assets/css/input.css -o ./public/assets/css/tailwind.css --watch",
+    "build": "npx @tailwindcss/cli -i ./public/assets/css/input.css -o ./public/assets/css/tailwind.css --minify",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hanamabdelhamid/itinerary-planner.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hanamabdelhamid/itinerary-planner/issues"
+  },
+  "homepage": "https://github.com/hanamabdelhamid/itinerary-planner#readme",
+  "devDependencies": {
+    "@tailwindcss/oxide-linux-x64-gnu": "^4.2.4",
+    "tailwindcss": "^4.2.4"
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.2.4",
+    "tailwindcss": "^4.2.4"
+  }
+}
