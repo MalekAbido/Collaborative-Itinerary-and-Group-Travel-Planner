@@ -1,0 +1,38 @@
+services:
+  # 1. The Web Server
+  web:
+    build: .
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/html # Your "Save and Refresh" volume
+    depends_on:
+      - db
+
+  # 2. The Database
+  db:
+    image: mysql:8.0
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql # Saves DB data locally
+      # MAGIC SYNC: This runs your install.sql automatically on first boot!
+      - ./install.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # 3. phpMyAdmin (Optional, for you and your team)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+    depends_on:
+      - db
+
+volumes:
+  db_data:
