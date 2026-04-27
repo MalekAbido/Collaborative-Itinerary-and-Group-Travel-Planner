@@ -3,9 +3,9 @@ services:
   web:
     build: .
     ports:
-      - "80:80"
+      - "8080:80"
     volumes:
-      - .:/var/www/html # Your "Save and Refresh" volume
+      - .:/var/www/html
     depends_on:
       - db
 
@@ -13,26 +13,37 @@ services:
   db:
     image: mysql:8.0
     ports:
-      - "3307:3306"
+      - "${DB_PORT:-3307}:3306"
     environment:
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASS}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     volumes:
-      - db_data:/var/lib/mysql # Saves DB data locally
-      # MAGIC SYNC: This runs your install.sql automatically on first boot!
+      - db_data:/var/lib/mysql 
       - ./install.sql:/docker-entrypoint-initdb.d/init.sql
 
   # 3. phpMyAdmin (Optional, for you and your team)
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     ports:
-      - "8080:80"
+      - "8081:80"
     environment:
       PMA_HOST: db
     depends_on:
       - db
 
+  tailwind:
+    image: node:20
+    container_name: itinerary-planner-tailwind
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+      - node_packages:/var/www/html/node_modules
+    # This command only runs npm install if node_modules is missing
+    command: >
+      sh -c "if [ ! -d 'node_modules' ]; then npm install; fi && npm run watch"
+
 volumes:
   db_data:
+  node_packages:
