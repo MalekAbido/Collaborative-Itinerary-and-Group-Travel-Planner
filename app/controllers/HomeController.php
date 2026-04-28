@@ -6,4 +6,9 @@ class HomeController extends Controller
     {
         $this->view("home/index");
     }
+
+    public function styleguide()
+    {
+        $this->view("home/styleguide");
+    }
 }

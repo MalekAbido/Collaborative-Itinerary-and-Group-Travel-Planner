@@ -9,8 +9,8 @@
     <div class="container">
         <div class="mb-3">
             <h2>Users</h2>
-            <a href="<?= BASE_URL ?>User/create" class="btn btn-success mr-2">Create New User</a>
-            <a href="<?= BASE_URL ?>Home/index" class="btn btn-danger">Back</a>
+            <a href="<?= BASE_URL ?>users/create" class="btn btn-success mr-2">Create New User</a>
+            <a href="<?= BASE_URL ?>" class="btn btn-danger">Back</a>
         </div>
 
         <div class="card shadow-sm">
@@ -24,16 +24,17 @@
                         </tr>
 
                         <?php foreach ($data['users'] as $user): ?>
-                            <tr>
-                                <td><?= $user['name'] ?></td>
-                                <td><?= $user['email'] ?></td>
+                        <tr>
+                            <td><?= $user['firstName'] ?></td>
+                            <td><?= $user['email'] ?></td>
 
-                                <td>
-                                    <a href="<?= BASE_URL ?>User/show/<?= $user['id'] ?>" class="btn btn-outline-primary btn-sm mr-2">View</a>
-                                    <a href="<?= BASE_URL ?>User/edit/<?= $user['id'] ?>" class="btn btn-outline-secondary btn-sm mr-2">Edit</a>
-                                    <a href="<?= BASE_URL ?>User/delete/<?= $user['id'] ?>" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete?')">Delete</a>
-                                </td>
-                            </tr>
+                            <td>
+                                <a href="<?= BASE_URL ?>users/<?= $user['id'] ?>"
+                                    class="btn btn-outline-primary btn-sm mr-2">View</a>
+                                <!-- <a href="<?= BASE_URL ?>users/edit/ ?>" class="btn btn-outline-secondary btn-sm mr-2">Edit</a> -->
+                                <!-- <a href="<?= BASE_URL ?>User/delete/ ?>" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete?')">Delete</a> -->
+                            </td>
+                        </tr>
                         <?php endforeach; ?>
                     </table>
                 </div>

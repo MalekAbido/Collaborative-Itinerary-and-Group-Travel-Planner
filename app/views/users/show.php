@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/bootstrap.min.css"> -->
 </head>
 
 <body>
@@ -15,11 +15,12 @@
                     <table class="table table-hover">
                         <tr>
                             <td>Name</td>
-                            <td><?= $data['user']['name'] ?></td>
+                            <!-- <td><?php var_dump($data) ?></td> -->
+                            <td><?= $data['user']['firstName'] ?></td>
                         </tr>
                         <tr>
                             <td>Age</td>
-                            <td><?= $data['user']['age'] ?></td>
+                            <td><?= $data['user']['nationality'] ?></td>
                         </tr>
                         <tr>
                             <td>Email</td>
@@ -27,14 +28,14 @@
                         </tr>
                         <tr>
                             <td>Role</td>
-                            <td><?= $data['user']['userType'] ?></td>
+                            <td><?= $data['user']['nationality'] ?></td>
                         </tr>
                     </table>
                 </div>
             </div>
         </div>
 
-        <a href="<?= BASE_URL ?>User/index" class="btn btn-danger mt-2">Back</a>
+        <a href="<?= BASE_URL ?>users/" class="btn btn-danger mt-2">Back</a>
 
     </div>
 </body>
