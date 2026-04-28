@@ -2,12 +2,14 @@ services:
   # 1. The Web Server
   web:
     build: .
+    restart: unless-stopped
     ports:
       - "8080:80"
     volumes:
-      - .:/var/www/html
+      - .:/var/www/html:z
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   # 2. The Database
   db:
@@ -21,28 +23,36 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     volumes:
       - db_data:/var/lib/mysql 
-      - ./install.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./install.sql:/docker-entrypoint-initdb.d/init.sql:z
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
 
   # 3. phpMyAdmin (Optional, for you and your team)
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
+    restart: unless-stopped
     ports:
       - "8081:80"
     environment:
       PMA_HOST: db
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
+  # 4. Tailwind
   tailwind:
     image: node:20
     container_name: itinerary-planner-tailwind
     working_dir: /var/www/html
     volumes:
-      - .:/var/www/html
-      - node_packages:/var/www/html/node_modules
-    # This command only runs npm install if node_modules is missing
+      - .:/var/www/html:z
+      - node_packages:/var/www/html/node_modules:z
     command: >
-      sh -c "if [ ! -d 'node_modules' ]; then npm install; fi && npm run watch"
+      sh -c "if [ ! -d 'node_modules' ] || [ -z "$(ls -A node_modules 2>/dev/null)" ]; then npm install; fi && npm run watch"
 
 volumes:
   db_data:
