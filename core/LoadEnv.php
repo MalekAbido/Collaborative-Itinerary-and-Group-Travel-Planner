@@ -1,4 +1,7 @@
 <?php
+namespace Core;
+
+use Exception;
 
 class LoadEnv
 {

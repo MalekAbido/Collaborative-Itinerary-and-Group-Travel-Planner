@@ -1,6 +1,9 @@
 <?php
-require_once "../app/helpers/Validator.php";
-require_once "../app/models/User.php";
+namespace App\Controllers;
+
+use App\Helpers\Validator;
+use App\Models\User;
+use Core\Controller;
 
 class UserController extends Controller
 {

@@ -1,5 +1,8 @@
 <?php
-require_once 'LoadEnv.php';
+namespace Core;
+
+use PDO;
+use PDOException;
 
 class Database
 {

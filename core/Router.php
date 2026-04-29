@@ -1,4 +1,7 @@
 <?php
+
+namespace Core;
+
 /**
  * ═══════════════════════════════════════════════════
  * ItineraryPlanner System — Router
@@ -293,59 +296,35 @@ class Router
      * @param string $method     Method name (e.g., 'cancel')
      * @param array  $params     URL parameters (e.g., ['5'])
      */
-    private function callController($controller, $method, $params = [])
+    private function callController($controllerName, $method, $params = [])
     {
-        // ── Build file path ──
-        $controllerFile = __DIR__ . '/../app/controllers/' . $controller . '.php';
+        // 1. Construct the Fully Qualified Class Name (FQCN)
+        // This turns "HomeController" into "App\Controllers\HomeController"
+        $fullClassName = "App\\Controllers\\" . $controllerName;
 
-        // ── Check file exists ──
-        if (!file_exists($controllerFile)) {
+        // 2. Let the Autoloader find the class!
+        // class_exists() will trigger the autoloader automatically.
+        // No more manual require_once or file_exists needed!
+        if (!class_exists($fullClassName)) {
             die(
                 "<div style='font-family:Arial; padding:20px;'>"
-                . "<h2>⚠️ ItineraryPlanner Error: Controller File Not Found</h2>"
-                . "<p>Looking for: <code>controllers/{$controller}.php</code></p>"
-                . "<p><strong>Fix:</strong> Create this file in the controllers/ folder.</p>"
+                . "<h2>⚠️ ItineraryPlanner Error: Controller Not Found</h2>"
+                . "<p>The autoloader could not find class: <code>{$fullClassName}</code></p>"
+                . "<p><strong>Fix:</strong> Ensure the file exists at <code>app/Controllers/{$controllerName}.php</code> "
+                . "and has <code>namespace App\Controllers;</code> at the top.</p>"
                 . "</div>"
             );
         }
 
-        // ── Load the file ──
-        require_once $controllerFile;
+        // 3. Create the controller object using the FQCN
+        $controllerObject = new $fullClassName();
 
-        // ── Check class exists in the file ──
-        if (!class_exists($controller)) {
-            die(
-                "<div style='font-family:Arial; padding:20px;'>"
-                . "<h2>⚠️ ItineraryPlanner Error: Controller Class Not Found</h2>"
-                . "<p>File <code>controllers/{$controller}.php</code> was loaded,</p>"
-                . "<p>but no class named <code>{$controller}</code> was found inside.</p>"
-                . "<p><strong>Fix:</strong> Make sure your class name matches: "
-                . "<code>class {$controller} extends Controller</code></p>"
-                . "</div>"
-            );
-        }
-
-        // ── Create the controller object (OOP!) ──
-        // This calls the constructor, which may set up model objects
-        $controllerObject = new $controller();
-
-        // ── Check method exists ──
+        // 4. Check if the method exists
         if (!method_exists($controllerObject, $method)) {
-            die(
-                "<div style='font-family:Arial; padding:20px;'>"
-                . "<h2>⚠️ ItineraryPlanner Error: Method Not Found</h2>"
-                . "<p>Class <code>{$controller}</code> doesn't have method "
-                . "<code>{$method}()</code></p>"
-                . "<p><strong>Available methods:</strong> "
-                . implode(', ', get_class_methods($controllerObject))
-                . "</p>"
-                . "</div>"
-            );
+            die("<h2>⚠️ Method Not Found</h2><p>Class <code>{$fullClassName}</code> has no method <code>{$method}()</code></p>");
         }
 
-        // ── Call the method with parameters ──
-        // If URL was /booking/cancel/5 and route was /booking/cancel/{id}
-        // Then $params = ['5'] and this calls: $controllerObject->cancel('5')
+        // 5. Call the method
         call_user_func_array([$controllerObject, $method], $params);
     }
 
