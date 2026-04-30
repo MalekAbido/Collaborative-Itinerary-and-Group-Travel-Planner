@@ -7,6 +7,7 @@
 
   /* Primary */
   --color-primary: #f65a41;
+  /* --color-tester: rgb(0, 0, 0); */
   --color-primary-container: #ff8b71;
   --color-primary-fixed: #ffdad3;
   --color-primary-fixed-dim: #ffb4a3;
@@ -202,7 +203,7 @@
     height: 100%;
   }
   body {
-    @apply font-body text-body-md bg-background text-on-background overflow-hidden;
+    @apply font-body text-body-md bg-background text-on-background overflow-hidden m-0;
   }
   ::selection {
     @apply bg-primary-fixed text-on-primary-fixed;
