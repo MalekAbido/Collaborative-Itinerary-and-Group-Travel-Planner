@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
     <meta charset="utf-8" />
@@ -18,25 +18,22 @@
         rel="stylesheet" />
 </head>
 
-<body class="bg-[#f65a411c] text-on-background font-body min-h-screen flex items-center justify-center p-4 md:p-8">
+<body
+    class="bg-[#f65a411c] text-on-background font-body min-h-screen flex items-center justify-center p-4 md:p-8 animate-fade-in">
 
     <div
         class="w-full max-w-250 bg-surface-container-lowest rounded-3xl shadow-xl flex flex-col lg:flex-row overflow-hidden min-h-150">
 
         <div class="hidden lg:block lg:w-1/2 relative bg-surface-variant">
-            <img src="/assets/images/log1.jpeg" alt="Travel Planning"
+            <img src="/assets/images/log6.jpeg" alt="Travel Planning"
                 class="absolute inset-0 w-full h-full object-cover" />
             <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent"></div>
 
             <div class="absolute bottom-12 left-12 right-12 text-white">
-                <div class="mb-4">
-                    <span class="material-symbols-outlined text-4xl text-primary-fixed">format_quote</span>
-                </div>
-                <h3 class="font-display text-[26px] font-bold leading-tight mb-4 text-white">
-                    "Itinerary made planning our summer trip an absolute breeze. Highly recommended!"
+                <span class="material-symbols-outlined text-4xl text-tertiary-fixed mb-4">explore</span>
+                <h3 class="font-display text-[26px] font-bold leading-tight mb-4">
+                    The ultimate tool to sync up your group trips without the headache.
                 </h3>
-                <p class="font-body text-[15px] text-white/80 font-medium">Hana AbdelHamid</p>
-                <p class="font-body text-[13px] text-white/60">Group Organizer</p>
             </div>
         </div>
 
@@ -63,8 +60,15 @@
                 <div>
                     <label
                         class="block text-[12px] font-bold tracking-widest text-on-surface-variant uppercase mb-2">Password</label>
-                    <input type="password" name="password" placeholder="••••••••" required
-                        class="w-full px-4 py-3.5 bg-surface border border-outline-variant rounded-xl text-on-surface placeholder-outline/60 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none font-mono text-lg">
+                    <div class="relative">
+                        <input type="password" id="reg-password" name="password" placeholder="••••••••" required
+                            class="w-full pl-4 pr-12 py-3.5 bg-surface border border-outline-variant rounded-xl text-on-surface placeholder-outline/60 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none">
+                        <button type="button" onclick="toggleVisibility('reg-password', 'reg-eye')"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors flex items-center justify-center cursor-pointer">
+                            <span id="reg-eye" class="material-symbols-outlined">visibility_off</span>
+                        </button>
+                    </div>
+
                 </div>
 
                 <a type="submit"
@@ -82,5 +86,7 @@
 
     </div>
 </body>
+
+<script src="/assets/js/main.js"></script>
 
 </html>

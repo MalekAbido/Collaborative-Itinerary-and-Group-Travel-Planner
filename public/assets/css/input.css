@@ -185,6 +185,18 @@
 
   --animate-pulse-dot: pulse-dot 1.4s ease-in-out infinite;
   --animate-spin-slow: spin 1s linear infinite;
+  --animate-fade-in: fadeIn 0.4s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes pulse-dot {
@@ -198,12 +210,8 @@
 }
 
 @layer base {
-  html,
   body {
-    height: 100%;
-  }
-  body {
-    @apply font-body text-body-md bg-background text-on-background overflow-hidden m-0;
+    @apply font-body text-body-md bg-background text-on-background overflow-x-hidden m-0;
   }
   ::selection {
     @apply bg-primary-fixed text-on-primary-fixed;
