@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "./tailwind.css";
 @source "../../../app";
 @source "../../../public";
 /* Define your custom theme variables for Tailwind v4 */
