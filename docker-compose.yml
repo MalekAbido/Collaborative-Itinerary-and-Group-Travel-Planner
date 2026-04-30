@@ -46,15 +46,15 @@ services:
 
   # 4. Tailwind
   tailwind:
-    image: node:20
+    image: node:20-slim
     container_name: itinerary-planner-tailwind
     working_dir: /var/www/html
     volumes:
       - .:/var/www/html:z
-      - node_packages:/var/www/html/node_modules:z
-    command: >
-      sh -c "if [ ! -d 'node_modules' ]; then npm install; fi && npm run watch"
+    command: sh -c "npm install && npm run watch"
+    stdin_open: true # <-- Keeps the standard input stream open
+    tty: true        # <-- Allocates a terminal
 
 volumes:
   db_data:
-  node_packages:
+  # node_packages:

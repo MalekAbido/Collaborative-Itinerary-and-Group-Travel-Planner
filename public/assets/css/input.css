@@ -1,4 +1,4 @@
-@import "./tailwind.css";
+@import "tailwindcss";
 @source "../../../app";
 @source "../../../public";
 /* Define your custom theme variables for Tailwind v4 */
@@ -202,7 +202,7 @@
     height: 100%;
   }
   body {
-    @apply font-body text-body-md bg-background text-on-background overflow-hidden m-0;
+    @apply font-body text-body-md bg-background text-on-background overflow-hidden;
   }
   ::selection {
     @apply bg-primary-fixed text-on-primary-fixed;

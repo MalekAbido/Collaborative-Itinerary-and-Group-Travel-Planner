@@ -14,7 +14,7 @@
     <div class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl p-10 max-w-lg w-full text-center border border-slate-100">
 
-            <h1 class="text-3xl font-bold text-slate-900 mb-4 tracking-tight">
+            <h1 class="text-3xl  text-slate-900 mb-3 tracking-tight">
                 Welcome to the MVC Project
             </h1>
 
@@ -25,7 +25,7 @@
             <div class="flex flex-col space-y-4">
                 <a href="<?php echo BASE_URL ?>styleguide"
                     class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 ease-in-out shadow-sm hover:shadow-md">
-                    View UI Components Playground
+                    View UI Components Playground here
                 </a>
                 <br>
                 <a href="<?php echo BASE_URL ?>users"

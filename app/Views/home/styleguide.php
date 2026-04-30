@@ -25,7 +25,7 @@
         </p>
 
         <button
-            class="bg-primary hover:bg-primary-container text-on-primary font-bold py-3 px-6 rounded-lg transition-colors shadow-sm">
+            class="bg-tester hover:bg-primary-container text-on-primary font-bold py-3 px-6 rounded-lg transition-colors shadow-sm">
             Start Planning
         </button>
 
