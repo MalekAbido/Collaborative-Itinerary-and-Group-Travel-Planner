@@ -11,6 +11,9 @@ $this->get('/users/create', 'UserController', 'create'); // Show create form
 $this->post('/users/store', 'UserController', 'store');  // Process create form
 $this->get('/users/{id}', 'UserController', 'show');     // Show specific user profile
 
+$this->get('/profile', 'UserController', 'showUserProfile');
+$this->get('/dashboard', 'UserController', 'showUserTripsDashboard');
+
 // Home Route
 $this->get('/', 'HomeController', 'index');
 $this->get('/styleguide', 'HomeController', 'styleguide');
