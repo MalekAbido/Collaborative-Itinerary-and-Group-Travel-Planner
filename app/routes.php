@@ -12,7 +12,18 @@ $this->post('/users/store', 'UserController', 'store');  // Process create form
 $this->get('/users/{id}', 'UserController', 'show');     // Show specific user profile
 
 $this->get('/profile', 'UserController', 'showUserProfile');
-$this->get('/dashboard', 'UserController', 'showUserTripsDashboard');
+$this->get('/profile/update', 'UserController', 'updateUserProfile');
+$this->get('/my-trips', 'UserController', 'showUserTripsDashboard');
+
+// ALLERGY CONTROLLER ROUTES
+$this->get('/allergy/add', 'AllergyController', 'addAllergy');
+$this->get('/allergy/update', 'AllergyController', 'updateAllergy');
+$this->get('/allergy/remove', 'AllergyController', 'removeAllergy');
+
+// EMERGENCY CONTROLLER ROUTES
+$this->get('/emergency-contact/add', 'EmergencyController', 'addEmergencyContact');
+$this->get('/emergency-contact/update', 'EmergencyController', 'updateEmergencyContact');
+$this->get('/emergency-contact/remove', 'EmergencyController', 'removeEmergencyContact');
 
 // Home Route
 $this->get('/', 'HomeController', 'index');
