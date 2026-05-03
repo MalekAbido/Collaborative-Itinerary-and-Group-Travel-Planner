@@ -26,7 +26,7 @@ class UserController extends Controller
             return $this->view('user/profile', [
                 'user' => $user,
                 'allergies' => $user->getAllergies(),
-                'emergencyContacts' => $user->getEmergencyContacts(),
+                'emergencyContacts' => $user->getEmergencyContacts()
             ]);
         }
 

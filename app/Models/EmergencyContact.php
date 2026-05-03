@@ -84,12 +84,21 @@ class EmergencyContact
         $this->userId = $userId;
     }
 
-    public function create()
+    public function create($data)
     {
-        $this->contactId = uniqid('emg_');
-        $sql = "INSERT INTO EmergencyContact (contactId, name, phone, email, relationship, userId) VALUES (:contactId, :name, :phone, :email, :relationship, :userId)";
+        $this->setUserId($data['userId']);
+        $this->setName($data['name']);
+        $this->setPhone($data['phone'] ?? '');
+        $this->setEmail($data['email'] ?? '');
+        $this->setRelationship($data['relationship']);
+        $this->setContactId(uniqid('cnt_'));
+
+        $sql = "INSERT INTO EmergencyContact (contactId, name, phone, email, relationship, userId)
+                VALUES (:contactId, :name, :phone, :email, :relationship, :userId)";
+
         $stmt = $this->db->prepare($sql);
-        $success = $stmt->execute([
+
+        return $stmt->execute([
             ':contactId' => $this->contactId,
             ':name' => $this->name,
             ':phone' => $this->phone,
@@ -97,11 +106,6 @@ class EmergencyContact
             ':relationship' => $this->relationship,
             ':userId' => $this->userId
         ]);
-
-        if ($success) {
-            $this->id = $this->db->lastInsertId();
-        }
-        return $success;
     }
 
     public function read($id)

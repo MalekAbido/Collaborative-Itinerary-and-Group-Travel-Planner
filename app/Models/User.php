@@ -117,7 +117,7 @@ class User
     public static function getByUserId($userId)
     {
         $db = Database::getInstance()->getConnection();
-        $sql = "SELECT * FROM User WHERE userId = :userId LIMIT 1";
+        $sql = "SELECT * FROM User WHERE id = :userId LIMIT 1";
         $stmt = $db->prepare($sql);
         $stmt->execute([':userId' => $userId]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -140,7 +140,8 @@ class User
     public function create()
     {
         $this->userId = uniqid('usr_');
-        $sql = "INSERT INTO User (userId, firstName, lastName, email, passwordHash, nationality, policyNumber) VALUES (:userId, :firstName, :lastName, :email, :passwordHash, :nationality, :policyNumber)";
+        $sql = "INSERT INTO User (userId, firstName, lastName, email, passwordHash, nationality, policyNumber)
+                VALUES (:userId, :firstName, :lastName, :email, :passwordHash, :nationality, :policyNumber)";
         $stmt = $this->db->prepare($sql);
         $success = $stmt->execute([
             ':userId' => $this->userId,

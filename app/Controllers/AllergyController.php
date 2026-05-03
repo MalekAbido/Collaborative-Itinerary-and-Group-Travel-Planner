@@ -23,13 +23,10 @@ class AllergyController extends Controller
             die("Invalid allergy data.");
         }
 
-        $allergy = new Allergy();
-        $allergy->setAllergen($allergyData['allergen']);
-        $allergy->setSeverity($allergyData['severity']);
-        $allergy->setReaction($allergyData['reaction'] ?? '');
-        $allergy->setUserId($this->userId);
+        $allergyData['userId'] = $this->userId;
 
-        if ($allergy->create()) {
+        $allergy = new Allergy();
+        if ($allergy->create($allergyData)) {
             header("Location: /profile");
             exit;
         }

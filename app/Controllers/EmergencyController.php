@@ -23,14 +23,10 @@ class EmergencyController extends Controller
             die("Invalid contact data.");
         }
 
+        $contactData['userId'] = $this->userId;
+        
         $contact = new EmergencyContact();
-        $contact->setName($contactData['name']);
-        $contact->setEmail($contactData['email'] ?? '');
-        $contact->setPhone($contactData['phone'] ?? '');
-        $contact->setRelationship($contactData['relationship']);
-        $contact->setUserId($this->userId);
-
-        if ($contact->create()) {
+        if ($contact->create($contactData)) {
             header("Location: /profile");
             exit;
         }
