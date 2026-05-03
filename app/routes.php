@@ -28,4 +28,6 @@ $this->get('/logout', 'AuthController', 'logout');
 $this->get('/finance/expense/add', 'ExpenseController', 'showAddForm');         // add expense form
 $this->post('/finance/expense/create', 'ExpenseController', 'createExpense');   // process the form 
 $this->get('/finance/expense/details', 'ExpenseController', 'getExpenseDetails'); // breakdown the given expense
+$this->post('/finance/expense/delete', 'ExpenseController', 'deleteExpense');      // delete expense
+
 
