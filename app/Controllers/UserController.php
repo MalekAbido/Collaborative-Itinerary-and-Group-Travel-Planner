@@ -8,15 +8,22 @@ use Core\Controller;
 
 class UserController extends Controller
 {
-    public function showUserProfile($userId)
+    private $userId;
+
+    public function __construct()
+    {
+        $this->userId = 1; // Session.getUserId();
+    }
+
+    public function showUserProfile()
     {
         $user = new User();
 
-        if ($user->read($userId)) {
+        if ($user->read($this->userId)) {
             $user->loadAllergies();
             $user->loadEmergencyContacts();
 
-            return $this->view('profile', [
+            return $this->view('user/profile', [
                 'user' => $user,
                 'allergies' => $user->getAllergies(),
                 'emergencyContacts' => $user->getEmergencyContacts(),
@@ -26,14 +33,14 @@ class UserController extends Controller
         return json_encode(['status' => 'error', 'message' => 'User profile not found.']);
     }
 
-    public function showUserTripsDashboard($userId)
+    public function showUserTripsDashboard()
     {
         $user = new User();
 
-        if ($user->read($userId)) {
+        if ($user->read($this->userId)) {
             $myTrips = $user->getUserItineraries();
 
-            return $this->view('dashboard', [
+            return $this->view('user/dashboard', [
                 'myTrips' => $myTrips,
             ]);
         }
@@ -41,21 +48,26 @@ class UserController extends Controller
         return json_encode(['status' => 'error', 'message' => 'User profile not found.']);
     }
 
-    public function updateProfile($userId, $data)
-    {
-        if (!$this->validateProfileData($data)) {
-            return json_encode(['status' => 'error', 'message' => 'Invalid standard data provided.']);
-        }
+    public function updateUserProfile()
+{
+    // 1. Grab POST data directly
+    $data = $_POST;
 
-        $user = new User();
-
-        if ($user->read($userId)) {
-            $user->updateProfile($data);
-            return json_encode(['status' => 'success', 'message' => 'Profile successfully updated.']);
-        }
-
-        return json_encode(['status' => 'error', 'message' => 'User not found.']);
+    if (!$this->validateProfileData($data)) {
+        die("Invalid profile data provided. Please check your inputs.");
     }
+
+    $user = new User();
+
+    if ($user->read($this->userId)) {
+        $user->updateProfile($data);
+        
+        header("Location: /profile");
+        exit;
+    }
+
+    die('User not found.');
+}
 
     public function validateProfileData($data)
     {
