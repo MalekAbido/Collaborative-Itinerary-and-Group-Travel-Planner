@@ -52,9 +52,6 @@
                         <a href="/dashboard" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary hover:bg-primary-fixed/40 transition">
                             Dashboard
                         </a>
-                        <a href="/profile" class="px-3 py-2 rounded-md text-body-sm font-medium text-primary border-b-2 border-primary">
-                            Profile Settings
-                        </a>
                     </div>
                 </div>
 
