@@ -37,3 +37,6 @@ $this->get('/register', 'AuthController', 'register');
 $this->post('/register/process', 'AuthController', 'processRegister');
 
 $this->get('/logout', 'AuthController', 'logout');
+
+//Finance Overview Dashboard
+$this->get('/finance/dashboard/{id}', 'FinanceController', 'dashboard');
