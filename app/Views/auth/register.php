@@ -50,7 +50,7 @@
             <h2 class="font-display text-3xl font-bold text-on-surface mb-2">Create an account</h2>
             <p class="font-body text-on-surface-variant mb-8">Join us to start planning your next adventure.</p>
 
-            <form action="/register/process" method="POST" class="flex flex-col gap-5">
+            <form id="register-form" action="/register/process" method="POST" class="flex flex-col gap-5" novalidate>
 
                 <div class="flex flex-col md:flex-row gap-5">
                     <div class="flex-1">

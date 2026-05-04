@@ -39,6 +39,7 @@
     --radius-xl: 16px;
     --radius-2xl: 24px;
     --radius-3xl: 1.5rem;
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
     --blur-md: 12px;
     --default-transition-duration: 150ms;
     --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -390,6 +391,9 @@
   .mt-auto {
     margin-top: auto;
   }
+  .mb-1 {
+    margin-bottom: var(--spacing-1);
+  }
   .mb-2 {
     margin-bottom: var(--spacing-2);
   }
@@ -641,6 +645,12 @@
   .border-b {
     border-bottom-style: var(--tw-border-style);
     border-bottom-width: 1px;
+  }
+  .border-error\/20 {
+    border-color: color-mix(in srgb, #ba1a1a 20%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-error) 20%, transparent);
+    }
   }
   .border-outline-variant {
     border-color: var(--color-outline-variant);
@@ -930,6 +940,9 @@
   }
   .text-\[15px\] {
     font-size: 15px;
+  }
+  .text-\[16px\] {
+    font-size: 16px;
   }
   .text-\[20px\] {
     font-size: 20px;

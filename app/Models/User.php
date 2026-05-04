@@ -137,6 +137,26 @@ class User
         return null;
     }
 
+    public static function getByEmail($email){
+        $db = Database::getInstance()->getConnection();
+        $sql = "SELECT * FROM User WHERE email = :email LIMIT 1";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':email' => $email]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if($data){
+            $user = new self();
+            $user->setId($data['id']);
+            $user->setUserId($data['userId']);
+            $user->setFirstName($data['firstName']);
+            $user->setLastName($data['lastName']);
+            $user->setEmail($data['email']);
+            $user->setPasswordHash($data['passwordHash']);
+            return $user;
+        }
+        return null;
+    }
+
     public function create()
     {
         $this->userId = uniqid('usr_');

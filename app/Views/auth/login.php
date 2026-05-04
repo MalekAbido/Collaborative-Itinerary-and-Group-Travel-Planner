@@ -71,11 +71,11 @@
 
                 </div>
 
-                <a type="submit"
+                <button type="submit"
                     class="w-full bg-primary text-white font-semibold py-4 rounded-xl shadow-lg hover:bg-on-primary-fixed-variant transition-colors mt-2 flex justify-center items-center gap-2 cursor-pointer">
                     Login
                     <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
-                </a>
+                </button>
             </form>
 
             <p class="text-center text-sm text-on-surface-variant mt-8">
