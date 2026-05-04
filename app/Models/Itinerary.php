@@ -1,7 +1,7 @@
 <?php
-
 namespace App\Models;
 
+use App\Models\Subtrip;
 use Core\Database;
 use PDO;
 
@@ -18,7 +18,8 @@ class Itinerary
     private $invitations = [];
     private $historyLog;
     private $tripFinance;
-    private $itineraryItems = [];
+    private $activities = null;
+    private $subtrips   = null;
 
     public function __construct()
     {
@@ -29,6 +30,7 @@ class Itinerary
     {
         return $this->id;
     }
+
     public function setId($id)
     {
         $this->id = $id;
@@ -38,6 +40,7 @@ class Itinerary
     {
         return $this->itineraryId;
     }
+
     public function setItineraryId($itineraryId)
     {
         $this->itineraryId = $itineraryId;
@@ -47,6 +50,7 @@ class Itinerary
     {
         return $this->title;
     }
+
     public function setTitle($title)
     {
         $this->title = $title;
@@ -56,6 +60,7 @@ class Itinerary
     {
         return $this->description;
     }
+
     public function setDescription($description)
     {
         $this->description = $description;
@@ -65,6 +70,7 @@ class Itinerary
     {
         return $this->startDate;
     }
+
     public function setStartDate($startDate)
     {
         $this->startDate = $startDate;
@@ -74,6 +80,7 @@ class Itinerary
     {
         return $this->endDate;
     }
+
     public function setEndDate($endDate)
     {
         $this->endDate = $endDate;
@@ -83,6 +90,7 @@ class Itinerary
     {
         return $this->tripMembers;
     }
+
     public function setTripMembers($tripMembers)
     {
         $this->tripMembers = $tripMembers;
@@ -92,6 +100,7 @@ class Itinerary
     {
         return $this->invitations;
     }
+
     public function setInvitations($invitations)
     {
         $this->invitations = $invitations;
@@ -101,6 +110,7 @@ class Itinerary
     {
         return $this->historyLog;
     }
+
     public function setHistoryLog($historyLog)
     {
         $this->historyLog = $historyLog;
@@ -110,6 +120,7 @@ class Itinerary
     {
         return $this->tripFinance;
     }
+
     public function setTripFinance($tripFinance)
     {
         $this->tripFinance = $tripFinance;
@@ -119,6 +130,7 @@ class Itinerary
     {
         return $this->itineraryItems;
     }
+
     public function setItineraryItems($itineraryItems)
     {
         $this->itineraryItems = $itineraryItems;
@@ -127,66 +139,103 @@ class Itinerary
     public function create()
     {
         $this->itineraryId = uniqid('itin_');
-        $sql = "INSERT INTO Itinerary (itineraryId, title, description, startDate, endDate) VALUES (:itineraryId, :title, :description, :startDate, :endDate)";
-        $stmt = $this->db->prepare($sql);
-        $success = $stmt->execute([
+        $sql               = "INSERT INTO Itinerary (itineraryId, title, description, startDate, endDate) VALUES (:itineraryId, :title, :description, :startDate, :endDate)";
+        $stmt              = $this->db->prepare($sql);
+        $success           = $stmt->execute([
             ':itineraryId' => $this->itineraryId,
-            ':title' => $this->title,
+            ':title'       => $this->title,
             ':description' => $this->description,
-            ':startDate' => $this->startDate,
-            ':endDate' => $this->endDate
+            ':startDate'   => $this->startDate,
+            ':endDate'     => $this->endDate,
         ]);
 
         if ($success) {
             $this->id = $this->db->lastInsertId();
         }
+
         return $success;
     }
 
     public function read($id)
     {
-        $sql = "SELECT * FROM Itinerary WHERE id = :id LIMIT 1";
+        $sql  = "SELECT * FROM Itinerary WHERE id = :id LIMIT 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($data) {
-            $this->id = $data['id'];
+            $this->id          = $data['id'];
             $this->itineraryId = $data['itineraryId'];
-            $this->title = $data['title'];
+            $this->title       = $data['title'];
             $this->description = $data['description'];
-            $this->startDate = $data['startDate'];
-            $this->endDate = $data['endDate'];
+            $this->startDate   = $data['startDate'];
+            $this->endDate     = $data['endDate'];
             return true;
         }
+
         return false;
     }
 
     public function update()
     {
-        $sql = "UPDATE Itinerary SET title = :title, description = :description, startDate = :startDate, endDate = :endDate WHERE id = :id";
+        $sql  = "UPDATE Itinerary SET title = :title, description = :description, startDate = :startDate, endDate = :endDate WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
-            ':title' => $this->title,
+            ':title'       => $this->title,
             ':description' => $this->description,
-            ':startDate' => $this->startDate,
-            ':endDate' => $this->endDate,
-            ':id' => $this->id
+            ':startDate'   => $this->startDate,
+            ':endDate'     => $this->endDate,
+            ':id'          => $this->id,
         ]);
     }
 
     public function delete()
     {
-        $sql = "DELETE FROM Itinerary WHERE id = :id";
+        $sql  = "DELETE FROM Itinerary WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([':id' => $this->id]);
     }
 
-    public function addActivity($activity) {}
+    public function addActivity($activity)
+    {}
 
-    public function removeActivity($activityId) {}
+    public function removeActivity($activityId)
+    {}
 
-    public function addSubtrip($subtrip) {}
+    public function addSubtrip($subtrip)
+    {}
 
-    public function removeSubtrip($subtripId) {}
+    public function removeSubtrip($subtripId)
+    {}
+
+    public function getActivities()
+    {
+
+        if ($this->activities === null) {
+            $this->activities = Activity::getAllByItineraryId($this->id);
+
+            if ($this->activities === false) {
+                $this->activities = [];
+            }
+        }
+
+        return $this->activities;
+    }
+
+    /**
+     * Fetches all subtrips attached to this itinerary.
+     */
+    public function getSubtrips()
+    {
+
+        if ($this->subtrips === null) {
+            $this->subtrips = Subtrip::getAllByItineraryId($this->id);
+
+            if ($this->subtrips === false) {
+                $this->subtrips = [];
+            }
+        }
+
+        return $this->subtrips;
+    }
 }
