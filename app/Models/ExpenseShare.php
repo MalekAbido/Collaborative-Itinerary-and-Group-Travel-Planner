@@ -81,6 +81,28 @@ class ExpenseShare
         ]);
     }
 
+    public function update()
+    {
+        $pdo = Database::getInstance()->getConnection();
+        $sql = "UPDATE ExpenseShare 
+                SET shareId = :shareId,
+                    amount = :amount,
+                    isPayer = :isPayer,
+                    expenseId = :expenseId,
+                    tripMemberId = :tripMemberId
+                WHERE id = :id";
+
+        $stmt = $pdo->prepare($sql);
+        return $stmt->execute([
+            'shareId' => $this->shareId,
+            'amount' => $this->amount,
+            'isPayer' => $this->isPayer,
+            'expenseId' => $this->expenseId,
+            'tripMemberId' => $this->tripMemberId,
+            'id' => $this->id
+        ]);
+    }
+
     public function findByExpenseId($expenseId) 
     {
         $pdo = Database::getInstance()->getConnection();

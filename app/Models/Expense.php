@@ -7,9 +7,11 @@ use PDO;
 
 class Expense
 {
+    private $pdo;
     private $id;
     private $expenseId;
     private $amount;
+    private $refundedAmount;
     private $currencyType;
     private $description;
     private $category;
@@ -20,104 +22,150 @@ class Expense
 
     public array $expenseShares = [];
 
-    public function getId() {
+
+    public function __construct()
+    {
+        $pdo = Database::getInstance()->getConnection();
+    }
+
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function getExpenseId() {
+    public function getExpenseId()
+    {
         return $this->expenseId;
     }
 
-    public function getAmount() {
+    public function getAmount()
+    {
         return $this->amount;
     }
 
-    public function getCurrencyType() {
+    public function getRefundedAmount()
+    {
+        return $this->refundedAmount;
+    }
+
+    public function getCurrencyType()
+    {
         return $this->currencyType;
     }
 
-    public function getDescription() {
+    public function getDescription()
+    {
         return $this->description;
     }
 
-    public function getCategory() {
+    public function getCategory()
+    {
         return $this->category;
     }
 
-    public function getIsNonCash() {
+    public function getIsNonCash()
+    {
         return $this->isNonCash;
     }
 
-    public function getPaidByKitty() {
+    public function getPaidByKitty()
+    {
         return $this->paidByKitty;
     }
 
-    public function getTripFinanceId() {
+    public function getTripFinanceId()
+    {
         return $this->tripFinanceId;
     }
 
-    public function getTripMemberId() {
+    public function getTripMemberId()
+    {
         return $this->tripMemberId;
     }
 
-    public function getExpenseShares() {
+    public function getExpenseShares()
+    {
         return $this->expenseShares;
     }
 
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
     }
 
-    public function setExpenseId($expenseId) {
+    public function setExpenseId($expenseId)
+    {
         $this->expenseId = $expenseId;
     }
 
-    public function setAmount($amount) {
+    public function setAmount($amount)
+    {
         $this->amount = $amount;
     }
 
-    public function setCurrencyType($currencyType) {
+    public function setRefundedAmount($refundedAmount)
+    {
+        $this->refundedAmount = $refundedAmount;
+    }
+
+    public function setCurrencyType($currencyType)
+    {
         $this->currencyType = $currencyType;
     }
 
-    public function setDescription($description) {
+    public function setDescription($description)
+    {
         $this->description = $description;
     }
 
-    public function setCategory($category) {
+    public function setCategory($category)
+    {
         $this->category = $category;
     }
 
-    public function setIsNonCash($isNonCash) {
+    public function setIsNonCash($isNonCash)
+    {
         $this->isNonCash = $isNonCash;
     }
 
-    public function setPaidByKitty($paidByKitty) {
+    public function setPaidByKitty($paidByKitty)
+    {
         $this->paidByKitty = $paidByKitty;
     }
 
-    public function setTripFinanceId($tripFinanceId) {
+    public function setTripFinanceId($tripFinanceId)
+    {
         $this->tripFinanceId = $tripFinanceId;
     }
 
-    public function setTripMemberId($tripMemberId) {
+    public function setTripMemberId($tripMemberId)
+    {
         $this->tripMemberId = $tripMemberId;
     }
 
-    public function setExpenseShares(array $expenseShares) {
+    public function setExpenseShares(array $expenseShares)
+    {
         $this->expenseShares = $expenseShares;
+    }
+
+    public function getItinerary()
+    {
+        $sql = "SELECT itineraryId FROM TripFinance WHERE id = :financeId LIMIT 1";
+        
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['financeId' => $this->tripFinanceId]);
+                
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function create($data)
     {
-        $pdo = Database::getInstance()->getConnection();
-
         $uniqueExpenseId = 'EXP-' . uniqid();
 
         $sql = "INSERT INTO Expense (expenseId, amount, currencyType, description, category, isNonCash, paidByKitty, tripFinanceId, tripMemberId) 
                 VALUES (:expenseId, :amount, :currencyType, :description, :category, :isNonCash, :paidByKitty, :tripFinanceId, :tripMemberId)";
-        
-        $stmt = $pdo->prepare($sql);
+
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             'expenseId' => $uniqueExpenseId,
             'amount' => $data['amount'],
@@ -129,25 +177,25 @@ class Expense
             'tripFinanceId' => $data['financeId'],
             'tripMemberId' => $data['payerId']
         ]);
-        
-        return $pdo->lastInsertId(); 
+
+        return $this->pdo->lastInsertId();
     }
-    
-    public function findById($id) 
+
+    public function findById($id)
     {
-        $pdo = Database::getInstance()->getConnection();
         $sql = "SELECT * FROM Expense WHERE id = :id";
-        
-        $stmt = $pdo->prepare($sql); 
-        
+
+        $stmt = $this->pdo->prepare($sql);
+
         $stmt->execute(['id' => $id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if ($data) {
             $expense = new self();
             $expense->setId($data['id']);
             $expense->setExpenseId($data['expenseId']);
             $expense->setAmount($data['amount']);
+            $expense->setRefundedAmount($data['refundedAmount'] ?? 0);
             $expense->setCurrencyType($data['currencyType']);
             $expense->setDescription($data['description']);
             $expense->setCategory($data['category']);
@@ -160,23 +208,85 @@ class Expense
         return null;
     }
 
-    public function delete($id) 
+    public function delete($id)
     {
-        $pdo = Database::getInstance()->getConnection();
         $sql = "DELETE FROM Expense WHERE id = :id";
-        
-        $stmt = $pdo->prepare($sql);
+
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['id' => $id]);
     }
-    public function loadShares($expenseId) {
+
+    public function update()
+    {
         $pdo = Database::getInstance()->getConnection();
-        $sql = "SELECT * FROM ExpenseShare WHERE expenseId = :expenseId";
+        $sql = "UPDATE Expense 
+                SET expenseId = :expenseId,
+                    amount = :amount,
+                    refundedAmount = :refundedAmount,
+                    currencyType = :currencyType,
+                    description = :description,
+                    category = :category,
+                    isNonCash = :isNonCash,
+                    paidByKitty = :paidByKitty,
+                    tripFinanceId = :tripFinanceId,
+                    tripMemberId = :tripMemberId
+                WHERE id = :id";
 
         $stmt = $pdo->prepare($sql);
+        return $stmt->execute([
+            'expenseId' => $this->expenseId,
+            'amount' => $this->amount,
+            'refundedAmount' => $this->refundedAmount,
+            'currencyType' => $this->currencyType,
+            'description' => $this->description,
+            'category' => $this->category,
+            'isNonCash' => $this->isNonCash,
+            'paidByKitty' => $this->paidByKitty,
+            'tripFinanceId' => $this->tripFinanceId,
+            'tripMemberId' => $this->tripMemberId,
+            'id' => $this->id
+        ]);
+    }
+
+    public function updateRefundedAmount($newRefundInput)
+    {
+        // 1. Safety check
+        if ($newRefundInput <= 0 || $newRefundInput > $this->amount) {
+            return false; 
+        }
+
+        // 2. Calculate the proportion of the refund
+        $reductionRatio = $newRefundInput / $this->amount;
+
+        // 3. Update this Expense's amounts and save to database
+        $this->amount -= $newRefundInput;
+        $this->refundedAmount += $newRefundInput;
+        $this->update();
+
+        // 4. Load and update all associated ExpenseShares proportionally
+        $shares = $this->loadShares($this->id);
+        
+        foreach ($shares as $share) {
+            $shareReduction = $share->getAmount() * $reductionRatio;
+            $newShareAmount = $share->getAmount() - $shareReduction;
+            
+            $share->setAmount($newShareAmount);
+            $share->update(); 
+        }
+
+        return true;
+    }
+
+    public function loadShares($expenseId)
+    {
+        $this->pdo = Database::getInstance()->getConnection();
+        $sql = "SELECT * FROM ExpenseShare WHERE expenseId = :expenseId";
+
+        $stmt = $this->pdo->prepare($sql);
 
         $stmt->execute(['expenseId' => $expenseId]);
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         $this->expenseShares = [];
         foreach ($data as $row) {
             $share = new ExpenseShare();

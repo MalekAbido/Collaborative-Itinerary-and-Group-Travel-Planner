@@ -1,13 +1,14 @@
 <?php
+
 namespace App\Controllers;
 
 use Core\Controller;
 use App\Models\Expense;
 use App\Models\ExpenseShare;
 
-class ExpenseController extends Controller 
+class ExpenseController extends Controller
 {
-    public function showAddForm() 
+    public function showAddForm()
     {
         // $itineraryId = $_GET['itineraryId'] ?? 1; 
 
@@ -22,7 +23,7 @@ class ExpenseController extends Controller
         $this->view('expenses/add');
     }
 
-    public function createExpense() 
+    public function createExpense()
     {
         $financeId = $_POST['financeId'] ?? '';
         $payerId = (int)($_POST['payerId'] ?? 0);
@@ -31,7 +32,7 @@ class ExpenseController extends Controller
         $currencyType = trim($_POST['currencyType'] ?? 'USD');
         $isNonCash = isset($_POST['isNonCash']) ? 1 : 0;
         $paidByKitty = isset($_POST['paidByKitty']) ? 1 : 0;
-        
+
         $details = [
             'description' => $_POST['description'] ?? '',
             'category' => $_POST['category'] ?? '',
@@ -48,7 +49,7 @@ class ExpenseController extends Controller
             'financeId'   => $financeId,
             'payerId'     => $payerId,
             'amount'      => $totalAmount,
-            'currencyType'=> $currencyType,
+            'currencyType' => $currencyType,
             'isNonCash'   => $isNonCash,
             'paidByKitty' => $paidByKitty,
             'description' => $details['description'],
@@ -59,25 +60,24 @@ class ExpenseController extends Controller
 
         if ($splitMethod === 'EVEN') {
             $memberCount = count($details['shares']);
-            $evenSplitAmount = $totalAmount / $memberCount; 
-            
+            $evenSplitAmount = $totalAmount / $memberCount;
+
             foreach ($details['shares'] as $memberId => $dummyValue) {
-                $isPayer = ((int)$memberId === $payerId) ? 1 : 0; 
+                $isPayer = ((int)$memberId === $payerId) ? 1 : 0;
                 $shareModel->create($expenseId, $memberId, $evenSplitAmount, $isPayer);
             }
-
         } elseif ($splitMethod === 'UNEVEN') {
             foreach ($details['shares'] as $memberId => $amountOwed) {
                 $isPayer = ((int)$memberId === $payerId) ? 1 : 0;
                 $shareModel->create($expenseId, $memberId, $amountOwed, $isPayer);
             }
         }
-        
+
         header("Location: /finance/expense/details?id=" . $expenseId);
         exit();
     }
 
-    public function deleteExpense() 
+    public function deleteExpense()
     {
         $expenseId = $_POST['expenseId'] ?? null;
 
@@ -101,7 +101,7 @@ class ExpenseController extends Controller
         exit();
     }
 
-    public function getExpenseDetails() 
+    public function getExpenseDetails()
     {
         $expenseId = $_GET['id'] ?? null;
 
@@ -129,12 +129,40 @@ class ExpenseController extends Controller
                 $debtors[] = $share;
             }
         }
-        
+
         $this->view('expenses/details', [
             'expense' => $expense,
             'payer'   => $payer,
             'debtors' => $debtors
         ]);
+    }
+
+    public function refundExpense()
+    {
+        $expenseId = $_POST['expenseId'] ?? null;
+        $newRefundInput = (float) ($_POST['refundAmount'] ?? 0);
+
+        if (!$expenseId) {
+            die("Error: No Expense ID provided.");
+        }
+
+        $expenseModel = new Expense();
+        $expense = $expenseModel->findById($expenseId);
+
+        if (!$expense) {
+            die("Error: Expense not found.");
+        }
+
+        if ($newRefundInput <= 0 || $newRefundInput > $expense->getAmount()) {
+            die("Error: Invalid refund amount. It must be greater than 0 and cannot exceed the current expense amount.");
+        }
+
+        $expense->updateRefundedAmount($newRefundInput);
+
+        $itinerary = $expense->getItinerary();
+
+        header("Location: /finance/dashboard/" . $itinerary['itineraryId'] . "?success=refund_applied");
+        exit();
     }
 
     /**
@@ -144,7 +172,7 @@ class ExpenseController extends Controller
      * @return bool Returns true if valid, false if invalid
      */
 
-    private function validateExpenseData($splitMethod, $totalAmount, $shares) 
+    private function validateExpenseData($splitMethod, $totalAmount, $shares)
     {
         if (empty($shares)) {
             return false;
@@ -152,7 +180,7 @@ class ExpenseController extends Controller
 
         if ($splitMethod === 'UNEVEN') {
             $sumOfShares = array_sum($shares);
-            
+
             // the epsilon method to handle decimal inaccuracy
             if (abs($sumOfShares - $totalAmount) > 0.01) {
                 return false;
