@@ -45,3 +45,29 @@ $this->get('/finance/expense/details', 'ExpenseController', 'getExpenseDetails')
 $this->post('/finance/expense/delete', 'ExpenseController', 'deleteExpense');      // delete expense
 
 
+
+// Creating a trip
+$this->get('/itinerary/create', 'ItineraryController', 'create');
+$this->post('/itinerary/store', 'ItineraryController', 'store');
+
+// Managing trip settings
+$this->get('/itinerary/settings/{id}', 'ItineraryController', 'settings');
+$this->post('/itinerary/update/{id}', 'ItineraryController', 'update');
+$this->post('/itinerary/destroy/{id}', 'ItineraryController', 'destroy');
+
+// Dashboard & Members (From your UML diagram, for later!)
+$this->get('/itinerary/dashboard/{id}', 'ItineraryController', 'getDashboard');
+$this->get('/itinerary/members/{id}', 'ItineraryController', 'getMembersList');
+
+
+// 1. View the Members Dashboard
+$this->get('/itinerary/members/{id}', 'TripMemberController', 'index');
+
+// 2. Invite a new member
+$this->post('/itinerary/members/invite/{id}', 'TripMemberController', 'store');
+
+// 3. Update a member's role 
+$this->post('/itinerary/members/updateRole/{id}', 'TripMemberController', 'updateRole');
+
+// 4. Remove a member 
+$this->post('/itinerary/members/remove/{id}', 'TripMemberController', 'destroy');

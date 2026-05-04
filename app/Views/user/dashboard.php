@@ -71,9 +71,9 @@
                         Manage your upcoming itineraries and past adventures.
                     </p>
                 </div>
-                <button class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-md px-8 py-4 shadow-sm hover:bg-on-primary-fixed-variant transition shrink-0">
-                    <span class="material-symbols-outlined text-[20px]">add</span> Create Trip
-                </button>
+                    <a href="/itinerary/create" class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-md px-8 py-4 shadow-sm hover:bg-on-primary-fixed-variant transition shrink-0">
+                        <span class="material-symbols-outlined text-[20px]">add</span> Create Trip
+                    </a>
             </header>
 
             <!-- Trips Grid -->
@@ -100,7 +100,7 @@
                                     <?= htmlspecialchars($trip['description']) ?>
                                 </p>
                                 
-                                <a href="/itinerary/<?= htmlspecialchars($trip['itineraryId']) ?>" class="mt-auto inline-flex items-center gap-1 text-body-sm font-semibold text-primary hover:underline group">
+                                <a href="/itinerary/dashboard/<?= htmlspecialchars($trip['itineraryId']) ?>" class="mt-auto inline-flex items-center gap-1 text-body-sm font-semibold text-primary hover:underline group">
                                     View Dashboard <span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
                                 </a>
                             </div>
