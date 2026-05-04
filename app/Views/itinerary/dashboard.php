@@ -76,6 +76,11 @@
                 <button class="inline-flex items-center gap-1 rounded-lg border-2 border-error px-3 py-1.5 text-body-xs font-bold tracking-wide text-error hover:bg-error-container transition">
                     <span class="material-symbols-outlined text-base">warning</span>SOS
                 </button>
+                <a href="/profile" class="flex items-center gap-2 cursor-pointer">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
+                        <?= isset($user) ? strtoupper(substr($user->getFirstName(), 0, 1) . substr($user->getLastName(), 0, 1)) : 'ME' ?>
+                    </div>
+                </a>
             </div>
         </div>
     </nav>

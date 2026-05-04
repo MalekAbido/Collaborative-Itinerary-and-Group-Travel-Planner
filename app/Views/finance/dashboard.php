@@ -313,7 +313,7 @@ if ($percentage >= 100) {
                         <p class="text-body-md text-on-surface-variant mb-4">Start tracking what the group spends.</p>
                     </div>
                 <?php else: ?>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-4">
                         <?php foreach ($expenses as $expense): ?>
                             <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5 flex flex-col hover:shadow-md transition">
                                 <div class="flex justify-between items-start mb-2">
