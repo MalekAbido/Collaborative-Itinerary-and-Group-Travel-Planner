@@ -73,3 +73,5 @@ $this->post('/itinerary/members/updateRole/{id}', 'TripMemberController', 'updat
 
 // 4. Remove a member 
 $this->post('/itinerary/members/remove/{id}', 'TripMemberController', 'destroy');
+//Finance Overview Dashboard
+$this->get('/finance/dashboard/{id}', 'FinanceController', 'dashboard');
