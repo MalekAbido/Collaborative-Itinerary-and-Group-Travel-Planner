@@ -3,6 +3,7 @@ namespace App\Controllers;
 
 use Core\Controller;
 use App\Models\Itinerary;
+use App\Models\TripFinance;
 
 class ItineraryController extends Controller{
 
@@ -20,6 +21,7 @@ class ItineraryController extends Controller{
                 $_POST['startDate'], 
                 $_POST['endDate']
             );
+            $tripFinance = new TripFinance();
             header("Location: /itinerary/dashboard/" . $newTripId);
             exit;
         }
