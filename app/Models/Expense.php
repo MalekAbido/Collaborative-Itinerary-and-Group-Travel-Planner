@@ -12,15 +12,18 @@ class Expense
 
         $uniqueExpenseId = 'EXP-' . uniqid();
 
-        $sql = "INSERT INTO Expense (expenseId, amount, description, category, tripFinanceId, tripMemberId) 
-                VALUES (:expenseId, :amount, :description, :category, :tripFinanceId, :tripMemberId)";
+        $sql = "INSERT INTO Expense (expenseId, amount, currencyType, description, category, isNonCash, paidByKitty, tripFinanceId, tripMemberId) 
+                VALUES (:expenseId, :amount, :currencyType, :description, :category, :isNonCash, :paidByKitty, :tripFinanceId, :tripMemberId)";
         
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'expenseId' => $uniqueExpenseId,
             'amount' => $data['amount'],
+            'currencyType' => $data['currencyType'] ?? 'USD',
             'description' => $data['description'],
             'category' => $data['category'],
+            'isNonCash' => $data['isNonCash'] ? 1 : 0,
+            'paidByKitty' => $data['paidByKitty'] ? 1 : 0,
             'tripFinanceId' => $data['financeId'],
             'tripMemberId' => $data['payerId']
         ]);
