@@ -1,12 +1,15 @@
 <?php
 
 namespace App\Models;
+
 use Core\Database;
 use PDO;
 
-class Expense 
+class Expense
 {
-    public function create($data) 
+    public array $expenseShares = [];
+
+    public function create($data)
     {
         $pdo = Database::getInstance()->getConnection();
 
@@ -49,5 +52,15 @@ class Expense
         
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['id' => $id]);
+    }
+    public function loadShares($expenseId) {
+        $pdo = Database::getInstance()->getConnection();
+        $sql = "SELECT * FROM ExpenseShare WHERE expenseId = :expenseId";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['expenseId' => $expenseId]);
+        
+        $this->expenseShares = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->expenseShares;
     }
 }
