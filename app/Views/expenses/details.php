@@ -10,7 +10,10 @@
     <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 20px;">
         <h2><?= htmlspecialchars($expense['description']) ?></h2>
         <p><strong>Category:</strong> <?= htmlspecialchars($expense['category']) ?></p>
-        <p><strong>Total Amount:</strong> $<?= number_format($expense['amount'], 2) ?></p>
+        <p><strong>Currency:</strong> <?= htmlspecialchars($expense['currencyType']) ?></p>
+        <p><strong>Total Amount:</strong> <?= htmlspecialchars($expense['currencyType']) === 'USD' ? '$' : '' ?><?= number_format($expense['amount'], 2) ?></p>
+        <p><strong>Payment Type:</strong> <?= $expense['isNonCash'] ? 'Non-Cash' : 'Cash' ?></p>
+        <p><strong>Paid by Kitty:</strong> <?= $expense['paidByKitty'] ? 'Yes' : 'No' ?></p>
     </div>
 
     <div style="background-color: #e6f7ff; padding: 15px; margin-bottom: 20px;">

@@ -25,10 +25,13 @@ class ExpenseController extends Controller
     public function createExpense() 
     {
         $financeId = $_POST['financeId'] ?? '';
-        $payerId = (int)($_POST['payerId'] ?? 0); 
+        $payerId = (int)($_POST['payerId'] ?? 0);
         $splitMethod = $_POST['splitMethod'] ?? 'EVEN';
-        $totalAmount = (float)($_POST['amount'] ?? 0); 
-
+        $totalAmount = (float)($_POST['amount'] ?? 0);
+        $currencyType = trim($_POST['currencyType'] ?? 'USD');
+        $isNonCash = isset($_POST['isNonCash']) ? 1 : 0;
+        $paidByKitty = isset($_POST['paidByKitty']) ? 1 : 0;
+        
         $details = [
             'description' => $_POST['description'] ?? '',
             'category' => $_POST['category'] ?? '',
@@ -45,6 +48,9 @@ class ExpenseController extends Controller
             'financeId'   => $financeId,
             'payerId'     => $payerId,
             'amount'      => $totalAmount,
+            'currencyType'=> $currencyType,
+            'isNonCash'   => $isNonCash,
+            'paidByKitty' => $paidByKitty,
             'description' => $details['description'],
             'category'    => $details['category']
         ]);
