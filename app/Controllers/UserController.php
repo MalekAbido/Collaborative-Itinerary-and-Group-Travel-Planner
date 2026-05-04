@@ -1,6 +1,9 @@
 <?php
-require_once "../app/helpers/Validator.php";
-require_once "../app/models/User.php";
+namespace App\Controllers;
+
+use App\Helpers\Validator;
+use App\Models\User;
+use Core\Controller;
 
 class UserController extends Controller
 {
@@ -35,12 +38,11 @@ class UserController extends Controller
     {
         $validator = new Validator();
 
-        $name  = $_POST['name'];
-        $age   = $_POST['age'];
-        $email = $_POST['email'];
-        $password = $_POST['password'];
+        $name     = $_POST['firstName'];
+        $age      = $_POST['age'];
+        $email    = $_POST['email'];
+        $password = $_POST['passwordHash'];
         $userType = "Student";
-
 
         // Validation rules
         $validator->required('name', $name);
@@ -51,12 +53,12 @@ class UserController extends Controller
         if ($validator->passes()) {
             // Save to DB
             $this->userModel->createUser($name, $age, $email, $password, $userType);
-            header("Location: " . BASE_URL . "User/index");
+            header("Location: " . BASE_URL . "users/");
         } else {
             // Return errors to view
             $this->view("users/create", [
                 'errors' => $validator->getErrors(),
-                'old'    => $_POST
+                'old'    => $_POST,
             ]);
         }
     }
@@ -71,22 +73,14 @@ class UserController extends Controller
     // UPDATE USER
     public function update($id)
     {
-        $name  = $_POST['name'];
-        $age   = $_POST['age'];
-        $email = $_POST['email'];
+        $name     = $_POST['name'];
+        $age      = $_POST['age'];
+        $email    = $_POST['email'];
         $password = $_POST['password'];
         $userType = "Student";
 
         $this->userModel->updateUser($id, $name, $age, $email, $password, $userType);
 
-        header("Location: " . BASE_URL . "User/index");
-    }
-
-    // DELETE USER
-    public function delete($id)
-    {
-        $this->userModel->deleteUser($id);
-
-        header("Location: " . BASE_URL . "User/index");
+        header("Location: " . BASE_URL . "users/");
     }
 }

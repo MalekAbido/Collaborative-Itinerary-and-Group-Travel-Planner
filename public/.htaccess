@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+    Options -Multiviews
+    RewriteEngine On
+    
+    # If the requested file or directory does not exist...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    
+    # ...send the request to index.php
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>

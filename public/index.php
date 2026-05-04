@@ -1,9 +1,7 @@
 <?php
 
-require_once '../core/App.php';
-require_once '../core/Controller.php';
-require_once '../core/Database.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+use Core\Router;
 
-define("BASE_URL", '/' . basename(dirname(__DIR__)) . '/public/');
-
-$app = new App();
+define("BASE_URL", '/');
+$router = new Router();
