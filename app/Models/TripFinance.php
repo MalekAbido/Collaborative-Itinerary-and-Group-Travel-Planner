@@ -44,7 +44,7 @@ class TripFinance
     {
         $total = 0;
         foreach ($this->expenses as $expense) {
-            $total += $expense->getAmount();
+            $total += $expense->amount;
         }
         return $total;
     }
