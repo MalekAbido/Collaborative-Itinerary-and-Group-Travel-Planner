@@ -4,8 +4,16 @@ namespace App\Models;
 use Core\Database;
 use PDO;
 
+
 class ExpenseShare
 {
+    public $id;
+    public $shareId;
+    public $amount;
+    public $isPayer;
+    public $expenseId;
+    public $tripMemberId;
+    
     public function create($expenseId, $tripMemberId, $amount, $isPayer) 
     {
         $pdo = Database::getInstance()->getConnection();
@@ -31,6 +39,8 @@ class ExpenseShare
         $sql = "SELECT * FROM ExpenseShare WHERE expenseId = :expenseId";
         
         $stmt = $pdo->prepare($sql);
+        
+        $stmt->setFetchMode(PDO::FETCH_CLASS, self::class);
         $stmt->execute(['expenseId' => $expenseId]);
         
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
