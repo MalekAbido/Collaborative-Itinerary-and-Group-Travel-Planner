@@ -1,6 +1,9 @@
 <?php
-// Provided by UserController::showUserProfile()
-// $user (User Object), $allergies (Array of Allergy Objects), $emergencyContacts (Array of Contact Objects)
+/**
+ * @var \App\Models\User $user
+ * @var \App\Models\Allergy[] $allergies
+ * @var \App\Models\EmergencyContact[] $emergencyContacts
+ */
 ?>
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">

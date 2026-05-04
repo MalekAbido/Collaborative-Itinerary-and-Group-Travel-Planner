@@ -1,6 +1,7 @@
 <?php
-// Provided by UserController::showUserTripsDashboard()
-// $myTrips (Array of itineraries)
+/**
+ * @var array $myTrips
+ */
 ?>
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
