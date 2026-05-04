@@ -123,7 +123,7 @@ class ExpenseController extends Controller
         $debtors = [];
 
         foreach ($expense->expenseShares as $share) {
-            if ($share->isPayer == 1) {
+            if ($share->getIsPayer() == 1) {
                 $payer = $share;
             } else {
                 $debtors[] = $share;
