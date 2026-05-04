@@ -143,3 +143,6 @@ vite.config.ts.timestamp-*
 .vite/
 
 /vendor/
+GEMINI.md
+itineraryplanner-design-guide.html
+Class Diagram PlantUML Code.txt
