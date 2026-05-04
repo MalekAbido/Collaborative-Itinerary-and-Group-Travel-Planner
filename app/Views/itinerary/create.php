@@ -70,7 +70,7 @@
                     class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-body-sm text-on-surface placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/30 focus:outline-none transition resize-y"></textarea>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                     <label class="block text-label-caps uppercase text-on-surface-variant mb-2" for="startDate">Departure Date</label>
                     <input id="startDate" name="startDate" type="date" required
@@ -81,6 +81,18 @@
                     <input id="endDate" name="endDate" type="date" required
                         class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-body-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/30 focus:outline-none transition" />
                 </div>
+            </div>
+
+            <div class="mb-8">
+                <label class="block text-label-caps uppercase text-on-surface-variant mb-2" for="inviteEmails">
+                    Invite Members <span class="normal-case text-outline font-normal ml-1">(Optional)</span>
+                </label>
+                <div class="relative">
+                    <span class="material-symbols-outlined absolute inset-y-0 left-3 flex items-center text-[20px] text-outline pointer-events-none">mail</span>
+                    <input id="inviteEmails" name="inviteEmails" type="text" placeholder="e.g., ahmed@gmail.com, sara@gmail.com"
+                        class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest pl-11 pr-4 py-2.5 text-body-sm text-on-surface placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/30 focus:outline-none transition" />
+                </div>
+                <p class="mt-1.5 text-body-xs text-outline">Separate multiple email addresses with a comma.</p>
             </div>
 
             <div class="flex items-center justify-between pt-4 border-t border-outline-variant">
