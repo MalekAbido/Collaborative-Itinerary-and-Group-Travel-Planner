@@ -38,6 +38,10 @@ $this->post('/register/process', 'AuthController', 'processRegister');
 
 $this->get('/logout', 'AuthController', 'logout');
 
+//Finance Overview Dashboard
+$this->get('/finance/dashboard/{id}', 'FinanceController', 'dashboard');
+$this->post('/finance/update-settings/{id}', 'FinanceController', 'updateSettings');
+$this->post('/finance/create-fund/{id}', 'FinanceController', 'createGroupFund');
 // Expense routes
 $this->get('/finance/expense/add', 'ExpenseController', 'showAddForm');         // add expense form
 $this->post('/finance/expense/create', 'ExpenseController', 'createExpense');   // process the form 
@@ -71,3 +75,8 @@ $this->post('/itinerary/members/updateRole/{id}', 'TripMemberController', 'updat
 
 // 4. Remove a member 
 $this->post('/itinerary/members/remove/{id}', 'TripMemberController', 'destroy');
+//Finance Overview Dashboard
+$this->get('/finance/dashboard/{id}', 'FinanceController', 'dashboard');
+
+// Group Fund (Kitty)
+$this->post('/fund/contribute/{id}', 'CommonPoolController', 'contribute');
