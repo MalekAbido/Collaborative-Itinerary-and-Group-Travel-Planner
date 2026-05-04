@@ -64,10 +64,11 @@
     <nav class="fixed inset-x-0 top-0 z-50 h-navbar bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant shadow-sm">
         <div class="mx-auto flex h-full max-w-[1280px] items-center justify-between px-6 lg:px-8">
             <div class="flex items-center gap-8">
-                <a href="/home" class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
+                <a href="/dashboard" class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
                 <div class="hidden md:flex items-center gap-1">
+                    <a href="/dashboard" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Dashboard</a>
                     <a href="#" class="px-3 py-2 rounded-md text-body-sm font-medium text-primary border-b-2 border-primary">Itinerary</a>
-                    <a href="#" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Polls</a>
+                    <a href="/polls" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Polls</a>
                     <a href="/finance/dashboard/<?= htmlspecialchars($data['trip']['id']) ?>" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Finances</a>
                 </div>
             </div>

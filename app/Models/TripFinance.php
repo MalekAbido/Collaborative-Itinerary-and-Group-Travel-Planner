@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Core\Database;
 use PDO;
+use App\Models\Expense; // Ensure we pull in the Expense class!
 
 class TripFinance
 {
@@ -60,7 +61,7 @@ class TripFinance
     {
         $total = 0;
         foreach ($this->expenses as $expense) {
-            $total += $expense->amount;
+            $total += $expense->getAmount();
         }
         return $total;
     }
@@ -114,14 +115,27 @@ class TripFinance
     {
         $this->expenses = []; 
         
-        $sql = "SELECT * FROM Expense WHERE tripFinanceId = :id";
+        $sql = "SELECT * FROM Expense WHERE tripFinanceId = :id ORDER BY id DESC"; // Added ORDER BY to show newest first!
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $this->id]);
         
         $expenseRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         foreach ($expenseRows as $row) {
-            $this->expenses[] = (object) $row; 
+            $expense = new Expense();
+            $expense->setId($row['id']);
+            $expense->setExpenseId($row['expenseId']);
+            $expense->setAmount($row['amount']);
+            $expense->setRefundedAmount($row['refundedAmount'] ?? 0);
+            $expense->setCurrencyType($row['currencyType']);
+            $expense->setDescription($row['description']);
+            $expense->setCategory($row['category']);
+            $expense->setIsNonCash($row['isNonCash']);
+            $expense->setPaidByKitty($row['paidByKitty']);
+            $expense->setTripFinanceId($row['tripFinanceId']);
+            $expense->setTripMemberId($row['tripMemberId']);
+
+            $this->expenses[] = $expense; 
         }
     }
 }

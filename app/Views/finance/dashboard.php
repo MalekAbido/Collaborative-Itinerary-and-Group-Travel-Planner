@@ -1,4 +1,20 @@
 <?php
+/**
+ * @var float $totalBudget
+ * @var float $actualSpending
+ * @var string $baseCurrency
+ * @var float $kittyBalance
+ * @var array $alert
+ * @var float $percentage
+ * @var string $barColor
+ * @var string $tripStringId
+ * @var int $itineraryId
+ * @var \App\Models\User $user
+ * @var int|null $fundId
+ * @var array $contributions
+ * @var \App\Models\Expense[] $expenses  <-- Added this for Intelephense
+ */
+
 // Calculate the percentage for the progress bar
 $percentage = 0;
 if ($totalBudget > 0) {
@@ -33,8 +49,8 @@ if ($percentage >= 100) {
                 extend: {
                     colors: {
                         "primary": "#f65a41", "primary-container": "#ff8b71", "primary-fixed": "#ffdad3", "on-primary": "#ffffff", "on-primary-fixed-variant": "#7b2a1a",
-                        "secondary": "#825500", "secondary-container": "#feaa00", "secondary-fixed": "#ffddb3", "on-secondary": "#ffffff",
-                        "tertiary": "#006a5f", "tertiary-fixed": "#8df5e4", "on-tertiary": "#ffffff",
+                        "secondary": "#825500", "secondary-container": "#feaa00", "secondary-fixed": "#ffddb3", "on-secondary": "#ffffff", "on-secondary-fixed": "#291800",
+                        "tertiary": "#006a5f", "tertiary-fixed": "#8df5e4", "on-tertiary": "#ffffff", "on-tertiary-fixed-variant": "#128200",
                         "success": "#16a34a", "success-container": "#bbf7d0", "on-success": "#ffffff", "on-success-container": "#064e2c",
                         "error": "#ba1a1a", "error-container": "#ffdad6", "on-error": "#ffffff", "on-error-container": "#93000a",
                         "background": "#fcf8f8", "on-background": "#191c1d", "surface": "#fcf8f8",
@@ -81,8 +97,9 @@ if ($percentage >= 100) {
             <div class="flex items-center gap-8">
                 <a href="/home" class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
                 <div class="hidden md:flex items-center gap-1">
+                    <a href="/dashboard/" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Dashboard</a>
                     <a href="/itinerary/dashboard/<?= htmlspecialchars($tripStringId) ?>" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Itinerary</a>
-                    <a href="#" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Polls</a>
+                    <a href="/polls" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Polls</a>
                     <a href="/finance/dashboard/<?= htmlspecialchars($itineraryId) ?>" class="px-3 py-2 rounded-md text-body-sm font-medium text-primary border-b-2 border-primary">Finances</a>
                 </div>
             </div>
@@ -90,6 +107,11 @@ if ($percentage >= 100) {
                 <button class="inline-flex items-center gap-1 rounded-lg border-2 border-error px-3 py-1.5 text-body-xs font-bold tracking-wide text-error hover:bg-error-container transition">
                     <span class="material-symbols-outlined text-base">warning</span>SOS
                 </button>
+                <a href="/profile" class="flex items-center gap-2 cursor-pointer">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
+                        <?= isset($user) ? strtoupper(substr($user->getFirstName(), 0, 1) . substr($user->getLastName(), 0, 1)) : 'ME' ?>
+                    </div>
+                </a>
             </div>
         </div>
     </nav>
@@ -97,7 +119,6 @@ if ($percentage >= 100) {
     <main class="flex-1 mt-navbar h-[calc(100vh-theme(spacing.navbar))] overflow-y-auto bg-surface p-6 lg:p-8 scroll-thin">
         <div class="max-w-[1280px] mx-auto">
             
-
             <header class="mb-10 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
                 <div>
                     <h1 class="font-display text-display text-on-surface mb-2">Finance Dashboard</h1>
@@ -108,7 +129,7 @@ if ($percentage >= 100) {
                 </button>
             </header>
 
-            <?php if ($alert['status'] === 'warning'): ?>
+            <?php if (isset($alert) && $alert['status'] === 'warning'): ?>
             <div class="mb-8 flex items-center gap-3 rounded-xl border border-secondary/30 bg-secondary-fixed px-4 py-3 shadow-sm">
                 <span class="material-symbols-outlined text-secondary">warning</span>
                 <div class="flex-1">
@@ -186,8 +207,7 @@ if ($percentage >= 100) {
             </div>
             <?php endif; ?>
 
-
-
+            <!-- Group Fund Section -->
             <div class="mt-8 pt-8 border-t border-outline-variant">
                 <div class="flex items-center gap-2 mb-6">
                     <span class="material-symbols-outlined text-tertiary">volunteer_activism</span>
@@ -199,13 +219,13 @@ if ($percentage >= 100) {
                     <div class="bg-tertiary-fixed border border-outline-variant rounded-xl shadow-sm p-6 flex flex-col justify-center items-center text-center">
                         <span class="text-label-caps uppercase text-on-tertiary-fixed-variant mb-2">Current Pool Balance</span>
                         <div class="font-display text-[40px] font-extrabold text-on-surface">
-                            <?= number_format($kittyBalance) ?> <span class="text-h3 text-on-surface-variant"><?= htmlspecialchars($baseCurrency) ?></span>
+                            <?= number_format($kittyBalance ?? 0) ?> <span class="text-h3 text-on-surface-variant"><?= htmlspecialchars($baseCurrency) ?></span>
                         </div>
                         <p class="text-body-sm text-on-surface-variant mt-2">Available for central group expenses</p>
                     </div>
 
                     <div class="lg:col-span-2">
-                        <?php if ($fundId): ?>
+                        <?php if (isset($fundId) && $fundId): ?>
                         <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5">
                             <h3 class="font-display text-h4 text-on-surface mb-1">Make a Contribution</h3>
                             <p class="text-body-xs text-on-surface-variant mb-4">Add your money to the central pool.</p>
@@ -226,7 +246,7 @@ if ($percentage >= 100) {
                         <div class="mt-6 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
                             <div class="px-5 py-4 border-b border-outline-variant flex items-center justify-between">
                                 <h4 class="font-display text-body-lg font-semibold text-on-surface">Recent Contributions</h4>
-                                <span class="text-label-xs uppercase text-outline font-bold"><?= count($contributions) ?> Records</span>
+                                <span class="text-label-xs uppercase text-outline font-bold"><?= isset($contributions) ? count($contributions) : 0 ?> Records</span>
                             </div>
                             <?php if (empty($contributions)): ?>
                                 <div class="p-6 text-center text-body-sm text-on-surface-variant">
@@ -271,6 +291,80 @@ if ($percentage >= 100) {
                     </div>
                 </div>
             </div>
+
+            <!-- Expenses Section -->
+            <div class="mt-8 pt-8 border-t border-outline-variant">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">receipt_long</span>
+                        <h2 class="font-display text-h2 text-on-surface m-0">Expenses</h2>
+                    </div>
+                    <a href="/finance/expense/add/<?= htmlspecialchars($itineraryId) ?>" class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition">
+                        <span class="material-symbols-outlined text-[18px]">add</span> Add Expense
+                    </a>
+                </div>
+
+                <?php if (empty($expenses)): ?>
+                    <div class="flex flex-col items-center justify-center py-16 border-2 border-dashed border-outline-variant rounded-xl bg-surface-container-lowest text-center">
+                        <div class="flex h-16 w-16 items-center justify-center rounded-full bg-surface-container mb-4">
+                            <span class="material-symbols-outlined text-[32px] text-outline">receipt_long</span>
+                        </div>
+                        <h3 class="font-display text-h3 text-on-surface mb-1">No Expenses Yet</h3>
+                        <p class="text-body-md text-on-surface-variant mb-4">Start tracking what the group spends.</p>
+                    </div>
+                <?php else: ?>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <?php foreach ($expenses as $expense): ?>
+                            <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5 flex flex-col hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex-1 pr-4">
+                                        <h4 class="font-display text-h4 text-on-surface leading-tight mb-1"><?= htmlspecialchars($expense->getDescription()) ?></h4>
+                                        <span class="inline-block bg-surface-container-highest px-2 py-0.5 rounded-md text-label-xs uppercase text-on-surface-variant tracking-wider">
+                                            <?= htmlspecialchars($expense->getCategory()) ?>
+                                        </span>
+                                    </div>
+                                    <div class="text-right shrink-0">
+                                        <div class="font-display text-h3 font-extrabold text-on-surface">
+                                            <?= number_format($expense->getAmount(), 2) ?> <span class="text-body-xs font-normal text-outline"><?= htmlspecialchars($expense->getCurrencyType()) ?></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Partial Refund Warning Box -->
+                                <?php if ($expense->getRefundedAmount() > 0): ?>
+                                    <div class="mt-3 bg-secondary-fixed text-on-secondary-fixed px-3 py-2.5 rounded-lg text-body-sm border border-secondary/20">
+                                        <div class="flex items-center gap-1.5 font-bold mb-0.5">
+                                            <span class="material-symbols-outlined text-[18px]">currency_exchange</span>
+                                            Refund Applied: <?= number_format($expense->getRefundedAmount(), 2) ?> <?= htmlspecialchars($expense->getCurrencyType()) ?>
+                                        </div>
+                                        <div class="text-label-xs opacity-80 uppercase tracking-wide">
+                                            Original Total: <?= number_format($expense->getAmount() + $expense->getRefundedAmount(), 2) ?> <?= htmlspecialchars($expense->getCurrencyType()) ?>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+
+                                <!-- Card Actions -->
+                                <div class="mt-auto pt-5 flex items-center justify-between gap-3 border-t border-outline-variant/50">
+                                    <a href="/finance/expense/details?id=<?= htmlspecialchars($expense->getId()) ?>" class="text-body-sm font-semibold text-primary hover:underline group flex items-center gap-1">
+                                        View Details <span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+                                    </a>
+                                    
+                                    <?php if ($expense->getAmount() > 0): ?>
+                                        <button onclick="openRefundModal(<?= htmlspecialchars($expense->getId()) ?>, <?= htmlspecialchars($expense->getAmount()) ?>)" class="inline-flex items-center gap-1.5 text-body-sm font-semibold text-outline hover:text-secondary transition">
+                                            <span class="material-symbols-outlined text-[18px]">undo</span> Partial Refund
+                                        </button>
+                                    <?php else: ?>
+                                        <span class="inline-flex items-center gap-1 text-success text-body-sm font-bold bg-success-container px-2 py-1 rounded-md">
+                                            <span class="material-symbols-outlined text-[16px]">check_circle</span> Fully Refunded
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+
         </div>
     </main>
 </div>
@@ -317,6 +411,63 @@ if ($percentage >= 100) {
         </div>
     </div>
 </div>
+
+<!-- Refund Modal -->
+<div id="refundModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-on-background/50 backdrop-blur-sm transition-opacity">
+    <div class="w-full max-w-md rounded-2xl bg-surface-container-lowest shadow-lg border border-outline-variant overflow-hidden">
+        <div class="flex items-center justify-between border-b border-outline-variant px-6 py-4 bg-surface">
+            <h3 class="font-display text-h3 text-on-surface m-0 flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary">currency_exchange</span> Apply Refund
+            </h3>
+            <button type="button" onclick="closeRefundModal()" class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+        </div>
+        <div class="p-6">
+            <form action="/finance/expense/refund" method="POST" class="flex flex-col gap-5">
+                <input type="hidden" name="expenseId" id="refundExpenseId" value="">
+                
+                <div>
+                    <label class="block text-label-caps uppercase text-on-surface-variant mb-2">Amount to Refund</label>
+                    <div class="flex items-center gap-2">
+                        <span class="text-body-md font-semibold text-outline"><?= htmlspecialchars($baseCurrency ?? '$') ?></span>
+                        <input type="number" name="refundAmount" id="refundAmountInput" min="0.01" step="0.01" required placeholder="0.00" 
+                               class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-md focus:border-secondary focus:ring-secondary focus:outline-none transition">
+                    </div>
+                    <p class="text-body-xs text-outline mt-2 font-medium">Maximum refund available: <span id="maxRefundDisplay" class="text-on-surface"></span></p>
+                </div>
+                
+                <div class="mt-2 flex justify-end gap-3">
+                    <button type="button" onclick="closeRefundModal()" class="px-5 py-2.5 rounded-lg border border-outline-variant text-on-surface font-semibold text-body-sm hover:bg-surface-container transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-secondary text-on-secondary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-secondary-container transition">
+                        Process Refund
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Handles populating and opening the refund modal
+    function openRefundModal(expenseId, maxAmount) {
+        document.getElementById('refundExpenseId').value = expenseId;
+        
+        const input = document.getElementById('refundAmountInput');
+        input.max = maxAmount;
+        input.value = ''; // Reset on open
+        
+        document.getElementById('maxRefundDisplay').innerText = parseFloat(maxAmount).toFixed(2);
+        document.getElementById('refundModal').classList.remove('hidden');
+    }
+
+    // Closes the refund modal
+    function closeRefundModal() {
+        document.getElementById('refundModal').classList.add('hidden');
+    }
+</script>
 
 </body>
 </html>

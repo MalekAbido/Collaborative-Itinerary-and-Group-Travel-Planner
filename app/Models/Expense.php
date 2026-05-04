@@ -25,7 +25,7 @@ class Expense
 
     public function __construct()
     {
-        $pdo = Database::getInstance()->getConnection();
+        $this->pdo = Database::getInstance()->getConnection();
     }
 
     public function getId()
@@ -255,15 +255,12 @@ class Expense
             return false; 
         }
 
-        // 2. Calculate the proportion of the refund
         $reductionRatio = $newRefundInput / $this->amount;
 
-        // 3. Update this Expense's amounts and save to database
         $this->amount -= $newRefundInput;
         $this->refundedAmount += $newRefundInput;
         $this->update();
 
-        // 4. Load and update all associated ExpenseShares proportionally
         $shares = $this->loadShares($this->id);
         
         foreach ($shares as $share) {
@@ -271,7 +268,7 @@ class Expense
             $newShareAmount = $share->getAmount() - $shareReduction;
             
             $share->setAmount($newShareAmount);
-            $share->update(); 
+            $share->update();
         }
 
         return true;

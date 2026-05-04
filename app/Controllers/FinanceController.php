@@ -42,7 +42,8 @@ class FinanceController extends Controller
             'alert' => $budgetAlert,
             'fundId' => $fundId, 
             'kittyBalance' => $kittyBalance,
-            'contributions' => $contributions
+            'contributions' => $contributions,
+            'expenses' => $finance->getExpenses()
         ]);
     }
 

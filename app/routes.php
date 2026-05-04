@@ -80,3 +80,5 @@ $this->get('/finance/dashboard/{id}', 'FinanceController', 'dashboard');
 
 // Group Fund (Kitty)
 $this->post('/fund/contribute/{id}', 'CommonPoolController', 'contribute');
+
+$this->post('/finance/expense/refund', 'ExpenseController', 'refundExpense');
