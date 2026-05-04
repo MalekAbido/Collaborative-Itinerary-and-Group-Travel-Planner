@@ -74,23 +74,26 @@ class Allergy
         $this->userId = $userId;
     }
 
-    public function create()
+    public function create($data)
     {
-        $this->allergenId = uniqid('alg_');
-        $sql = "INSERT INTO Allergy (allergenId, allergen, severity, reaction, userId) VALUES (:allergenId, :allergen, :severity, :reaction, :userId)";
+        $this->setUserId($data['userId']);
+        $this->setAllergen($data['allergen']);
+        $this->setSeverity($data['severity']);
+        $this->setReaction($data['reaction'] ?? '');
+        $this->setAllergenId(uniqid('alg_'));
+
+        $sql = "INSERT INTO Allergy (allergenId, allergen, severity, reaction, userId)
+                VALUES (:allergenId, :allergen, :severity, :reaction, :userId)";
+
         $stmt = $this->db->prepare($sql);
-        $success = $stmt->execute([
+
+        return $stmt->execute([
             ':allergenId' => $this->allergenId,
             ':allergen' => $this->allergen,
             ':severity' => $this->severity,
             ':reaction' => $this->reaction,
             ':userId' => $this->userId
         ]);
-
-        if ($success) {
-            $this->id = $this->db->lastInsertId();
-        }
-        return $success;
     }
 
     public function read($id)

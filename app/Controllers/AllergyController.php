@@ -7,59 +7,77 @@ use App\Models\User;
 
 class AllergyController extends Controller
 {
-    public function addAllergy($userId, $allergyData)
+    private $userId;
+
+    public function __construct()
     {
-        if (!$this->validateAllergyInput($allergyData)) {
-            return json_encode(['status' => 'error', 'message' => 'Invalid allergy data.']);
-        }
-
-        $allergy = new Allergy();
-        $allergy->setAllergen($allergyData['allergen']);
-        $allergy->setSeverity($allergyData['severity']);
-        $allergy->setReaction($allergyData['reaction'] ?? '');
-        $allergy->setUserId($userId);
-
-        if ($allergy->create()) {
-            $user = User::getByUserId($userId);
-            $user->addAllergy($allergy);
-            return json_encode(['status' => 'success', 'message' => 'Allergy successfully recorded.']);
-        }
-
-        return json_encode(['status' => 'error', 'message' => 'Database error while saving allergy.']);
+        $this->userId = 1; // Session.getUserId();
     }
 
-    public function removeAllergy($userId, $allergyId)
+    public function addAllergy()
     {
+        $allergyData = $_POST;
+
+        if (!$this->validateAllergyInput($allergyData)) {
+            // In a real app, you might redirect back with an error flash message in the session
+            die("Invalid allergy data.");
+        }
+
+        $allergyData['userId'] = $this->userId;
+
+        $allergy = new Allergy();
+        if ($allergy->create($allergyData)) {
+            header("Location: /profile");
+            exit;
+        }
+
+        die("Database error while saving allergy.");
+    }
+
+    public function removeAllergy()
+    {
+        // The ID comes from the hidden input field in our HTML form
+        $allergyId = $_POST['allergyId'] ?? null;
+        
+        if (!$allergyId) {
+            die("No allergy ID provided.");
+        }
+
         $allergy = new Allergy();
         
-        if ($allergy->read($allergyId) && $allergy->getUserId() == $userId) {
+        if ($allergy->read($allergyId) && $allergy->getUserId() == $this->userId) {
             if ($allergy->delete()) {
-                return json_encode(['status' => 'success', 'message' => 'Allergy successfully removed.']);
+                header("Location: /profile");
+                exit;
             }
         }
         
-        return json_encode(['status' => 'error', 'message' => 'Failed to remove allergy or unauthorized.']);
+        die("Failed to remove allergy or unauthorized.");
     }
 
-    public function updateAllergy($userId, $allergyId, $allergyData)
+    public function updateAllergy()
     {
-        if (!$this->validateAllergyInput($allergyData)) {
-            return json_encode(['status' => 'error', 'message' => 'Invalid allergy data.']);
+        $allergyData = $_POST;
+        $allergyId = $allergyData['allergyId'] ?? null;
+
+        if (!$allergyId || !$this->validateAllergyInput($allergyData)) {
+            die("Invalid allergy data.");
         }
 
         $allergy = new Allergy();
         
-        if ($allergy->read($allergyId) && $allergy->getUserId() == $userId) {
+        if ($allergy->read($allergyId) && $allergy->getUserId() == $this->userId) {
             $allergy->setAllergen($allergyData['allergen']);
             $allergy->setSeverity($allergyData['severity']);
             $allergy->setReaction($allergyData['reaction'] ?? '');
             
             if ($allergy->update()) {
-                return json_encode(['status' => 'success', 'message' => 'Allergy successfully updated.']);
+                header("Location: /profile");
+                exit;
             }
         }
         
-        return json_encode(['status' => 'error', 'message' => 'Failed to update allergy or unauthorized.']);
+        die("Failed to update allergy or unauthorized.");
     }
 
     public function getTripAllergies($tripId)
