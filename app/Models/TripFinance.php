@@ -8,6 +8,7 @@ use PDO;
 class TripFinance
 {
     private $db;
+    private $id;
     private $financeId;
     private $itineraryId;
     private $baseCurrency;
@@ -69,6 +70,7 @@ class TripFinance
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($data) {
+            $this->id = $data['id'];
             $this->financeId = $data['financeId'];
             $this->itineraryId = $data['itineraryId'];
             $this->baseCurrency = $data['baseCurrency'];
@@ -85,9 +87,9 @@ class TripFinance
     {
         $this->expenses = []; 
         
-        $sql = "SELECT * FROM Expense WHERE financeId = :financeId";
+        $sql = "SELECT * FROM Expense WHERE tripFinanceId = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([':financeId' => $this->financeId]);
+        $stmt->execute([':id' => $this->id]);
         
         $expenseRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
