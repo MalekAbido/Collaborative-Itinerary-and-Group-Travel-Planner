@@ -40,6 +40,8 @@ $this->get('/logout', 'AuthController', 'logout');
 
 //Finance Overview Dashboard
 $this->get('/finance/dashboard/{id}', 'FinanceController', 'dashboard');
+$this->post('/finance/update-settings/{id}', 'FinanceController', 'updateSettings');
+$this->post('/finance/create-fund/{id}', 'FinanceController', 'createGroupFund');
 // Expense routes
 $this->get('/finance/expense/add', 'ExpenseController', 'showAddForm');         // add expense form
 $this->post('/finance/expense/create', 'ExpenseController', 'createExpense');   // process the form 

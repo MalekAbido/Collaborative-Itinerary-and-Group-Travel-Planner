@@ -41,6 +41,20 @@ class TripFinance
 
     public function getExpenses() { return $this->expenses; }
     public function setExpenses(array $expenses) { $this->expenses = $expenses; }
+
+    public function create($itineraryId, $baseCurrency = 'USD', $budgetLimit = 0)
+    {
+        $this->financeId = uniqid('fin_');
+        $sql = "INSERT INTO TripFinance (financeId, baseCurrency, budgetLimit, itineraryId) 
+                VALUES (:financeId, :baseCurrency, :budgetLimit, :itineraryId)";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':financeId' => $this->financeId,
+            ':baseCurrency' => $baseCurrency,
+            ':budgetLimit' => $budgetLimit,
+            ':itineraryId' => $itineraryId
+        ]);
+    }
     
     public function getActualSpending()
     {
@@ -62,6 +76,17 @@ class TripFinance
             ];
         }
         return ['status' => 'ok', 'message' => 'Within budget'];
+    }
+
+    public function updateSettingsByItineraryId($itineraryId, $budgetLimit, $baseCurrency)
+    {
+        $sql = "UPDATE TripFinance SET budgetLimit = :budgetLimit, baseCurrency = :baseCurrency WHERE itineraryId = :itineraryId";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':budgetLimit' => $budgetLimit,
+            ':baseCurrency' => $baseCurrency,
+            ':itineraryId' => $itineraryId
+        ]);
     }
 
     public function readByItinerary($itineraryId)

@@ -26,6 +26,19 @@ class GroupFund
     public function getCurrentBalance() { return $this->currentBalance; }
     public function setCurrentBalance($currentBalance) { $this->currentBalance = $currentBalance; }
 
+    public function create($tripFinanceId, $targetBalance = 0)
+    {
+        $this->fundId = uniqid('fund_');
+        $sql = "INSERT INTO GroupFund (fundId, targetBalance, currentBalance, tripFinanceId) 
+                VALUES (:fundId, :targetBalance, 0, :tripFinanceId)";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':fundId' => $this->fundId,
+            ':targetBalance' => $targetBalance,
+            ':tripFinanceId' => $tripFinanceId
+        ]);
+    }
+
     public function addFunds($contributorId, $amount)
     {
         $sql = "UPDATE GroupFund SET currentBalance = currentBalance + :amount WHERE id = :id";
@@ -90,5 +103,20 @@ class GroupFund
             return true;
         }
         return false;
+    }
+
+    public function getContributions()
+    {
+        if (!$this->fundId) return [];
+
+        $sql = "SELECT fc.amount, fc.timestamp, u.firstName, u.lastName 
+                FROM FundContribution fc
+                JOIN TripMember tm ON fc.tripMemberId = tm.id
+                JOIN User u ON tm.userId = u.id
+                WHERE fc.groupFundId = :groupFundId
+                ORDER BY fc.timestamp DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':groupFundId' => $this->fundId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

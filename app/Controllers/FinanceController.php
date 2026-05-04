@@ -3,7 +3,8 @@ namespace App\Controllers;
 
 use Core\Controller;
 use App\Models\TripFinance;
-use App\Models\GroupFund; // Make sure to import this!
+use App\Models\GroupFund;
+use App\Models\Itinerary;
 
 class FinanceController extends Controller
 {
@@ -13,8 +14,13 @@ class FinanceController extends Controller
         $isFound = $finance->readByItinerary($itineraryId);
 
         if (!$isFound) {
-            die("<h2>Error: Finance profile not found for Itinerary ID: {$itineraryId}</h2>");
+            $finance->create($itineraryId, 'USD', 0);
+            $finance->readByItinerary($itineraryId);
         }
+
+        $itineraryModel = new Itinerary();
+        $trip = $itineraryModel->findByIdNumeric($itineraryId);
+        $tripStringId = $trip ? $trip['itineraryId'] : '';
 
         $actualSpending = $finance->getActualSpending();
         $budgetAlert = $finance->checkBudgetAlert();
@@ -25,15 +31,43 @@ class FinanceController extends Controller
         
         $fundId = $isFundFound ? $groupFund->getFundId() : null;
         $kittyBalance = $isFundFound ? $groupFund->getCurrentBalance() : 0;
+        $contributions = $isFundFound ? $groupFund->getContributions() : [];
 
         $this->view('finance/dashboard', [
             'itineraryId' => $itineraryId,
+            'tripStringId' => $tripStringId,
             'baseCurrency' => $finance->getBaseCurrency(),
             'totalBudget' => $finance->getTotalBudgetLimit(),
             'actualSpending' => $actualSpending,
             'alert' => $budgetAlert,
             'fundId' => $fundId, 
-            'kittyBalance' => $kittyBalance 
+            'kittyBalance' => $kittyBalance,
+            'contributions' => $contributions
         ]);
+    }
+
+    public function updateSettings($itineraryId)
+    {
+        $budget = floatval($_POST['budgetLimit'] ?? 0);
+        $currency = $_POST['baseCurrency'] ?? 'USD';
+
+        $finance = new TripFinance();
+        $finance->updateSettingsByItineraryId($itineraryId, $budget, $currency);
+
+        header("Location: /finance/dashboard/" . $itineraryId);
+        exit;
+    }
+
+    public function createGroupFund($itineraryId)
+    {
+        $finance = new TripFinance();
+        if ($finance->readByItinerary($itineraryId)) {
+            $groupFund = new GroupFund();
+            if (!$groupFund->readByTripFinanceId($finance->getId())) {
+                $groupFund->create($finance->getId());
+            }
+        }
+        header("Location: /finance/dashboard/" . $itineraryId);
+        exit;
     }
 }
