@@ -118,22 +118,22 @@ class ExpenseController extends Controller
             die("Expense not found.");
         }
 
-        $shares = $shareModel->findByExpenseId($expenseId);
+        $expense->loadShares($expenseId);
         $payer = null;
         $debtors = [];
 
-        foreach ($shares as $share) {
-            if ($share['isPayer'] == 1) {
+        foreach ($expense->expenseShares as $share) {
+            if ($share->isPayer == 1) {
                 $payer = $share;
             } else {
                 $debtors[] = $share;
             }
         }
+        
         $this->view('expenses/details', [
             'expense' => $expense,
             'payer'   => $payer,
-            'debtors' => $debtors,
-            'shares'  => $shares
+            'debtors' => $debtors
         ]);
     }
 

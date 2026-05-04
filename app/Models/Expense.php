@@ -7,6 +7,17 @@ use PDO;
 
 class Expense
 {
+    public $id;
+    public $expenseId;
+    public $amount;
+    public $currencyType;
+    public $description;
+    public $category;
+    public $isNonCash;
+    public $paidByKitty;
+    public $tripFinanceId;
+    public $tripMemberId;
+
     public array $expenseShares = [];
 
     public function create($data)
@@ -39,10 +50,11 @@ class Expense
         $pdo = Database::getInstance()->getConnection();
         $sql = "SELECT * FROM Expense WHERE id = :id";
         
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id' => $id]);
+        $stmt = $pdo->prepare($sql); 
         
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->setFetchMode(PDO::FETCH_CLASS, self::class); 
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch();
     }
 
     public function delete($id) 
@@ -58,9 +70,11 @@ class Expense
         $sql = "SELECT * FROM ExpenseShare WHERE expenseId = :expenseId";
 
         $stmt = $pdo->prepare($sql);
+
+        $stmt->setFetchMode(PDO::FETCH_CLASS, ExpenseShare::class);
         $stmt->execute(['expenseId' => $expenseId]);
         
-        $this->expenseShares = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $this->expenseShares = $stmt->fetchAll();
         return $this->expenseShares;
     }
 }
