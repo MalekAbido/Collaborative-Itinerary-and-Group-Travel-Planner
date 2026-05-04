@@ -22,8 +22,28 @@
         </div>
 
         <div>
-            <label>Total Amount ($):</label>
+            <label>Total Amount:</label>
             <input type="number" step="0.01" name="amount" required>
+        </div>
+
+        <div>
+            <label>Currency:</label>
+            <select name="currencyType" required>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="NGN">NGN</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Cash or Non-Cash?</label>
+            <label><input type="checkbox" name="isNonCash" value="1"> Non-Cash</label>
+        </div>
+
+        <div>
+            <label>Paid by Group Kitty?</label>
+            <label><input type="checkbox" name="paidByKitty" value="1"> Yes</label>
         </div>
 
         <div>
