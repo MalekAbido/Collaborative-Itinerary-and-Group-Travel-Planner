@@ -28,22 +28,24 @@ class GroupFund
 
     public function addFunds($contributorId, $amount)
     {
-        $this->currentBalance += $amount;
-
-        $sql = "UPDATE GroupFund SET currentBalance = :balance WHERE fundId = :id";
+        $sql = "UPDATE GroupFund SET currentBalance = currentBalance + :amount WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
-            ':balance' => $this->currentBalance,
+            ':amount' => $amount,
             ':id' => $this->fundId
         ]);
 
-        $logSql = "INSERT INTO Contribution (fundId, contributorId, amount, timestamp) 
-                   VALUES (:fundId, :contributorId, :amount, NOW())";
+        $contributionId = uniqid('cont_');
+
+        $logSql = "INSERT INTO FundContribution (contributionId, amount, timestamp, groupFundId, tripMemberId) 
+                   VALUES (:contributionId, :amount, NOW(), :groupFundId, :tripMemberId)";
+        
         $logStmt = $this->db->prepare($logSql);
         return $logStmt->execute([
-            ':fundId' => $this->fundId,
-            ':contributorId' => $contributorId,
-            ':amount' => $amount
+            ':contributionId' => $contributionId,
+            ':amount'         => $amount,
+            ':groupFundId'    => $this->fundId,
+            ':tripMemberId'   => $contributorId
         ]);
     }
 
@@ -73,5 +75,20 @@ class GroupFund
             ':balance' => $this->currentBalance,
             ':id' => $this->fundId
         ]);
+    }
+
+    public function readByTripFinanceId($tripFinanceId)
+    {
+        $sql = "SELECT * FROM GroupFund WHERE tripFinanceId = :tripFinanceId LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':tripFinanceId' => $tripFinanceId]);
+        $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if ($data) {
+            $this->fundId = $data['id']; // We use the internal integer ID
+            $this->currentBalance = $data['currentBalance'];
+            return true;
+        }
+        return false;
     }
 }

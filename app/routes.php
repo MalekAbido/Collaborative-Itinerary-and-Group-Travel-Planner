@@ -75,3 +75,6 @@ $this->post('/itinerary/members/updateRole/{id}', 'TripMemberController', 'updat
 $this->post('/itinerary/members/remove/{id}', 'TripMemberController', 'destroy');
 //Finance Overview Dashboard
 $this->get('/finance/dashboard/{id}', 'FinanceController', 'dashboard');
+
+// Group Fund (Kitty)
+$this->post('/fund/contribute/{id}', 'CommonPoolController', 'contribute');

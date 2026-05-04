@@ -22,6 +22,8 @@ class TripFinance
         $this->db = Database::getInstance()->getConnection();
     }
 
+    public function getId() { return $this->id; }
+
     public function getFinanceId() { return $this->financeId; }
     public function setFinanceId($financeId) { $this->financeId = $financeId; }
 

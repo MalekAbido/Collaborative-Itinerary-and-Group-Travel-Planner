@@ -30,24 +30,36 @@ if ($percentage >= 100) {
 
 <body class="bg-background text-on-background font-body text-body-md min-h-screen flex flex-col m-0">
     
-    <header class="w-full h-16 z-50 flex items-center justify-between px-6 lg:px-8 bg-surface-container-lowest border-b border-outline-variant shadow-sm">
-        <div class="text-[22px] font-display font-extrabold text-primary tracking-tight">ItineraryPlanner</div>
-        <div class="flex items-center gap-4">
-            <a href="/dashboard" class="text-body-sm font-semibold text-outline hover:text-primary transition">Back to Trips</a>
+    <nav class="fixed inset-x-0 top-0 z-50 h-16 bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant shadow-sm">
+        <div class="mx-auto flex h-full max-w-content items-center justify-between px-6 lg:px-8">
+            <div class="flex items-center gap-8">
+                <a href="/dashboard" class="font-display text-[22px] font-extrabold tracking-tight text-primary whitespace-nowrap">
+                    Itinerary
+                </a>
+                <div class="hidden md:flex items-center gap-2">
+                    <a href="/dashboard" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">
+                        Dashboard
+                    </a>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button class="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant text-on-surface-variant hover:bg-surface-container transition">
+                    <span class="material-symbols-outlined text-[22px]">notifications</span>
+                </button>
+                <a href="/profile" class="flex items-center gap-2 cursor-pointer">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
+                        <?= isset($user) ? strtoupper(substr($user->getFirstName(), 0, 1) . substr($user->getLastName(), 0, 1)) : 'ME' ?>
+                    </div>
+                </a>
+            </div>
         </div>
-    </header>
+    </nav>
 
-    <main class="grow py-8 bg-surface">
+    <main class="grow pt-24 pb-8 bg-surface">
         <div class="max-w-content mx-auto p-6 lg:p-8">
+            
 
             <header class="mb-8">
-                <div class="flex items-center gap-2 text-body-sm text-outline mb-2">
-                    <a href="/trips" class="hover:text-primary">Trips</a>
-                    <span class="material-symbols-outlined text-base">chevron_right</span>
-                    <a href="/itinerary/<?= htmlspecialchars($itineraryId) ?>" class="hover:text-primary">Itinerary #<?= htmlspecialchars($itineraryId) ?></a>
-                    <span class="material-symbols-outlined text-base">chevron_right</span>
-                    <span class="text-on-surface font-medium">Finance Overview</span>
-                </div>
                 <h1 class="font-display text-h1 text-on-surface mb-2">Finance Dashboard</h1>
                 <p class="text-body-lg text-on-surface-variant">Track group expenses and monitor budget limits.</p>
             </header>
@@ -129,7 +141,44 @@ if ($percentage >= 100) {
                 </div>
             </div>
             <?php endif; ?>
+            <div class="mt-8 pt-8 border-t border-outline-variant">
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="material-symbols-outlined text-tertiary">volunteer_activism</span>
+                    <h2 class="font-display text-h2 text-on-surface m-0">Group Fund (Kitty)</h2>
+                </div>
 
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <div class="bg-tertiary-fixed border border-outline-variant rounded-xl shadow-sm p-6 flex flex-col justify-center items-center text-center">
+                        <span class="text-label-caps uppercase text-on-tertiary-fixed-variant mb-2">Current Pool Balance</span>
+                        <div class="font-display text-[40px] font-extrabold text-on-surface">
+                            <?= number_format($kittyBalance) ?> <span class="text-h3 text-on-surface-variant"><?= htmlspecialchars($baseCurrency) ?></span>
+                        </div>
+                        <p class="text-body-sm text-on-surface-variant mt-2">Available for central group expenses</p>
+                    </div>
+
+                    <div class="lg:col-span-2">
+                        
+                        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5">
+                            <h3 class="font-display text-h4 text-on-surface mb-1">Make a Contribution</h3>
+                            <p class="text-body-xs text-on-surface-variant mb-4">Add your money to the central pool.</p>
+                            
+                            <form action="/fund/contribute/<?= htmlspecialchars($fundId) ?>" method="POST" class="flex flex-col gap-3">
+                                <input type="hidden" name="itineraryId" value="<?= htmlspecialchars($itineraryId) ?>">
+                                <input type="hidden" name="userId" value="1"> <div class="flex items-center gap-2">
+                                    <span class="text-body-md font-semibold text-outline"><?= htmlspecialchars($baseCurrency) ?></span>
+                                    <input type="number" name="amount" min="1" step="0.01" required placeholder="0.00" 
+                                           class="w-full rounded-md border-outline-variant bg-surface px-3 py-2 text-body-md focus:border-primary focus:ring-primary">
+                                </div>
+                                <button type="submit" class="w-full rounded-lg bg-tertiary text-on-tertiary font-semibold text-body-sm px-4 py-2 hover:bg-tertiary/90 transition">
+                                    Add Funds
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 </body>
