@@ -74,6 +74,7 @@ class ExpenseController extends Controller
         }
         
         header("Location: /finance/expense/details?id=" . $expenseId);
+        exit();
     }
 
     public function deleteExpense() 
@@ -97,6 +98,7 @@ class ExpenseController extends Controller
         $expenseModel->delete($expenseId);
 
         header("Location: /finance/dashboard");
+        exit();
     }
 
     public function getExpenseDetails() 
@@ -111,27 +113,27 @@ class ExpenseController extends Controller
         $shareModel = new ExpenseShare();
 
         $expense = $expenseModel->findById($expenseId);
-        $shares = $shareModel->findByExpenseId($expenseId);
 
         if (!$expense) {
             die("Expense not found.");
         }
 
+        $shares = $shareModel->findByExpenseId($expenseId);
         $payer = null;
         $debtors = [];
 
         foreach ($shares as $share) {
             if ($share['isPayer'] == 1) {
-                $payer = $share; 
+                $payer = $share;
             } else {
-                $debtors[] = $share; 
+                $debtors[] = $share;
             }
         }
-
         $this->view('expenses/details', [
             'expense' => $expense,
-            'payer' => $payer,
-            'debtors' => $debtors
+            'payer'   => $payer,
+            'debtors' => $debtors,
+            'shares'  => $shares
         ]);
     }
 
