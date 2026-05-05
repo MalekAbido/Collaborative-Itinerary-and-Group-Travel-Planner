@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Core\Database;
@@ -21,26 +22,68 @@ class Poll
     }
 
     // Getters and Seters
-    public function getId() { return $this->id; }
-    public function setId($id) { $this->id = $id; }
+    public function getId()
+    {
+        return $this->id;
+    }
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
-    public function getPollId() { return $this->pollId; }
-    public function setPollId($pollId) { $this->pollId = $pollId; }
+    public function getPollId()
+    {
+        return $this->pollId;
+    }
+    public function setPollId($pollId)
+    {
+        $this->pollId = $pollId;
+    }
 
-    public function getDeadline() { return $this->deadline; }
-    public function setDeadline($deadline) { $this->deadline = $deadline; }
+    public function getDeadline()
+    {
+        return $this->deadline;
+    }
+    public function setDeadline($deadline)
+    {
+        $this->deadline = $deadline;
+    }
 
-    public function getStatus() { return $this->status; }
-    public function setStatus($status) { $this->status = $status; }
+    public function getStatus()
+    {
+        return $this->status;
+    }
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
 
-    public function getIsAnonymous() { return $this->isAnonymous; }
-    public function setIsAnonymous($isAnonymous) { $this->isAnonymous = $isAnonymous; }
+    public function getIsAnonymous()
+    {
+        return $this->isAnonymous;
+    }
+    public function setIsAnonymous($isAnonymous)
+    {
+        $this->isAnonymous = $isAnonymous;
+    }
 
-    public function getWeightedTotal() { return $this->weightedTotal; }
-    public function setWeightedTotal($weightedTotal) { $this->weightedTotal = $weightedTotal; }
+    public function getWeightedTotal()
+    {
+        return $this->weightedTotal;
+    }
+    public function setWeightedTotal($weightedTotal)
+    {
+        $this->weightedTotal = $weightedTotal;
+    }
 
-    public function getActivityId() { return $this->activityId; }
-    public function setActivityId($activityId) { $this->activityId = $activityId; }
+    public function getActivityId()
+    {
+        return $this->activityId;
+    }
+    public function setActivityId($activityId)
+    {
+        $this->activityId = $activityId;
+    }
 
     // CRUD Operations
     public function create()
@@ -150,13 +193,27 @@ class Poll
         $stmt->execute([':pollId' => $this->id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
+
     public static function getByActivityId($activityId)
     {
         $db = Database::getInstance()->getConnection();
         $sql = "SELECT * FROM Poll WHERE activityId = :activityId";
         $stmt = $db->prepare($sql);
         $stmt->execute([':activityId' => $activityId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function getPollsByItinerary($itineraryId)
+    {
+        $db = Database::getInstance()->getConnection();
+        $sql = "SELECT p.*, a.name as activityName 
+                FROM Poll p 
+                JOIN Activity a ON p.activityId = a.id 
+                WHERE a.itineraryId = :itineraryId
+                ORDER BY p.deadline ASC";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':itineraryId' => $itineraryId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

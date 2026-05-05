@@ -44,6 +44,19 @@ class Auth
         return null;
     }
 
+    // Add this inside your Auth class
+    public static function user()
+    {
+        $userId = self::id();
+        
+        if ($userId) {
+            $user = new User();
+            return $user->getById($userId); 
+        }
+
+        return null;
+    }
+
     public static function login($userId)
     {
         Session::set('userId', $userId);

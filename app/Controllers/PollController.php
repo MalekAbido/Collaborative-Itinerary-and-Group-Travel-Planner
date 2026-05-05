@@ -7,19 +7,18 @@ use App\Models\Poll;
 use App\Models\Vote;
 use App\Models\TripMember;
 use App\Models\Itinerary;
-use App\Helpers\Auth; // Added Auth helper
+use App\Helpers\Auth;
 
 class PollController extends Controller
 {
     public function __construct()
     {
-        date_default_timezone_set('Africa/Cairo'); 
+        Auth::requireLogin();
+        date_default_timezone_set('Africa/Cairo');
     }
 
     public function store()
     {
-        $this->requireAuth();
-
         $activityId = $_POST['activityId'] ?? null;
         $deadlineRaw = $_POST['deadline'] ?? null;
         $isAnonymous = isset($_POST['isAnonymous']);
@@ -48,8 +47,6 @@ class PollController extends Controller
 
     public function vote()
     {
-        $this->requireAuth();
-
         $pollId = $_POST['pollId'] ?? null;
         $ratingChoiceId = $_POST['ratingChoiceId'] ?? null;
         $userId = $_SESSION['user_id'] ?? Auth::id();
@@ -74,16 +71,14 @@ class PollController extends Controller
             exit();
         }
 
-        $db = \Core\Database::getInstance()->getConnection();
-        $stmt = $db->prepare("SELECT id FROM TripMember WHERE userId = :userId AND itineraryId = :itineraryId LIMIT 1");
-        $stmt->execute([':userId' => $userId, ':itineraryId' => $itineraryId]);
-        $member = $stmt->fetch();
+        $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
         if (!$member) {
             die("You are not a member of this trip.");
         }
 
-        $tripMemberId = $member['id'];
+        $tripMemberId = $member->getId();
+        
         $vote = Vote::getByMemberAndPoll($tripMemberId, $pollId);
 
         if ($vote) {
@@ -142,7 +137,6 @@ class PollController extends Controller
         if ($poll->read($pollId)) {
             $formattedDeadline = date('Y-m-d H:i:s', strtotime($newDeadlineRaw));
             $poll->setDeadline($formattedDeadline);
-            // openPoll() updates the object in the DB, so it saves the new deadline too!
             $poll->openPoll();
         }
 
@@ -153,47 +147,39 @@ class PollController extends Controller
     private function enforceEditorRole($itineraryId)
     {
         $userId = Auth::id();
-        
-        $db = \Core\Database::getInstance()->getConnection();
-        $stmt = $db->prepare("SELECT role FROM TripMember WHERE userId = :userId AND itineraryId = :itineraryId LIMIT 1");
-        $stmt->execute([':userId' => $userId, ':itineraryId' => $itineraryId]);
-        $member = $stmt->fetch();
-        
-        $role = $member ? $member['role'] : 'Member';
 
-        if (!Auth::requireRole('Editor', $role)) {
-            die("Unauthorized: You must be an Editor or Leader to perform this action.");
+        $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
+        
+        // Handle array or object
+        if ($member) {
+            $role = is_array($member) ? $member['role'] : $member->getRole();
+        } else {
+            $role = 'Member';
         }
+
+        Auth::requireRole('Editor', $role);
     }
 
     public function index($itineraryId)
     {
-        $this->requireAuth();
-
         $itineraryModel = new Itinerary();
         $itinerary = $itineraryModel->findByIdNumeric($itineraryId);
-        
+
         if (!$itinerary) {
             die("Itinerary not found.");
         }
 
-        $db = \Core\Database::getInstance()->getConnection();
-        
-        // Fetch user role for the UI conditional rendering
         $userId = Auth::id() ?? 1;
-        $stmtRole = $db->prepare("SELECT role FROM TripMember WHERE userId = :userId AND itineraryId = :itineraryId LIMIT 1");
-        $stmtRole->execute([':userId' => $userId, ':itineraryId' => $itineraryId]);
-        $memberRow = $stmtRole->fetch();
-        $userRole = $memberRow ? $memberRow['role'] : 'Member';
 
-        $sql = "SELECT p.*, a.name as activityName 
-                FROM Poll p 
-                JOIN Activity a ON p.activityId = a.id 
-                WHERE a.itineraryId = :itineraryId
-                ORDER BY p.deadline ASC";
-        $stmt = $db->prepare($sql);
-        $stmt->execute([':itineraryId' => $itineraryId]);
-        $allPolls = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
+        
+        if ($member) {
+            $userRole = is_array($member) ? $member['role'] : $member->getRole();
+        } else {
+            $userRole = 'Member';
+        }
+
+        $allPolls = Poll::getPollsByItinerary($itineraryId);
 
         $activePolls = [];
         $closedPolls = [];
@@ -221,10 +207,10 @@ class PollController extends Controller
 
         $this->view('polls/polls', [
             'itinerary' => $itinerary,
-            'activePolls' => $activePolls,   
-            'closedPolls' => $closedPolls,   
+            'activePolls' => $activePolls,
+            'closedPolls' => $closedPolls,
             'ratingChoices' => $ratingChoices,
-            'userRole' => $userRole // Pass the role to the view
+            'userRole' => $userRole
         ]);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\Itinerary;
@@ -25,40 +26,64 @@ class TripMember
     }
 
     public function getId()
-    {return $this->id;}
+    {
+        return $this->id;
+    }
 
     public function setId($id)
-    {$this->id = $id;}
+    {
+        $this->id = $id;
+    }
 
     public function getMembershipId()
-    {return $this->membershipId;}
+    {
+        return $this->membershipId;
+    }
 
     public function setMembershipId($membershipId)
-    {$this->membershipId = $membershipId;}
+    {
+        $this->membershipId = $membershipId;
+    }
 
     public function getRole()
-    {return $this->role;}
+    {
+        return $this->role;
+    }
 
     public function setRole($role)
-    {$this->role = $role;}
+    {
+        $this->role = $role;
+    }
 
     public function getJoinedAt()
-    {return $this->joinedAt;}
+    {
+        return $this->joinedAt;
+    }
 
     public function setJoinedAt($joinedAt)
-    {$this->joinedAt = $joinedAt;}
+    {
+        $this->joinedAt = $joinedAt;
+    }
 
     public function getUserId()
-    {return $this->userId;}
+    {
+        return $this->userId;
+    }
 
     public function setUserId($userId)
-    {$this->userId = $userId;}
+    {
+        $this->userId = $userId;
+    }
 
     public function getItineraryId()
-    {return $this->itineraryId;}
+    {
+        return $this->itineraryId;
+    }
 
     public function setItineraryId($itineraryId)
-    {$this->itineraryId = $itineraryId;}
+    {
+        $this->itineraryId = $itineraryId;
+    }
 
     public function create()
     {
@@ -120,7 +145,7 @@ class TripMember
     public function getAllByItineraryId($itineraryId)
     {
 
-// TEMPORARY FIX: We removed the JOIN to the users table so it doesn't crash.
+        // TEMPORARY FIX: We removed the JOIN to the users table so it doesn't crash.
         // We are injecting fake names/emails just so the UI has data to display!
         $sql = "SELECT m.id, m.role, m.joinedAt,
                        'Test' as firstName, 'User' as lastName, 'test@email.com' as email
@@ -213,31 +238,17 @@ class TripMember
         return $this->db->lastInsertId();
     }
 
-    public function voteInPoll()
-    {
-    }
+    public function voteInPoll() {}
 
-    public function proposeActivity()
-    {
-    }
+    public function proposeActivity() {}
 
-    public function viewItinerary()
-    {
-    }
+    public function viewItinerary() {}
 
-    public function useEmergencyContact()
-    {
-    }
+    public function useEmergencyContact() {}
 
-    public function leaveTrip()
-    {
-    }
+    public function leaveTrip() {}
 
-    public function assignRole($newRole)
-    {
-    }
+    public function assignRole($newRole) {}
 
-    public function generateInvitation()
-    {
-    }
+    public function generateInvitation() {}
 }

@@ -70,6 +70,8 @@ $this->get('/itinerary/members/{id}', 'ItineraryController', 'getMembersList');
 $this->get('/itinerary/polls/{id}', 'PollController', 'index');
 $this->post('/poll/vote', 'PollController', 'vote');
 $this->post('/poll/store', 'PollController', 'store');
+$this->post('/poll/close-early', 'PollController', 'closeEarly');
+$this->post('/poll/reopen', 'PollController', 'reopen');
 
 
 // 1. View the Members Dashboard

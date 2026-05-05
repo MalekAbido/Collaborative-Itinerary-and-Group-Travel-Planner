@@ -3,7 +3,6 @@ namespace App\Controllers;
 
 use App\Helpers\Auth;
 use App\Helpers\Validator;
-use App\Helpers\Auth;
 use App\Models\User;
 use Core\Controller;
 

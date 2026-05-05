@@ -123,7 +123,7 @@ class User
         $this->emergencyContacts = $emergencyContacts;
     }
 
-    public static function getByUserId($userId)
+    public static function getById($userId)
     {
         $db   = Database::getInstance()->getConnection();
         $sql  = "SELECT * FROM User WHERE id = :userId LIMIT 1";
