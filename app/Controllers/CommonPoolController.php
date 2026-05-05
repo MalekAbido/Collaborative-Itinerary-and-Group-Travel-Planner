@@ -1,17 +1,18 @@
 <?php
 namespace App\Controllers;
 
-use Core\Controller;
+use App\Helpers\Auth;
 use App\Models\GroupFund;
+use Core\Controller;
 
 class CommonPoolController extends Controller
 {
 
     public function contribute($fundId)
     {
-        $contributorId = $_POST['userId'] ?? 1; // Using dummy ID 1 for now
-        $amount = floatval($_POST['amount'] ?? 0);
-        $itineraryId = $_POST['itineraryId'] ?? 1; 
+        $contributorId = Auth::id(); // Using dummy ID 1 for now
+        $amount        = floatval($_POST['amount'] ?? 0);
+        $itineraryId   = $_POST['itineraryId'] ?? 1;
 
         if ($amount > 0) {
             $pool = new GroupFund();
@@ -22,5 +23,4 @@ class CommonPoolController extends Controller
         header("Location: /finance/dashboard/" . $itineraryId);
         exit;
     }
-
 }

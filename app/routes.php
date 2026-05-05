@@ -46,13 +46,15 @@ $this->post('/finance/create-fund/{id}', 'FinanceController', 'createGroupFund')
 $this->get('/finance/expense/add/{id}', 'ExpenseController', 'showAddForm');         // add expense form
 $this->post('/finance/expense/create', 'ExpenseController', 'createExpense');   // process the form 
 $this->get('/finance/expense/details', 'ExpenseController', 'getExpenseDetails'); // breakdown the given expense
-$this->post('/finance/expense/delete', 'ExpenseController', 'deleteExpense');      // delete expense
-
-
+$this->post('/finance/expense/delete', 'ExpenseController', 'deleteExpense');     // delete expense
 
 // Creating a trip
 $this->get('/itinerary/create', 'ItineraryController', 'create');
 $this->post('/itinerary/store', 'ItineraryController', 'store');
+
+$this->get('/itinerary/{id}/activity/{id}', 'ActivityController', 'show');
+$this->post('/itinerary/{id}/activity/{id}/updateAttendance', 'ActivityController', 'updateAttendance');
+$this->post('/itinerary/{id}/activity/{id}/delete', 'ActivityController', 'delete');
 
 // Managing trip settings
 $this->get('/itinerary/settings/{id}', 'ItineraryController', 'settings');
@@ -63,17 +65,16 @@ $this->post('/itinerary/destroy/{id}', 'ItineraryController', 'destroy');
 $this->get('/itinerary/dashboard/{id}', 'ItineraryController', 'getDashboard');
 $this->get('/itinerary/members/{id}', 'ItineraryController', 'getMembersList');
 
-
 // 1. View the Members Dashboard
 $this->get('/itinerary/members/{id}', 'TripMemberController', 'index');
 
 // 2. Invite a new member
 $this->post('/itinerary/members/invite/{id}', 'TripMemberController', 'store');
 
-// 3. Update a member's role 
+// 3. Update a member's role
 $this->post('/itinerary/members/updateRole/{id}', 'TripMemberController', 'updateRole');
 
-// 4. Remove a member 
+// 4. Remove a member
 $this->post('/itinerary/members/remove/{id}', 'TripMemberController', 'destroy');
 //Finance Overview Dashboard
 $this->get('/finance/dashboard/{id}', 'FinanceController', 'dashboard');

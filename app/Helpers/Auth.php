@@ -6,7 +6,6 @@ use App\Models\User;
 
 class Auth
 {
-    // The strict hierarchy: 3 can do what 2 and 1 can do.
     private static $roles = [
         'Member' => 1,
         'Editor' => 2,
@@ -16,7 +15,7 @@ class Auth
     public static function check()
     {
 
-        if (Session::get('user_id') !== null) {
+        if (Session::get('userId') !== null) {
             return true;
         }
 
@@ -27,7 +26,7 @@ class Auth
             $userId = User::getBySessionToken($hashedToken);
 
             if ($userId) {
-                Session::set('user_id', $userId);
+                Session::set('userId', $userId);
                 return true;
             }
         }
@@ -39,7 +38,7 @@ class Auth
     {
 
         if (self::check()) {
-            return Session::get('user_id');
+            return Session::get('userId');
         }
 
         return null;
@@ -81,7 +80,7 @@ class Auth
     {
 
         if (! self::hasRole($requiredRole, $currentRole)) {
-            Session::setFlash('error', 'You do not have permission to perform this action.');
+            Session::setFlash(Session::FLASH_ERROR, 'You do not have permission to perform this action.');
             header('Location: /dashboard');
             exit;
         }
@@ -91,7 +90,7 @@ class Auth
     {
 
         if (! self::check()) {
-            Session::setFlash('error', 'Please log in to continue.');
+            Session::setFlash(Session::FLASH_ERROR, 'Please log in to continue.');
             header('Location: /login');
             exit;
         }

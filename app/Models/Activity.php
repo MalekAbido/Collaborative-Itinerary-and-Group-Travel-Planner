@@ -1,0 +1,177 @@
+<?php
+namespace App\Models;
+
+use App\Models\ItineraryItem;
+use Core\Database;
+use PDO;
+use \App\Models\AttendanceList;
+
+class Activity extends ItineraryItem
+{
+    private $category;
+    private $activityStatus;
+    private $subtripId;
+    private $locationId;
+    private $inventoryItemsList   = null;
+    private $attendanceListObject = null;
+
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    public function setCategory($category)
+    {
+        $this->category = $category;
+    }
+
+    public function getActivityStatus()
+    {
+        return $this->activityStatus;
+    }
+
+    public function setActivityStatus($activityStatus)
+    {
+        $this->activityStatus = $activityStatus;
+    }
+
+    public function getSubtripId()
+    {
+        return $this->subtripId;
+    }
+
+    public function setSubtripId($subtripId)
+    {
+        $this->subtripId = $subtripId;
+    }
+
+    public function getLocationId()
+    {
+        return $this->locationId;
+    }
+
+    public function setLocationId($locationId)
+    {
+        $this->locationId = $locationId;
+    }
+
+    public function fill(array $row)
+    {
+        $this->setId($row['id']);
+        $this->setItemId($row['itemId']);
+        $this->setName($row['name']);
+        $this->setDescription($row['description']);
+        $this->setStartTime($row['startTime']);
+        $this->setEndTime($row['endTime']);
+        $this->setCategory($row['category']);
+        $this->setActivityStatus($row['status']);
+        $this->setItineraryId($row['itineraryId']);
+        $this->setTripMemberId($row['tripMemberId']);
+        $this->setSubtripId($row['subtripId']);
+        $this->setLocationId($row['locationId']);
+    }
+
+    public static function getByActivityId($activityId)
+    {
+        $db   = Database::getInstance()->getConnection();
+        $sql  = "SELECT * FROM Activity WHERE id = :activityId LIMIT 1";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':activityId' => $activityId]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($data) {
+            $activity = new self();
+            $activity->fill($data);
+            return $activity;
+        }
+
+        return null;
+    }
+
+    public function read($id)
+    {
+        $db   = Database::getInstance()->getConnection();
+        $sql  = "SELECT * FROM Activity WHERE id = :activityId LIMIT 1";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':activityId' => $activityId]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($data) {
+            $this->fill($data);
+            return true;
+        }
+
+        return false;
+    }
+
+    public static function getByIdAndItinerary($activityId, $itineraryId)
+    {
+        $db = Database::getInstance()->getConnection();
+
+        $sql = "SELECT * FROM Activity WHERE id = :id AND itineraryId = :itineraryId LIMIT 1";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute([
+            ':id'          => $activityId,
+            ':itineraryId' => $itineraryId,
+        ]);
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($row) {
+            $activity = new self();
+            $activity->fill($row);
+
+            return $activity;
+        }
+
+        return null;
+    }
+
+    public function delete()
+    {
+        $db   = Database::getInstance()->getConnection();
+        $sql  = "UPDATE Activity SET status = 'Removed' WHERE id = :id";
+        $stmt = $db->prepare($sql);
+        return $stmt->execute([':id' => ($this->id)]);
+    }
+
+    public function getInventoryItems()
+    {
+
+// if ($this->inventoryItemsList === null) {
+
+//     $this->inventoryItemsList = InventoryItem::getAllByActivityId($this->id);
+        // }
+
+        return $this->inventoryItemsList;
+    }
+
+    public static function getAllByItineraryId($itineraryId)
+    {
+        $db   = Database::getInstance()->getConnection();
+        $sql  = "SELECT * FROM Activity WHERE itineraryId = :itineraryId ORDER BY startTime ASC";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':itineraryId' => $itineraryId]);
+        $data            = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $activityObjects = [];
+
+        foreach ($data as $row) {
+            $activity = new self();
+            $activity->fill($row);
+            $activityObjects[] = $activity;
+        }
+
+        return $activityObjects;
+    }
+
+    public function getAttendanceList()
+    {
+
+        if ($this->attendanceListObject === null) {
+            $this->attendanceListObject = AttendanceList::getByActivityId($this->id);
+        }
+
+        return $this->attendanceListObject;
+    }
+}
