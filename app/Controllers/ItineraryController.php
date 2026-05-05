@@ -100,7 +100,7 @@ class ItineraryController extends Controller {
         
         $itineraryModel = new Itinerary();
         // 1. Find the trip using the string ID from the URL
-        $tripData = $itineraryModel->findById($id);
+        $tripData = $itineraryModel->findByIdNumeric($id);
 
         if(!$tripData){
             header("Location: /dashboard");
