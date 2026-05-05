@@ -1,6 +1,7 @@
 <?php
 namespace App\Controllers;
 
+use App\Helpers\Auth;
 use App\Models\User;
 use Core\Controller;
 
@@ -16,10 +17,10 @@ class AuthController extends Controller
         header('Content-Type: application/json');
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $email = trim($_POST['email']);
+            $email    = trim($_POST['email']);
             $password = $_POST['password'];
-            
-            $rememberMe = isset($_POST['remember_me']); 
+
+            $rememberMe = isset($_POST['remember_me']);
 
             $errors = [];
 
@@ -30,17 +31,12 @@ class AuthController extends Controller
             }
 
             $user = new User();
-            
-            if ($user->login($email, $password)) {
-                $_SESSION['user_id'] = $user->getId();
 
-                if ($rememberMe) {
-                    setcookie('remember_user', $user->getId(), time() + (86400 * 30), "/", "", false, true);
-                }
+            if ($user->login($email, $password)) {
+                Auth::login($user->getId());
 
                 echo json_encode(['success' => true, 'redirect' => '/dashboard']);
                 exit();
-                
             } else {
                 echo json_encode(['success' => false, 'errors' => ["Invalid email or password."]]);
                 exit();
@@ -122,12 +118,7 @@ class AuthController extends Controller
 
     public function logout()
     {
-        $_SESSION = [];
-        session_destroy();
-        if (isset($_COOKIE['remember_user'])) {
-            setcookie('remember_user', '', time() - 3600, '/');
-        }
-        
+        Auth::logout();
         header("Location: /login");
         exit();
     }

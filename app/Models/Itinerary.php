@@ -175,6 +175,15 @@ class Itinerary
         return false;
     }
 
+    public function findById($id)
+    {
+        $sql  = "SELECT * FROM Itinerary WHERE itineraryId = :id LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $id]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function findByIdNumeric($id)
     {
         $sql  = "SELECT * FROM Itinerary WHERE id = :id LIMIT 1";

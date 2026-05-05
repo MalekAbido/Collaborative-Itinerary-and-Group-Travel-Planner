@@ -5,17 +5,17 @@ use Core\Database;
 
 abstract class ItineraryItem
 {
-    private $db;
-    private $id;
-    private $itemId;
-    private $name;
-    private $description;
-    private $startTime;
-    private $endTime;
-    private $itineraryId;
-    private $tripMemberId;
-    private $itineraryObject = null;
-    private $creatorObject   = null;
+    protected $db;
+    protected $id;
+    protected $itemId;
+    protected $name;
+    protected $description;
+    protected $startTime;
+    protected $endTime;
+    protected $itineraryId;
+    protected $tripMemberId;
+    protected $itineraryObject = null;
+    protected $creatorObject   = null;
 
     public function __construct()
     {
@@ -25,6 +25,11 @@ abstract class ItineraryItem
     public function getId()
     {
         return $this->id;
+    }
+
+    protected function setId($id)
+    {
+        $this->id = $id;
     }
 
     public function getItemId()

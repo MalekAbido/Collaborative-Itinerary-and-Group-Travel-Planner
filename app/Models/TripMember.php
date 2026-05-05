@@ -94,7 +94,7 @@ class TripMember
             $this->joinedAt     = $data['joinedAt'];
             $this->userId       = $data['userId'];
             $this->itineraryId  = $data['itineraryId'];
-            return true;
+            return $this;
         }
 
         return false;

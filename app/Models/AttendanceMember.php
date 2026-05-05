@@ -77,7 +77,7 @@ class AttendanceMember
     public static function getAllByListId($listId)
     {
         $db   = Database::getInstance()->getConnection();
-        $sql  = "SELECT * FROM AttendanceMember WHERE attendanceListId = :listId";
+        $sql  = "SELECT * FROM AttendanceMember WHERE attendanceListId = :listId ORDER BY FIELD(status, 'Going', 'Not Going', 'Pending')";
         $stmt = $db->prepare($sql);
         $stmt->execute([':listId' => $listId]);
         $data    = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -92,15 +92,37 @@ class AttendanceMember
         return $members;
     }
 
-    public function update()
+    public static function getByTripMemberAndAttendanceList($attendanceListId, $tripMemberId)
     {
         $db   = Database::getInstance()->getConnection();
-        $sql  = "UPDATE AttendanceMember SET status = :status, note = :note WHERE id = :id";
+        $sql  = "SELECT * FROM AttendanceMember WHERE attendanceListId = :listId AND tripMemberId = :tripMemberId LIMIT 1";
         $stmt = $db->prepare($sql);
-        return $stmt->execute([
+        $stmt->execute([
+            ':listId'       => $attendanceListId,
+            ':tripMemberId' => $tripMemberId,
+        ]);
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($row) {
+            $member = new self();
+            $member->fill($row);
+            return $member;
+        }
+
+        return null;
+    }
+
+    public function update()
+    {
+        $db     = Database::getInstance()->getConnection();
+        $sql    = "UPDATE AttendanceMember SET status = :status, note = :note WHERE id = :id";
+        $stmt   = $db->prepare($sql);
+        $result = $stmt->execute([
             ':status' => $this->status,
             ':note'   => $this->note,
             ':id'     => $this->id,
         ]);
+        return $result;
     }
 }
