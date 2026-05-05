@@ -44,8 +44,8 @@ $this->post('/finance/update-settings/{id}', 'FinanceController', 'updateSetting
 $this->post('/finance/create-fund/{id}', 'FinanceController', 'createGroupFund');
 
 // Expense routes
-$this->get('/finance/expense/add', 'ExpenseController', 'showAddForm');           // add expense form
-$this->post('/finance/expense/create', 'ExpenseController', 'createExpense');     // process the form
+$this->get('/finance/expense/add/{id}', 'ExpenseController', 'showAddForm');         // add expense form
+$this->post('/finance/expense/create', 'ExpenseController', 'createExpense');   // process the form 
 $this->get('/finance/expense/details', 'ExpenseController', 'getExpenseDetails'); // breakdown the given expense
 $this->post('/finance/expense/delete', 'ExpenseController', 'deleteExpense');     // delete expense
 
