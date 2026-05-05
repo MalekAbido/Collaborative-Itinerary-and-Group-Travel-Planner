@@ -16,7 +16,7 @@ class TripMemberController extends Controller
     {
         // 1. Get the trip details so the view has the title and ID
         $itineraryModel = new Itinerary();
-        $tripData = $itineraryModel->findById($id);
+        $tripData = $itineraryModel->findByIdNumeric($id);
 
         if (!$tripData) {
             header("Location: /dashboard");
