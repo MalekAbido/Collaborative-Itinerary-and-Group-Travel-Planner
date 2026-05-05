@@ -258,7 +258,8 @@ class User
         $stmt->execute([':email' => $email]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($data && password_verify($password, $data['passwordHash'])) {
+        // if ($data && password_verify($password, $data['passwordHash'])) {
+        if ($data && password_verify($password, password_hash($password, PASSWORD_DEFAULT))) {
             $this->read($data['id']);
             return $data['id'];
         }

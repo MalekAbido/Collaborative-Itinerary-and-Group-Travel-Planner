@@ -9,7 +9,7 @@ class Auth
     private static $roles = [
         'Member' => 1,
         'Editor' => 2,
-        'Leader' => 3,
+        'Organizer' => 3,
     ];
 
     public static function check()

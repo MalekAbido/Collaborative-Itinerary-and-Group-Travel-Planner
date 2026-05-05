@@ -53,6 +53,8 @@ $this->post('/finance/expense/delete', 'ExpenseController', 'deleteExpense');   
 $this->get('/itinerary/create', 'ItineraryController', 'create');
 $this->post('/itinerary/store', 'ItineraryController', 'store');
 
+$this->get('/itinerary/{id}/activity/create', 'ActivityController', 'create');
+$this->post('/itinerary/{id}/activity/store', 'ActivityController', 'store');
 $this->get('/itinerary/{id}/activity/{id}', 'ActivityController', 'show');
 $this->post('/itinerary/{id}/activity/{id}/updateAttendance', 'ActivityController', 'updateAttendance');
 $this->post('/itinerary/{id}/activity/{id}/delete', 'ActivityController', 'delete');
