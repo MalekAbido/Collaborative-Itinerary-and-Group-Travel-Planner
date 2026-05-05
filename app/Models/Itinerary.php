@@ -18,6 +18,24 @@ class Itinerary {
         $this->db=Database::getInstance()->getConnection();
     }
 
+    public function getId() { return $this->id; }
+    public function setId($id) { $this->id = $id; }
+
+    public function getItineraryId() { return $this->itineraryId; }
+    public function setItineraryId($itineraryId) { $this->itineraryId = $itineraryId; }
+
+    public function getTitle() { return $this->title; }
+    public function setTitle($title) { $this->title = $title; }
+
+    public function getDescription() { return $this->description; }
+    public function setDescription($description) { $this->description = $description; }
+
+    public function getStartDate() { return $this->startDate; }
+    public function setStartDate($startDate) { $this->startDate = $startDate; }
+
+    public function getEndDate() { return $this->endDate; }
+    public function setEndDate($endDate) { $this->endDate = $endDate; }
+
     public function create($title, $description, $startDate, $endDate){
         $this->itineraryId = uniqid('trip_');                                                                   
         

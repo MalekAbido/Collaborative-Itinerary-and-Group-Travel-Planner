@@ -2,9 +2,9 @@
 
 namespace App\Controllers;
 
-use Core\Controller;
+use App\Helpers\Auth;
 use App\Models\EmergencyContact;
-use App\Models\User;
+use Core\Controller;
 
 class EmergencyController extends Controller
 {
@@ -12,7 +12,7 @@ class EmergencyController extends Controller
 
     public function __construct()
     {
-        $this->userId = 1; // Session.getUserId();
+        $this->userId = Auth::id();
     }
 
     public function addEmergencyContact()

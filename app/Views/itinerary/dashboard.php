@@ -68,7 +68,7 @@
                 <div class="hidden md:flex items-center gap-1">
                     <a href="/dashboard" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Dashboard</a>
                     <a href="#" class="px-3 py-2 rounded-md text-body-sm font-medium text-primary border-b-2 border-primary">Itinerary</a>
-                    <a href="/polls" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Polls</a>
+                    <a href="/itinerary/polls/<?= htmlspecialchars($data['trip']['id']) ?>" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Polls</a>
                     <a href="/finance/dashboard/<?= htmlspecialchars($data['trip']['id']) ?>" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Finances</a>
                 </div>
             </div>

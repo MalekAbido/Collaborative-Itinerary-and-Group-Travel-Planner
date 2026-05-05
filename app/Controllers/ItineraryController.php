@@ -29,7 +29,7 @@ class ItineraryController extends Controller{
 
     public function settings($id){
         $itineraryModel = new Itinerary();
-        $tripData = $itineraryModel->findById($id);
+        $tripData = $itineraryModel->findByIdNumeric($id);
         $this->view("itinerary/settings", ['trip' => $tripData]);
     }
 
@@ -63,7 +63,7 @@ class ItineraryController extends Controller{
 
     public function getDashboard($id){
         $itineraryModel = new Itinerary();
-        $tripData = $itineraryModel->findById($id);
+        $tripData = $itineraryModel->findByIdNumeric($id);
 
         if(!$tripData){
             header("Location: /dashboard");

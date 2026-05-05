@@ -99,7 +99,7 @@ if ($percentage >= 100) {
                 <div class="hidden md:flex items-center gap-1">
                     <a href="/dashboard/" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Dashboard</a>
                     <a href="/itinerary/dashboard/<?= htmlspecialchars($tripStringId) ?>" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Itinerary</a>
-                    <a href="/polls" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Polls</a>
+                    <a href="/itinerary/polls/<?= htmlspecialchars($itineraryId) ?>" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Polls</a>
                     <a href="/finance/dashboard/<?= htmlspecialchars($itineraryId) ?>" class="px-3 py-2 rounded-md text-body-sm font-medium text-primary border-b-2 border-primary">Finances</a>
                 </div>
             </div>

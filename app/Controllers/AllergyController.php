@@ -1,9 +1,9 @@
 <?php
 namespace App\Controllers;
 
-use Core\Controller;
+use App\Helpers\Auth;
 use App\Models\Allergy;
-use App\Models\User;
+use Core\Controller;
 
 class AllergyController extends Controller
 {
@@ -11,7 +11,7 @@ class AllergyController extends Controller
 
     public function __construct()
     {
-        $this->userId = 1; // Session.getUserId();
+        $this->userId = Auth::id();
     }
 
     public function addAllergy()
@@ -27,7 +27,7 @@ class AllergyController extends Controller
 
         $allergy = new Allergy();
         if ($allergy->create($allergyData)) {
-            header("Location: /profile");
+            header("Location:" . $_SERVER['HTTP_REFERER']);
             exit;
         }
 

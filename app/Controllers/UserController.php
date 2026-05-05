@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Helpers\Validator;
+use App\Helpers\Auth;
 use App\Models\User;
 use Core\Controller;
 
@@ -12,7 +13,7 @@ class UserController extends Controller
 
     public function __construct()
     {
-        $this->userId = 1; // Session.getUserId();
+        $this->userId = Auth::id();
     }
 
     public function showUserProfile()
@@ -49,25 +50,25 @@ class UserController extends Controller
     }
 
     public function updateUserProfile()
-{
-    // 1. Grab POST data directly
-    $data = $_POST;
+    {
+        // 1. Grab POST data directly
+        $data = $_POST;
 
-    if (!$this->validateProfileData($data)) {
-        die("Invalid profile data provided. Please check your inputs.");
+        if (!$this->validateProfileData($data)) {
+            die("Invalid profile data provided. Please check your inputs.");
+        }
+
+        $user = new User();
+
+        if ($user->read($this->userId)) {
+            $user->updateProfile($data);
+
+            header("Location: /profile");
+            exit;
+        }
+
+        die('User not found.');
     }
-
-    $user = new User();
-
-    if ($user->read($this->userId)) {
-        $user->updateProfile($data);
-        
-        header("Location: /profile");
-        exit;
-    }
-
-    die('User not found.');
-}
 
     public function validateProfileData($data)
     {

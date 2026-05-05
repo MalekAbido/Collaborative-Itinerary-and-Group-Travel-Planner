@@ -63,6 +63,11 @@ $this->post('/itinerary/destroy/{id}', 'ItineraryController', 'destroy');
 $this->get('/itinerary/dashboard/{id}', 'ItineraryController', 'getDashboard');
 $this->get('/itinerary/members/{id}', 'ItineraryController', 'getMembersList');
 
+// Poll Routes
+$this->get('/itinerary/polls/{id}', 'PollController', 'index');
+$this->post('/poll/vote', 'PollController', 'vote');
+$this->post('/poll/store', 'PollController', 'store');
+
 
 // 1. View the Members Dashboard
 $this->get('/itinerary/members/{id}', 'TripMemberController', 'index');
