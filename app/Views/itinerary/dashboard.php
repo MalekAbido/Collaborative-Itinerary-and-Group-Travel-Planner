@@ -226,26 +226,48 @@
                         </article>
                     </div>
 
-                    <div class="space-y-8">
-                        <div>
-                            <div class="flex items-center justify-between pb-3 mb-4 border-b border-outline-variant">
-                                <div class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-primary">group</span>
-                                    <h2 class="font-display text-h3 text-on-surface m-0">Members</h2>
-                                </div>
-                                <a href="/itinerary/members/<?= htmlspecialchars($data['trip']['itineraryId']) ?>" class="text-body-sm font-semibold text-primary hover:underline">Manage</a>
+                <div class="space-y-8">
+                    <div>
+                        <div class="flex items-center justify-between pb-3 mb-4 border-b border-outline-variant">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">group</span>
+                                <h2 class="font-display text-h3 text-on-surface m-0">Members</h2>
                             </div>
-                            <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-fixed text-primary text-sm font-semibold">ME</div>
-                                    <div>
-                                        <div class="font-display text-h4 text-on-surface">You</div>
-                                        <span class="inline-flex items-center rounded-full bg-primary-fixed px-2 py-0.5 mt-1 text-[10px] font-bold uppercase text-primary">👑 Leader</span>
-                                    </div>
-                                </div>
+                            <a href="/itinerary/members/<?= htmlspecialchars($data['trip']['itineraryId']) ?>" class="text-body-sm font-semibold text-primary hover:underline">Manage</a>                        
+                        </div> 
+                        
+                        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-4">
+                            <div class="divide-y divide-outline-variant">
+                                <?php if (!empty($data['members'])): ?>
+                                    <?php foreach ($data['members'] as $member): ?>
+                                        <div class="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+                                            <div class="flex items-center gap-3">
+                                                <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-fixed text-primary text-sm font-semibold">
+                                                    <?= strtoupper(substr($member['firstName'], 0, 1) . substr($member['lastName'], 0, 1)) ?>
+                                                </div>
+                                                <div>
+                                                    <div class="font-display text-h4 text-on-surface"><?= htmlspecialchars($member['firstName'] . ' ' . $member['lastName']) ?></div>
+                                                    <div class="text-body-xs text-outline"><?= htmlspecialchars($member['email']) ?></div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <?php if ($member['role'] === 'Organizer'): ?>
+                                                    <span class="inline-flex items-center rounded-full bg-primary-fixed px-2 py-0.5 text-[10px] font-bold uppercase text-primary">👑 Organizer</span>
+                                                <?php elseif ($member['role'] === 'Editor'): ?>
+                                                    <span class="inline-flex items-center rounded-full bg-secondary-fixed px-2 py-0.5 text-[10px] font-bold uppercase text-secondary">✏️ Editor</span>
+                                                <?php else: ?>
+                                                    <span class="inline-flex items-center rounded-full bg-surface-container-highest px-2 py-0.5 text-[10px] font-bold uppercase text-outline">👤 Member</span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <div class="py-2 text-center text-on-surface-variant text-body-sm">No members found.</div>
+                                <?php endif; ?>
                             </div>
                         </div>
-                    </div>
+                        </div>
+                </div>
 
                 </div>
             </div>
