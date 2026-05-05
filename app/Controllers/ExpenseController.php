@@ -10,6 +10,7 @@ class ExpenseController extends Controller
 {
     public function showAddForm($id)
     {
+        $this->authorizeTripMember($id); 
         $itineraryId = $id;
         $tripMemberModel = new \App\Models\TripMember();
         $members = $tripMemberModel->getAllByItineraryId($itineraryId);
@@ -40,6 +41,12 @@ class ExpenseController extends Controller
             'category' => $_POST['category'] ?? '',
             'shares' => $_POST['shares'] ?? []
         ];
+
+        $financeModel = new \App\Models\TripFinance();
+        $financeModel->read($financeId);
+        $itineraryId = $financeModel->getItineraryId();
+
+        $currentMember = $this->authorizeTripMember($itineraryId); 
 
         $isValid = $this->validateExpenseData($splitMethod, $totalAmount, $details['shares']);
         if (!$isValid) {
@@ -116,6 +123,11 @@ class ExpenseController extends Controller
             die("Error: Expense not found.");
         }
 
+        $financeModel = new \App\Models\TripFinance();
+        $financeModel->read($expense->getTripFinanceId());
+
+        $this->authorizeTripMember($financeModel->getItineraryId());
+
         $shareModel->deleteByExpenseId($expenseId);
         $expenseModel->delete($expenseId);
 
@@ -139,6 +151,12 @@ class ExpenseController extends Controller
         if (!$expense) {
             die("Expense not found.");
         }
+
+        $financeModel = new \App\Models\TripFinance();
+        $financeModel->read($expense->getTripFinanceId());
+        $itineraryId = $financeModel->getItineraryId();
+
+        $this->authorizeTripMember($itineraryId);
 
         $expense->loadShares($expenseId);
         $payer = null;
@@ -200,15 +218,41 @@ class ExpenseController extends Controller
             return false;
         }
 
-        if ($splitMethod === 'UNEVEN') {
+        if ($splitMethod === 'UNEVEN') 
+        {
             $sumOfShares = array_sum($shares);
 
             // the epsilon method to handle decimal inaccuracy
-            if (abs($sumOfShares - $totalAmount) > 0.01) {
+            if (abs($sumOfShares - $totalAmount) > 0.01) 
+            {
                 return false;
             }
         }
 
         return true;
+    }
+    public function authorizeTripMember($itineraryId) 
+    {
+
+        // login check
+        if (session_status() === PHP_SESSION_NONE) 
+        {
+            session_start();
+        }
+
+        $loggedInUser = $_SESSION['userId'] ?? null;
+        if(!$loggedInUser)
+        {
+            die("You must login to perform this action");
+        }
+
+        $tripMemberModel = new \App\Models\TripMember();
+        $member = $tripMemberModel->getByUserAndItinerary($loggedInUser, $itineraryId);
+
+        if(!$member)  
+        {
+            die("Error: You are not an authorized member of this trip.");
+        }
+        return $member;
     }
 }
