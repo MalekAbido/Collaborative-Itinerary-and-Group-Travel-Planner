@@ -144,19 +144,25 @@ class TripMember
 
     public function getAllByItineraryId($itineraryId)
     {
-
-        // TEMPORARY FIX: We removed the JOIN to the users table so it doesn't crash.
-        // We are injecting fake names/emails just so the UI has data to display!
-        $sql = "SELECT m.id, m.role, m.joinedAt,
-                       'Test' as firstName, 'User' as lastName, 'test@email.com' as email
+        // REAL FIX: Joining the TripMember table with the User table
+        $sql = "SELECT m.id as memberId, m.role, m.joinedAt, m.itineraryId,
+                       u.id as userId, u.firstName, u.lastName, u.email
                 FROM TripMember m
+                JOIN User u ON m.userId = u.id
                 WHERE m.itineraryId = :itineraryId
-                ORDER BY m.role DESC";
+                ORDER BY 
+                    CASE m.role 
+                        WHEN 'Organizer' THEN 1 
+                        WHEN 'Editor' THEN 2 
+                        WHEN 'Member' THEN 3 
+                        ELSE 4 
+                    END, 
+                    m.joinedAt ASC";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':itineraryId' => $itineraryId]);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public static function getByUserAndItinerary($userId, $itineraryId)
