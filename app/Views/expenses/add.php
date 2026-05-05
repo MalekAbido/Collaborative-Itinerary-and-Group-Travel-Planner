@@ -62,6 +62,7 @@
                         
                         <!-- Currency Dropdown right next to Amount -->
                         <select name="currencyType" required class="rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-md focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition">
+                            <option value="EGP">EGP</option>    
                             <option value="USD">USD</option>
                             <option value="EUR">EUR</option>
                             <option value="GBP">GBP</option>

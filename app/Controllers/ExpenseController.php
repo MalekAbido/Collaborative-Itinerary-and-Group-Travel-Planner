@@ -31,7 +31,7 @@ class ExpenseController extends Controller
         $payerId = (int)($_POST['payerId'] ?? 0);
         $splitMethod = $_POST['splitMethod'] ?? 'EVEN';
         $totalAmount = (float)($_POST['amount'] ?? 0);
-        $currencyType = trim($_POST['currencyType'] ?? 'USD');
+        $currencyType = trim($_POST['currencyType'] ?? 'EGP');
         $isNonCash = isset($_POST['isNonCash']) ? 1 : 0;
         $paidByKitty = isset($_POST['paidByKitty']) ? 1 : 0;
 
@@ -46,6 +46,21 @@ class ExpenseController extends Controller
             die("Error: Invalid expense data or shares do not equal the total amount.");
         }
 
+        if($paidByKitty == 1) {
+            $groupFundModel = new \App\Models\GroupFund();
+            $fundExists = $groupFundModel->readByTripFinanceId($financeId);
+
+            if (!$fundExists) {
+                die("Error: There is no Group Fund set up for this trip yet.");
+            }
+            
+            if ($groupFundModel->getCurrentBalance() < $totalAmount) {
+                die("Error: Insufficient funds in the group kitty to cover this expense.");
+            } else {
+                $groupFundModel->deductExpense($totalAmount);
+            }
+        }
+
         $expenseModel = new Expense();
         $expenseId = $expenseModel->create([
             'financeId'   => $financeId,
@@ -57,7 +72,7 @@ class ExpenseController extends Controller
             'description' => $details['description'],
             'category'    => $details['category']
         ]);
-
+        
         $shareModel = new ExpenseShare();
 
         if ($splitMethod === 'EVEN') {
@@ -104,7 +119,7 @@ class ExpenseController extends Controller
         $shareModel->deleteByExpenseId($expenseId);
         $expenseModel->delete($expenseId);
 
-        header("Location: /finance/dashboard");
+        header("Location: /finance/dashboard/" . $expense->getTripFinanceId() . "?success=expense_deleted");
         exit();
     }
 

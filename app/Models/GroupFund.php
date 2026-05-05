@@ -70,7 +70,9 @@ class GroupFund
 
         $this->currentBalance -= $amount;
 
-        $sql = "UPDATE GroupFund SET currentBalance = :balance WHERE fundId = :id";
+        // I made a change, instead of passing the string id I pass the integer id.
+        // instead of fundId I will pass id.
+        $sql = "UPDATE GroupFund SET currentBalance = :balance WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             ':balance' => $this->currentBalance,
