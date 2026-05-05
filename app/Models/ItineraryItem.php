@@ -27,11 +27,6 @@ abstract class ItineraryItem
         return $this->id;
     }
 
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
     public function getItemId()
     {
         return $this->itemId;
