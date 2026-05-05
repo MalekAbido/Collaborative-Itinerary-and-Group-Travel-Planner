@@ -88,6 +88,55 @@ class Activity extends ItineraryItem
         return null;
     }
 
+    public function create()
+    {
+        $db = Database::getInstance()->getConnection();
+        
+        $this->itemId = uniqid('act_');
+        
+        $sql = "INSERT INTO Activity (itemId, name, description, startTime, endTime, category, status, itineraryId, tripMemberId, subtripId, locationId) 
+                VALUES (:itemId, :name, :description, :startTime, :endTime, :category, :status, :itineraryId, :tripMemberId, :subtripId, :locationId)";
+        
+        $stmt = $db->prepare($sql);
+        $success = $stmt->execute([
+            ':itemId'       => $this->itemId,
+            ':name'         => $this->name,
+            ':description'  => $this->description,
+            ':startTime'    => $this->startTime,
+            ':endTime'      => $this->endTime,
+            ':category'     => $this->category,
+            ':status'       => $this->activityStatus,
+            ':itineraryId'  => $this->itineraryId,
+            ':tripMemberId' => $this->tripMemberId,
+            ':subtripId'    => $this->subtripId,
+            ':locationId'   => $this->locationId
+        ]);
+
+        if ($success) {
+            $this->id = $db->lastInsertId();
+        }
+
+        return $success;
+    }
+
+    public static function hasOverlap($itineraryId, $startTime, $endTime)
+    {
+        $db = Database::getInstance()->getConnection();
+        $sql = "SELECT COUNT(*) FROM Activity 
+                WHERE itineraryId = :itineraryId 
+                AND status != 'Removed'
+                AND (startTime < :endTime AND endTime > :startTime)";
+        
+        $stmt = $db->prepare($sql);
+        $stmt->execute([
+            ':itineraryId' => $itineraryId,
+            ':startTime'   => $startTime,
+            ':endTime'     => $endTime
+        ]);
+        
+        return $stmt->fetchColumn() > 0;
+    }
+
     public function read($id)
     {
         $db   = Database::getInstance()->getConnection();

@@ -6,6 +6,8 @@ use App\Helpers\Session;
 use App\Models\Activity;
 use App\Models\AttendanceMember;
 use App\Models\TripMember;
+use App\Models\Itinerary;
+use App\Models\Location;
 use Core\Controller;
 
 class ActivityController extends Controller
@@ -16,6 +18,89 @@ class ActivityController extends Controller
     public function __construct()
     {
         Auth::requireLogin();
+    }
+
+    public function create($itineraryId)
+    {
+        $userId     = Auth::id();
+        $tripMember = TripMember::getByUserAndItinerary($userId, $itineraryId);
+
+        if ($tripMember === null) {
+            Session::setFlash(Session::FLASH_ERROR, 'You do not have access to this itinerary.');
+            header('Location: /dashboard');
+            exit;
+        }
+
+        $this->view('activity/create', ['itineraryId' => $itineraryId]);
+    }
+
+    public function store($itineraryId)
+    {
+        $userId     = Auth::id();
+        $tripMember = TripMember::getByUserAndItinerary($userId, $itineraryId);
+
+        if ($tripMember === null) {
+            Session::setFlash(Session::FLASH_ERROR, 'You do not have access to this itinerary.');
+            header('Location: /dashboard');
+            exit;
+        }
+
+        $name            = trim($_POST['name'] ?? '');
+        $description     = trim($_POST['description'] ?? '');
+        $startTime       = $_POST['start_time'] ?? '';
+        $endTime         = $_POST['end_time'] ?? '';
+        $category        = $_POST['category'] ?? 'General';
+        $locationName    = trim($_POST['location_name'] ?? '');
+        $locationAddress = trim($_POST['location_address'] ?? '');
+
+        if (empty($name) || empty($startTime) || empty($endTime)) {
+            Session::setFlash(Session::FLASH_ERROR, 'Name, start time, and end time are required.');
+            header("Location: /itinerary/{$itineraryId}/activity/create");
+            exit;
+        }
+
+        if (strtotime($endTime) <= strtotime($startTime)) {
+            Session::setFlash(Session::FLASH_ERROR, 'End time must be after start time.');
+            header("Location: /itinerary/{$itineraryId}/activity/create");
+            exit;
+        }
+
+        if (Activity::hasOverlap($itineraryId, $startTime, $endTime)) {
+            Session::setFlash(Session::FLASH_ERROR, 'This activity overlaps with an existing activity.');
+            header("Location: /itinerary/{$itineraryId}/activity/create");
+            exit;
+        }
+
+        $locationId = 1; // Fallback
+        if (!empty($locationName) || !empty($locationAddress)) {
+            $location = new Location();
+            $location->setName($locationName);
+            $location->setAddress($locationAddress);
+            if ($location->create()) {
+                $locationId = $location->getId();
+            }
+        }
+
+        $activity = new Activity();
+        $activity->setName($name);
+        $activity->setDescription($description);
+        $activity->setStartTime($startTime);
+        $activity->setEndTime($endTime);
+        $activity->setCategory($category);
+        $activity->setLocationId($locationId);
+        $activity->setActivityStatus('Draft');
+        $activity->setItineraryId($itineraryId);
+        $activity->setTripMemberId($tripMember->getId());
+        
+        if ($activity->create()) {
+            Session::setFlash(Session::FLASH_SUCCESS, 'Activity created successfully as a Draft.');
+            header("Location: /itinerary/dashboard/{$itineraryId}");
+            exit;
+        } else {
+            Session::setFlash(Session::FLASH_ERROR, 'Failed to create activity.');
+            header("Location: /itinerary/{$itineraryId}/activity/create");
+            exit;
+        }
     }
 
     public function show($itineraryId, $activityId)
@@ -51,7 +136,7 @@ class ActivityController extends Controller
             $totalGoing      = $attendanceList->getTotalAttendeeCount();
         }
 
-        $currentMemberStatus = AttendanceMember::getByTripMemberAndAttendanceList($attendanceList->getId(), $tripMember->getId());
+        $currentMemberStatus = AttendanceMember::getByTripMemberAndAttendanceList($attendanceList ? $attendanceList->getId() : 0, $tripMember->getId());
 
         $this->view('activity/show', [
             'itineraryId'         => $itineraryId,

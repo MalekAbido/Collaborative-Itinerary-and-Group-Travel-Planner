@@ -186,9 +186,19 @@ if ($percentage >= 100) {
                         <?php if ($currentUser->getProfileImage()): ?>
                             <img src="/<?= htmlspecialchars($currentUser->getProfileImage()) ?>" alt="Profile" class="h-8 w-8 rounded-full border-2 border-outline-variant object-cover">
                         <?php else: ?>
-                            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
-                                <?= strtoupper(substr($currentUser->getFirstName(), 0, 1) . substr($currentUser->getLastName(), 0, 1)) ?>
-                            </div>
+                        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5 flex flex-col justify-center items-center text-center text-on-surface-variant min-h-[160px]">
+                            <span class="material-symbols-outlined text-[40px] mb-3 text-outline">account_balance_wallet</span>
+                            <p class="text-body-md mb-4">No Group Fund exists for this trip yet.</p>
+                            <?php if (\App\Helpers\Auth::hasRole('Editor', $userRole)): ?>
+                            <form action="/finance/create-fund/<?= htmlspecialchars($itineraryId) ?>" method="POST">
+                                <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-tertiary text-on-tertiary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-tertiary/90 transition">
+                                    <span class="material-symbols-outlined text-base">add</span> Set up Group Fund
+                                </button>
+                            </form>
+                            <?php else: ?>
+                            <p class="text-body-sm text-outline mt-2">Only organizers and editors can set up the group fund.</p>
+                            <?php endif; ?>
+                        </div>
                         <?php endif; ?>
                     </a>
                 </div>
