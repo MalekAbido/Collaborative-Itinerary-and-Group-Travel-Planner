@@ -7,6 +7,7 @@
     <title>Itinerary | Login</title>
 
     <link rel="stylesheet" href="/assets/css/tailwind.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -48,7 +49,7 @@
             <h2 class="font-display text-3xl font-bold text-on-surface mb-2">Welcome back</h2>
             <p class="font-body text-on-surface-variant mb-8">Please enter your details to login.</p>
 
-            <form action="/login/process" method="POST" class="flex flex-col gap-5">
+            <form id="login-form" action="/login/process" method="POST" class="flex flex-col gap-5" novalidate>
                 <div>
                     <label
                         class="block text-[12px] font-bold tracking-widest text-on-surface-variant uppercase mb-2">Email
@@ -68,11 +69,18 @@
                             <span id="reg-eye" class="material-symbols-outlined">visibility_off</span>
                         </button>
                     </div>
+                </div>
 
+                <div class="flex items-center -mt-1 mb-2">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" name="remember_me"
+                            class="w-4 h-4 text-primary bg-surface border-outline-variant rounded focus:ring-primary focus:ring-2 cursor-pointer">
+                        <span class="text-sm text-on-surface-variant font-medium">Remember me</span>
+                    </label>
                 </div>
 
                 <button type="submit"
-                    class="w-full bg-primary text-white font-semibold py-4 rounded-xl shadow-lg hover:bg-on-primary-fixed-variant transition-colors mt-2 flex justify-center items-center gap-2 cursor-pointer">
+                    class="w-full bg-primary text-white font-semibold py-4 rounded-xl shadow-lg hover:bg-on-primary-fixed-variant transition-colors flex justify-center items-center gap-2 cursor-pointer">
                     Login
                     <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
                 </button>
@@ -87,6 +95,7 @@
     </div>
 </body>
 
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 <script src="/assets/js/main.js"></script>
 
 </html>
