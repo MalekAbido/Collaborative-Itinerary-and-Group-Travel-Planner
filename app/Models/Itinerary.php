@@ -8,7 +8,7 @@ use PDO;
 class Itinerary
 {
     private $db;
-    private $id;
+
     private $itineraryId;
     private $title;
     private $description;
@@ -136,24 +136,23 @@ class Itinerary
         $this->itineraryItems = $itineraryItems;
     }
 
-    public function create()
+    public function create($title, $description, $startDate, $endDate)
     {
-        $this->itineraryId = uniqid('itin_');
-        $sql               = "INSERT INTO Itinerary (itineraryId, title, description, startDate, endDate) VALUES (:itineraryId, :title, :description, :startDate, :endDate)";
-        $stmt              = $this->db->prepare($sql);
-        $success           = $stmt->execute([
-            ':itineraryId' => $this->itineraryId,
-            ':title'       => $this->title,
-            ':description' => $this->description,
-            ':startDate'   => $this->startDate,
-            ':endDate'     => $this->endDate,
+        $this->itineraryId = uniqid('trip_');
+
+        $sql = "INSERT INTO Itinerary (itineraryId, title, description, startDate, endDate)
+                VALUES (:id, :title, :desc, :start, :end)";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':id'    => $this->itineraryId,
+            ':title' => $title,
+            ':desc'  => $description,
+            ':start' => $startDate,
+            ':end'   => $endDate,
         ]);
 
-        if ($success) {
-            $this->id = $this->db->lastInsertId();
-        }
-
-        return $success;
+        return $this->itineraryId;
     }
 
     public function read($id)
@@ -176,9 +175,21 @@ class Itinerary
         return false;
     }
 
-    public function update()
+    public function findByIdNumeric($id)
     {
-        $sql  = "UPDATE Itinerary SET title = :title, description = :description, startDate = :startDate, endDate = :endDate WHERE id = :id";
+        $sql  = "SELECT * FROM Itinerary WHERE id = :id LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $id]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function update($id, $title, $description, $startDate, $endDate)
+    {
+        $sql = "UPDATE Itinerary
+                SET title = :title, description = :desc, startDate = :start, endDate = :end
+                WHERE itineraryId = :id";
+
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             ':title'       => $this->title,
@@ -189,11 +200,11 @@ class Itinerary
         ]);
     }
 
-    public function delete()
+    public function delete($id)
     {
-        $sql  = "DELETE FROM Itinerary WHERE id = :id";
+        $sql  = "DELETE FROM Itinerary WHERE itineraryId = :id";
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute([':id' => $this->id]);
+        return $stmt->execute([':id' => $id]);
     }
 
     public function addActivity($activity)

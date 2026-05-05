@@ -82,16 +82,17 @@ ALTER TABLE EmergencyContact
 
 CREATE TABLE Expense
 (
-  id            INT           NOT NULL AUTO_INCREMENT,
-  expenseId     VARCHAR(55)   NOT NULL,
-  amount        DECIMAL(15,2) NULL    ,
-  currencyType  VARCHAR(10)   NULL    ,
-  description   TEXT          NULL    ,
-  category      VARCHAR(50)   NULL    ,
-  isNonCash     BOOLEAN       NULL    ,
-  paidByKitty   BOOLEAN       NULL    ,
-  tripFinanceId INT           NOT NULL,
-  tripMemberId  INT           NOT NULL,
+  id              INT           NOT NULL AUTO_INCREMENT,
+  expenseId       VARCHAR(55)   NOT NULL,
+  amount          DECIMAL(15,2) NULL    ,
+  refundedAmount  DECIMAL(15,2) NULL    ,
+  currencyType    VARCHAR(10)   NULL    ,
+  description     TEXT          NULL    ,
+  category        VARCHAR(50)   NULL    ,
+  isNonCash       BOOLEAN       NULL    ,
+  paidByKitty     BOOLEAN       NULL    ,
+  tripFinanceId   INT           NOT NULL,
+  tripMemberId    INT           NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -656,9 +657,9 @@ INSERT INTO GroupFund (fundId, targetBalance, currentBalance, tripFinanceId) VAL
 ('fund_001', 150000.00, 50000.00, 1),
 ('fund_002', 5000.00, 2000.00, 2);
 
-INSERT INTO Expense (expenseId, amount, currencyType, description, category, isNonCash, paidByKitty, tripFinanceId, tripMemberId) VALUES
-('exp_001', 30000.00, 'JPY', 'Flight Booking Deposit', 'Transport', FALSE, FALSE, 1, 1),
-('exp_002', 15000.00, 'JPY', 'Hotel Booking', 'Accommodation', FALSE, TRUE, 1, 2);
+INSERT INTO Expense (expenseId, amount, refundedAmount, currencyType, description, category, isNonCash, paidByKitty, tripFinanceId, tripMemberId) VALUES
+('exp_001', 30000.00, 0.00, 'JPY', 'Flight Booking Deposit', 'Transport', FALSE, FALSE, 1, 1),
+('exp_002', 15000.00, 0.00, 'JPY', 'Hotel Booking', 'Accommodation', FALSE, TRUE, 1, 2);
 
 -- 4. Level 3 Dependencies 
 -- Note: Subtrip uses ID 1, Locations use 1, 2, 3
