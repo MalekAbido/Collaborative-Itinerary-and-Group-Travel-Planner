@@ -77,10 +77,13 @@
                     <span class="material-symbols-outlined text-base">warning</span>SOS
                 </button>
                 <a href="/profile" class="flex items-center gap-2 cursor-pointer">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
-                        <?= isset($user) ? strtoupper(substr($user->getFirstName(), 0, 1) . substr($user->getLastName(), 0, 1)) : 'ME' ?>
-                    </div>
-                </a>
+                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
+                            <?php
+                            $currentUser = \App\Helpers\Auth::user();
+                            echo $currentUser ? strtoupper(substr($currentUser->getFirstName(), 0, 1) . substr($currentUser->getLastName(), 0, 1)) : 'ME';
+                            ?>
+                        </div>
+                    </a>
             </div>
         </div>
     </nav>
@@ -98,7 +101,7 @@
                     </p>
                 </div>
                 <div class="flex gap-3">
-                    <a href="/itinerary/settings/<?= htmlspecialchars($data['trip']['itineraryId']) ?>" class="inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-body-sm px-6 py-2.5 hover:bg-surface-container transition">
+                    <a href="/itinerary/settings/<?= htmlspecialchars($data['trip']['id']) ?>" class="inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-body-sm px-6 py-2.5 hover:bg-surface-container transition">
                         <span class="material-symbols-outlined text-[18px]">settings</span> Settings
                     </a>
                     <button class="inline-flex items-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition">
