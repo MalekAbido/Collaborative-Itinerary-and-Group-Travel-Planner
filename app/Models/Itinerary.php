@@ -14,6 +14,9 @@ class Itinerary {
     private $startDate;
     private $endDate;
 
+    public function getItineraryId() {
+        return $this->itineraryId;
+    }
     public function __construct(){
         $this->db=Database::getInstance()->getConnection();
     }

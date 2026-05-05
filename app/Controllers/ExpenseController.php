@@ -8,19 +8,21 @@ use App\Models\ExpenseShare;
 
 class ExpenseController extends Controller
 {
-    public function showAddForm()
+    public function showAddForm($id)
     {
-        // $itineraryId = $_GET['itineraryId'] ?? 1; 
+        $itineraryId = $id;
+        $tripMemberModel = new \App\Models\TripMember();
+        $members = $tripMemberModel->getAllByItineraryId($itineraryId);
 
-        // $tripMemberModel = new \App\Models\TripMember(); needs to be created
+        $financeModel = new \App\Models\TripFinance();
+        $financeModel->readByItinerary($itineraryId);
+        $financeId = $financeModel->getId();
 
-        // $members = $tripMemberModel->findByItineraryId($itineraryId);
-
-        // $this->view('expenses/add', [
-        //     'members' => $members
-        // ]);
-
-        $this->view('expenses/add');
+        $this->view('expenses/add', [
+            'members' => $members,
+            'financeId' => $financeId,
+            'itineraryId' => $id
+        ]);
     }
 
     public function createExpense()
@@ -73,7 +75,12 @@ class ExpenseController extends Controller
             }
         }
 
-        header("Location: /finance/expense/details?id=" . $expenseId);
+
+        $financeModel = new \App\Models\TripFinance();
+        $financeModel->read($financeId);
+        $itineraryId = $financeModel->getItineraryId();
+
+        header("Location: /finance/dashboard/" . $itineraryId . "?success=expense_added");
         exit();
     }
 
