@@ -9,6 +9,9 @@ class Itinerary
 {
     private $db;
 
+    private $id;
+    private $itineraryItems;
+
     private $itineraryId;
     private $title;
     private $description;
@@ -152,7 +155,11 @@ class Itinerary
             ':end'   => $endDate,
         ]);
 
-        return $this->itineraryId;
+        // ADD THIS LINE to grab the numeric ID from the database
+        $this->id = $this->db->lastInsertId();
+
+        // Keep returning the string ID for the URLs
+        return $this->itineraryId; 
     }
 
     public function read($id)

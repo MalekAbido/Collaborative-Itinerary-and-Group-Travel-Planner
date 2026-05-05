@@ -14,8 +14,8 @@ class TripMemberController extends Controller
      */
     public function index($id)
     {
-        // 1. Get the trip details so the view has the title and ID
         $itineraryModel = new Itinerary();
+        // 1. Look up the trip by the string ID
         $tripData = $itineraryModel->findById($id);
 
         if (!$tripData) {
@@ -23,11 +23,11 @@ class TripMemberController extends Controller
             exit;
         }
 
-        // 2. Get all members for this specific trip
+        // 2. Query the members using the internal integer ID ($tripData['id'])
+        // DO NOT use $id here, because $id is the string!
         $memberModel = new TripMember();
-        $members = $memberModel->getAllByItineraryId($id); 
+        $members = $memberModel->getAllByItineraryId($tripData['id']); 
 
-        // 3. Load the view we just built
         $this->view("itinerary/members", [
             'trip' => $tripData,
             'members' => $members
