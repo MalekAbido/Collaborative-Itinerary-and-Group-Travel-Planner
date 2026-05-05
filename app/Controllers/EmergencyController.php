@@ -8,66 +8,81 @@ use App\Models\User;
 
 class EmergencyController extends Controller
 {
-    public function addEmergencyContact($userId, $contactData)
+    private $userId;
+
+    public function __construct()
     {
-        if (!$this->validateEmergencyInput($contactData)) {
-            return json_encode(['status' => 'error', 'message' => 'Invalid contact data.']);
-        }
-
-        $contact = new EmergencyContact();
-        $contact->setName($contactData['name']);
-        $contact->setEmail($contactData['email'] ?? '');
-        $contact->setPhone($contactData['phone'] ?? '');
-        $contact->setRelationship($contactData['relationship']);
-        $contact->setUserId($userId);
-
-        if ($contact->create()) {
-            $user = User::getByUserId($userId);
-            $user->addEmergencyContact($contact);
-            return json_encode(['status' => 'success', 'message' => 'Emergency contact successfully recorded.']);
-        }
-
-        return json_encode(['status' => 'error', 'message' => 'Database error while saving emergency contact.']);
+        $this->userId = 1; // Session.getUserId();
     }
 
-    public function removeEmergencyContact($userId, $contactId)
+    public function addEmergencyContact()
     {
+        $contactData = $_POST;
+
+        if (!$this->validateEmergencyInput($contactData)) {
+            die("Invalid contact data.");
+        }
+
+        $contactData['userId'] = $this->userId;
+        
+        $contact = new EmergencyContact();
+        if ($contact->create($contactData)) {
+            header("Location: /profile");
+            exit;
+        }
+
+        die("Database error while saving emergency contact.");
+    }
+
+    public function removeEmergencyContact()
+    {
+        $contactId = $_POST['contactId'] ?? null;
+
+        if (!$contactId) {
+            die("No contact ID provided.");
+        }
+
         $contact = new EmergencyContact();
 
-        if ($contact->read($contactId) && $contact->getUserId() == $userId) {
+        if ($contact->read($contactId) && $contact->getUserId() == $this->userId) {
             if ($contact->delete()) {
-                return json_encode(['status' => 'success', 'message' => 'Emergency contact successfully removed.']);
+                header("Location: /profile");
+                exit;
             }
         }
 
-        return json_encode(['status' => 'error', 'message' => 'Failed to remove contact or unauthorized.']);
+        die("Failed to remove contact or unauthorized.");
     }
 
-    public function updateEmergencyContact($userId, $contactId, $contactData)
+    public function updateEmergencyContact()
     {
-        if (!$this->validateEmergencyInput($contactData)) {
-            return json_encode(['status' => 'error', 'message' => 'Invalid contact data.']);
+        $contactData = $_POST;
+        $contactId = $contactData['contactId'] ?? null;
+
+        if (!$contactId || !$this->validateEmergencyInput($contactData)) {
+            die("Invalid contact data.");
         }
 
         $contact = new EmergencyContact();
 
-        if ($contact->read($contactId) && $contact->getUserId() == $userId) {
+        if ($contact->read($contactId) && $contact->getUserId() == $this->userId) {
             $contact->setName($contactData['name']);
             $contact->setEmail($contactData['email'] ?? '');
             $contact->setPhone($contactData['phone'] ?? '');
             $contact->setRelationship($contactData['relationship']);
 
             if ($contact->update()) {
-                return json_encode(['status' => 'success', 'message' => 'Emergency contact successfully updated.']);
+                header("Location: /profile");
+                exit;
             }
         }
 
-        return json_encode(['status' => 'error', 'message' => 'Failed to update contact or unauthorized.']);
+        die("Failed to update contact or unauthorized.");
     }
 
-    public function triggerEmergencyAlert($userId, $location) {}
+    public function triggerEmergencyAlert($location) {}
 
-    public function validateEmergencyRequest($userId) {}
+    public function validateEmergencyRequest() {}
 
     public function validateEmergencyInput($contactData)
     {

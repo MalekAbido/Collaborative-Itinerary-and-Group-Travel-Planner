@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Core\Database;
@@ -16,7 +15,7 @@ class User
     private $passwordHash;
     private $nationality;
     private $policyNumber;
-    private $allergies = [];
+    private $allergies         = [];
     private $emergencyContacts = [];
 
     public function __construct()
@@ -28,6 +27,7 @@ class User
     {
         return $this->id;
     }
+
     public function setId($id)
     {
         $this->id = $id;
@@ -37,6 +37,7 @@ class User
     {
         return $this->userId;
     }
+
     public function setUserId($userId)
     {
         $this->userId = $userId;
@@ -46,6 +47,7 @@ class User
     {
         return $this->firstName;
     }
+
     public function setFirstName($firstName)
     {
         $this->firstName = $firstName;
@@ -55,6 +57,7 @@ class User
     {
         return $this->lastName;
     }
+
     public function setLastName($lastName)
     {
         $this->lastName = $lastName;
@@ -64,6 +67,7 @@ class User
     {
         return $this->email;
     }
+
     public function setEmail($email)
     {
         $this->email = $email;
@@ -73,6 +77,7 @@ class User
     {
         return $this->passwordHash;
     }
+
     public function setPasswordHash($passwordHash)
     {
         $this->passwordHash = $passwordHash;
@@ -82,6 +87,7 @@ class User
     {
         return $this->nationality;
     }
+
     public function setNationality($nationality)
     {
         $this->nationality = $nationality;
@@ -91,6 +97,7 @@ class User
     {
         return $this->policyNumber;
     }
+
     public function setPolicyNumber($policyNumber)
     {
         $this->policyNumber = $policyNumber;
@@ -100,6 +107,7 @@ class User
     {
         return $this->allergies;
     }
+
     public function setAllergies($allergies)
     {
         $this->allergies = $allergies;
@@ -109,6 +117,7 @@ class User
     {
         return $this->emergencyContacts;
     }
+
     public function setEmergencyContacts($emergencyContacts)
     {
         $this->emergencyContacts = $emergencyContacts;
@@ -116,8 +125,8 @@ class User
 
     public static function getByUserId($userId)
     {
-        $db = Database::getInstance()->getConnection();
-        $sql = "SELECT * FROM User WHERE userId = :userId LIMIT 1";
+        $db   = Database::getInstance()->getConnection();
+        $sql  = "SELECT * FROM User WHERE id = :userId LIMIT 1";
         $stmt = $db->prepare($sql);
         $stmt->execute([':userId' => $userId]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -134,17 +143,19 @@ class User
             $user->setPolicyNumber($data['policyNumber']);
             return $user;
         }
+
         return null;
     }
 
-    public static function getByEmail($email){
-        $db = Database::getInstance()->getConnection();
-        $sql = "SELECT * FROM User WHERE email = :email LIMIT 1";
+    public static function getByEmail($email)
+    {
+        $db   = Database::getInstance()->getConnection();
+        $sql  = "SELECT * FROM User WHERE email = :email LIMIT 1";
         $stmt = $db->prepare($sql);
         $stmt->execute([':email' => $email]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if($data){
+        if ($data) {
             $user = new self();
             $user->setId($data['id']);
             $user->setUserId($data['userId']);
@@ -154,69 +165,73 @@ class User
             $user->setPasswordHash($data['passwordHash']);
             return $user;
         }
+
         return null;
     }
 
     public function create()
     {
         $this->userId = uniqid('usr_');
-        $sql = "INSERT INTO User (userId, firstName, lastName, email, passwordHash, nationality, policyNumber) VALUES (:userId, :firstName, :lastName, :email, :passwordHash, :nationality, :policyNumber)";
-        $stmt = $this->db->prepare($sql);
+        $sql          = "INSERT INTO User (userId, firstName, lastName, email, passwordHash, nationality, policyNumber)
+                VALUES (:userId, :firstName, :lastName, :email, :passwordHash, :nationality, :policyNumber)";
+        $stmt    = $this->db->prepare($sql);
         $success = $stmt->execute([
-            ':userId' => $this->userId,
-            ':firstName' => $this->firstName,
-            ':lastName' => $this->lastName,
-            ':email' => $this->email,
+            ':userId'       => $this->userId,
+            ':firstName'    => $this->firstName,
+            ':lastName'     => $this->lastName,
+            ':email'        => $this->email,
             ':passwordHash' => $this->passwordHash,
-            ':nationality' => $this->nationality,
-            ':policyNumber' => $this->policyNumber
+            ':nationality'  => $this->nationality,
+            ':policyNumber' => $this->policyNumber,
         ]);
 
         if ($success) {
             $this->id = $this->db->lastInsertId();
         }
+
         return $success;
     }
 
     public function read($id)
     {
-        $sql = "SELECT * FROM User WHERE id = :id LIMIT 1";
+        $sql  = "SELECT * FROM User WHERE id = :id LIMIT 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($data) {
-            $this->id = $data['id'];
-            $this->userId = $data['userId'];
-            $this->firstName = $data['firstName'];
-            $this->lastName = $data['lastName'];
-            $this->email = $data['email'];
+            $this->id           = $data['id'];
+            $this->userId       = $data['userId'];
+            $this->firstName    = $data['firstName'];
+            $this->lastName     = $data['lastName'];
+            $this->email        = $data['email'];
             $this->passwordHash = $data['passwordHash'];
-            $this->nationality = $data['nationality'];
+            $this->nationality  = $data['nationality'];
             $this->policyNumber = $data['policyNumber'];
             return true;
         }
+
         return false;
     }
 
     public function update()
     {
-        $sql = "UPDATE User SET firstName = :firstName, lastName = :lastName, email = :email, passwordHash = :passwordHash, nationality = :nationality, policyNumber = :policyNumber WHERE id = :id";
+        $sql  = "UPDATE User SET firstName = :firstName, lastName = :lastName, email = :email, passwordHash = :passwordHash, nationality = :nationality, policyNumber = :policyNumber WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
-            ':firstName' => $this->firstName,
-            ':lastName' => $this->lastName,
-            ':email' => $this->email,
+            ':firstName'    => $this->firstName,
+            ':lastName'     => $this->lastName,
+            ':email'        => $this->email,
             ':passwordHash' => $this->passwordHash,
-            ':nationality' => $this->nationality,
+            ':nationality'  => $this->nationality,
             ':policyNumber' => $this->policyNumber,
-            ':id' => $this->id
+            ':id'           => $this->id,
         ]);
     }
 
     public function delete()
     {
-        $sql = "DELETE FROM User WHERE id = :id";
+        $sql  = "DELETE FROM User WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([':id' => $this->id]);
     }
@@ -231,7 +246,6 @@ class User
         $this->allergies[] = $allergy;
     }
 
-
     public function register()
     {
         return $this->create();
@@ -239,15 +253,16 @@ class User
 
     public function login($email, $password)
     {
-        $sql = "SELECT * FROM User WHERE email = :email LIMIT 1";
+        $sql  = "SELECT * FROM User WHERE email = :email LIMIT 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':email' => $email]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($data && password_verify($password, $data['passwordHash'])) {
             $this->read($data['id']);
-            return true;
+            return $data['id'];
         }
+
         return false;
     }
 
@@ -262,19 +277,22 @@ class User
         foreach ($this->emergencyContacts as $emergencyContact) {
             $emergencyContact->update();
         }
+
         foreach ($this->allergies as $allergy) {
             $allergy->update();
         }
+
         $this->update();
     }
 
     public function loadAllergies()
     {
-        $sql = "SELECT * FROM Allergy WHERE userId = :userId";
+        $sql  = "SELECT * FROM Allergy WHERE userId = :userId";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':userId' => $this->id]);
 
         $this->allergies = [];
+
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $allergy = new Allergy();
             $allergy->setId($row['id']);
@@ -289,11 +307,12 @@ class User
 
     public function loadEmergencyContacts()
     {
-        $sql = "SELECT * FROM EmergencyContact WHERE userId = :userId";
+        $sql  = "SELECT * FROM EmergencyContact WHERE userId = :userId";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':userId' => $this->id]);
 
         $this->emergencyContacts = [];
+
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $contact = new EmergencyContact();
             $contact->setId($row['id']);
@@ -309,10 +328,10 @@ class User
 
     public function getUserItineraries()
     {
-        $sql = "SELECT i.id, i.itineraryId, i.title, i.description, i.startDate, i.endDate, tm.role, tm.joinedAt 
-                FROM Itinerary i 
-                JOIN TripMember tm ON i.id = tm.itineraryId 
-                WHERE tm.userId = :userId 
+        $sql = "SELECT i.id, i.itineraryId, i.title, i.description, i.startDate, i.endDate, tm.role, tm.joinedAt
+                FROM Itinerary i
+                JOIN TripMember tm ON i.id = tm.itineraryId
+                WHERE tm.userId = :userId
                 ORDER BY i.startDate ASC";
 
         $stmt = $this->db->prepare($sql);
@@ -320,7 +339,31 @@ class User
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function createItinerary() {}
+    public function createItinerary()
+    {}
 
-    public function joinItinerary($secureToken) {}
+    public function joinItinerary($secureToken)
+    {}
+
+    public static function updateSessionToken($userId, $hashedSessionToken)
+    {
+        $db     = Database::getInstance()->getConnection();
+        $sql    = "UPDATE User SET sessionToken = :sessionToken WHERE id = :id;";
+        $stmt   = $db->prepare($sql);
+        $result = $stmt->execute([
+            ':sessionToken' => $hashedSessionToken,
+            ':id'           => $userId,
+        ]);
+        return $result;
+    }
+
+    public static function getBySessionToken($hashedSessionToken)
+    {
+        $db   = Database::getInstance()->getConnection();
+        $sql  = "SELECT id FROM User WHERE sessionToken = :token LIMIT 1";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':token' => $hashedSessionToken]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $data ? $data['id'] : null;
+    }
 }

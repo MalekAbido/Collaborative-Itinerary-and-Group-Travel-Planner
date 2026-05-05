@@ -57,43 +57,44 @@ class AuthController extends Controller
     {
         header('Content-Type: application/json');
 
-        if($_SERVER['REQUEST_METHOD'] == 'POST'){
-            $firstName = htmlspecialchars(trim($_POST['first_name']));
-            $lastName = htmlspecialchars(trim($_POST['last_name']));
-            $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
-            $password = $_POST['password'];
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $firstName       = htmlspecialchars(trim($_POST['first_name']));
+            $lastName        = htmlspecialchars(trim($_POST['last_name']));
+            $email           = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
+            $password        = $_POST['password'];
             $confirmPassword = $_POST['confirm_password'];
 
             $errors = [];
 
-            if(empty($firstName) || empty($lastName) || empty($email) || empty($password) || empty($confirmPassword)){
+            if (empty($firstName) || empty($lastName) || empty($email) || empty($password) || empty($confirmPassword)) {
                 $errors[] = "All fields are required.";
-            }
+            } else
 
-            else if(!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)){
+            if (! empty($email) && ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $errors[] = "Invalid Email format.";
-            }
-            else if(User::getByEmail($email)){
+            } else
+
+            if (User::getByEmail($email)) {
                 $errors[] = "Email already in use.";
-            }
+            } else
 
-            else if (strlen($password) < 8) {
+            if (strlen($password) < 8) {
                 $errors[] = "Password must be at least 8 characters long.";
-            }
+            } else
 
-            else if (!preg_match('/[A-Z]/', $password)) {
+            if (! preg_match('/[A-Z]/', $password)) {
                 $errors[] = "Password must contain at least one uppercase letter.";
-            }
+            } else
 
-            else if (!preg_match('/[0-9]/', $password)) {
+            if (! preg_match('/[0-9]/', $password)) {
                 $errors[] = "Password must contain at least one number.";
-            }
+            } else
 
-            else if ($password !== $confirmPassword) {
+            if ($password !== $confirmPassword) {
                 $errors[] = "Passwords do not match.";
             }
-            
-            if(!empty($errors)){
+
+            if (! empty($errors)) {
                 echo json_encode(['success' => false, 'errors' => $errors]);
                 exit();
             }
@@ -109,7 +110,7 @@ class AuthController extends Controller
             $user->setNationality(null);
             $user->setPolicyNumber(null);
 
-            if($user->register()){
+            if ($user->register()) {
                 echo json_encode(['success' => true, 'redirect' => '/login']);
                 exit();
             } else {
@@ -118,7 +119,7 @@ class AuthController extends Controller
             }
         }
     }
-    
+
     public function logout()
     {
     }

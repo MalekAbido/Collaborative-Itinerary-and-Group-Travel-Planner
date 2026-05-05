@@ -382,6 +382,7 @@ CREATE TABLE User
   passwordHash VARCHAR(255) NULL    ,
   nationality  VARCHAR(50)  NULL    ,
   policyNumber CHAR(19)     NULL    ,
+  sessionToken VarCHAR(255) NULL    ,
   PRIMARY KEY (id)
 );
 
@@ -393,6 +394,9 @@ ALTER TABLE User
 
 ALTER TABLE User
   ADD CONSTRAINT UQ_email UNIQUE (email);
+
+ALTER TABLE User
+  ADD CONSTRAINT UQ_sessionToken UNIQUE (sessionToken);
 
 CREATE TABLE Vote
 (
