@@ -1,6 +1,7 @@
 <?php
-// Provided by UserController::showUserTripsDashboard()
-// $myTrips (Array of itineraries)
+/**
+ * @var array $myTrips
+ */
 ?>
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
@@ -30,26 +31,15 @@
 
 <div class="flex h-screen overflow-hidden">
 
-    <!-- NAVBAR WITH EMBEDDED NAVIGATION -->
-    <nav class="fixed inset-x-0 top-0 z-50 h-navbar bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant shadow-sm">
-        <div class="mx-auto flex h-full max-w-content items-center justify-between px-6 lg:px-8">
+    <nav class="fixed inset-x-0 top-0 z-50 h-navbar bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant shadow-sm">
+        <div class="mx-auto flex h-full max-w-[1280px] items-center justify-between px-6 lg:px-8">
             <div class="flex items-center gap-8">
-                <a href="/dashboard" class="font-display text-[22px] font-extrabold tracking-tight text-primary whitespace-nowrap">
-                    Itinerary
-                </a>
-                
-                <!-- Desktop Navigation Links -->
-                <div class="hidden md:flex items-center gap-2">
-                    <a href="/dashboard" class="px-3 py-2 rounded-md text-body-sm font-medium text-primary border-b-2 border-primary">
-                        Dashboard
-                    </a>
+                <a href="/dashboard" class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="/dashboard/" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Dashboard</a>
                 </div>
             </div>
-            
             <div class="flex items-center gap-3">
-                <button class="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant text-on-surface-variant hover:bg-surface-container transition">
-                    <span class="material-symbols-outlined text-[22px]">notifications</span>
-                </button>
                 <a href="/profile" class="flex items-center gap-2 cursor-pointer">
                     <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
                         <?= isset($user) ? strtoupper(substr($user->getFirstName(), 0, 1) . substr($user->getLastName(), 0, 1)) : 'ME' ?>
@@ -71,9 +61,9 @@
                         Manage your upcoming itineraries and past adventures.
                     </p>
                 </div>
-                <button class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-md px-8 py-4 shadow-sm hover:bg-on-primary-fixed-variant transition shrink-0">
-                    <span class="material-symbols-outlined text-[20px]">add</span> Create Trip
-                </button>
+                    <a href="/itinerary/create" class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-md px-8 py-4 shadow-sm hover:bg-on-primary-fixed-variant transition shrink-0">
+                        <span class="material-symbols-outlined text-[20px]">add</span> Create Trip
+                    </a>
             </header>
 
             <!-- Trips Grid -->
@@ -100,7 +90,7 @@
                                     <?= htmlspecialchars($trip['description']) ?>
                                 </p>
                                 
-                                <a href="/itinerary/<?= htmlspecialchars($trip['itineraryId']) ?>" class="mt-auto inline-flex items-center gap-1 text-body-sm font-semibold text-primary hover:underline group">
+                                <a href="/itinerary/dashboard/<?= htmlspecialchars($trip['itineraryId']) ?>" class="mt-auto inline-flex items-center gap-1 text-body-sm font-semibold text-primary hover:underline group">
                                     View Dashboard <span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
                                 </a>
                             </div>
