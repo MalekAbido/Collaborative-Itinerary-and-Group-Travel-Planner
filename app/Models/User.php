@@ -208,7 +208,7 @@ class User
             $this->passwordHash = $data['passwordHash'];
             $this->nationality  = $data['nationality'];
             $this->policyNumber = $data['policyNumber'];
-            return true;
+            return $this;
         }
 
         return false;

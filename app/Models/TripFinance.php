@@ -90,6 +90,24 @@ class TripFinance
         ]);
     }
 
+    public function read($id)
+    {
+        $sql = "SELECT * FROM TripFinance WHERE id = :id LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($data) {
+            $this->id = $data['id'];
+            $this->financeId = $data['financeId'];
+            $this->itineraryId = $data['itineraryId'];
+            $this->baseCurrency = $data['baseCurrency'];
+            $this->totalBudgetLimit = $data['budgetLimit'];
+            return true;
+        }
+        return false;
+    }
+
     public function readByItinerary($itineraryId)
     {
         $sql = "SELECT * FROM TripFinance WHERE itineraryId = :itineraryId LIMIT 1";

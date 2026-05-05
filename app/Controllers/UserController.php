@@ -1,7 +1,7 @@
 <?php
-
 namespace App\Controllers;
 
+use App\Helpers\Auth;
 use App\Helpers\Validator;
 use App\Helpers\Auth;
 use App\Models\User;
@@ -25,9 +25,9 @@ class UserController extends Controller
             $user->loadEmergencyContacts();
 
             return $this->view('user/profile', [
-                'user' => $user,
-                'allergies' => $user->getAllergies(),
-                'emergencyContacts' => $user->getEmergencyContacts()
+                'user'              => $user,
+                'allergies'         => $user->getAllergies(),
+                'emergencyContacts' => $user->getEmergencyContacts(),
             ]);
         }
 
@@ -53,11 +53,15 @@ class UserController extends Controller
     {
         // 1. Grab POST data directly
         $data = $_POST;
+    {
+        // 1. Grab POST data directly
+        $data = $_POST;
 
         if (!$this->validateProfileData($data)) {
             die("Invalid profile data provided. Please check your inputs.");
         }
 
+        $user = new User();
         $user = new User();
 
         if ($user->read($this->userId)) {
@@ -66,7 +70,15 @@ class UserController extends Controller
             header("Location: /profile");
             exit;
         }
+        if ($user->read($this->userId)) {
+            $user->updateProfile($data);
 
+            header("Location: /profile");
+            exit;
+        }
+
+        die('User not found.');
+    }
         die('User not found.');
     }
 

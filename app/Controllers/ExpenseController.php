@@ -8,19 +8,21 @@ use App\Models\ExpenseShare;
 
 class ExpenseController extends Controller
 {
-    public function showAddForm()
+    public function showAddForm($id)
     {
-        // $itineraryId = $_GET['itineraryId'] ?? 1; 
+        $itineraryId = $id;
+        $tripMemberModel = new \App\Models\TripMember();
+        $members = $tripMemberModel->getAllByItineraryId($itineraryId);
 
-        // $tripMemberModel = new \App\Models\TripMember(); needs to be created
+        $financeModel = new \App\Models\TripFinance();
+        $financeModel->readByItinerary($itineraryId);
+        $financeId = $financeModel->getId();
 
-        // $members = $tripMemberModel->findByItineraryId($itineraryId);
-
-        // $this->view('expenses/add', [
-        //     'members' => $members
-        // ]);
-
-        $this->view('expenses/add');
+        $this->view('expenses/add', [
+            'members' => $members,
+            'financeId' => $financeId,
+            'itineraryId' => $id
+        ]);
     }
 
     public function createExpense()
@@ -29,7 +31,7 @@ class ExpenseController extends Controller
         $payerId = (int)($_POST['payerId'] ?? 0);
         $splitMethod = $_POST['splitMethod'] ?? 'EVEN';
         $totalAmount = (float)($_POST['amount'] ?? 0);
-        $currencyType = trim($_POST['currencyType'] ?? 'USD');
+        $currencyType = trim($_POST['currencyType'] ?? 'EGP');
         $isNonCash = isset($_POST['isNonCash']) ? 1 : 0;
         $paidByKitty = isset($_POST['paidByKitty']) ? 1 : 0;
 
@@ -44,6 +46,21 @@ class ExpenseController extends Controller
             die("Error: Invalid expense data or shares do not equal the total amount.");
         }
 
+        if($paidByKitty == 1) {
+            $groupFundModel = new \App\Models\GroupFund();
+            $fundExists = $groupFundModel->readByTripFinanceId($financeId);
+
+            if (!$fundExists) {
+                die("Error: There is no Group Fund set up for this trip yet.");
+            }
+            
+            if ($groupFundModel->getCurrentBalance() < $totalAmount) {
+                die("Error: Insufficient funds in the group kitty to cover this expense.");
+            } else {
+                $groupFundModel->deductExpense($totalAmount);
+            }
+        }
+
         $expenseModel = new Expense();
         $expenseId = $expenseModel->create([
             'financeId'   => $financeId,
@@ -55,7 +72,7 @@ class ExpenseController extends Controller
             'description' => $details['description'],
             'category'    => $details['category']
         ]);
-
+        
         $shareModel = new ExpenseShare();
 
         if ($splitMethod === 'EVEN') {
@@ -73,7 +90,12 @@ class ExpenseController extends Controller
             }
         }
 
-        header("Location: /finance/expense/details?id=" . $expenseId);
+
+        $financeModel = new \App\Models\TripFinance();
+        $financeModel->read($financeId);
+        $itineraryId = $financeModel->getItineraryId();
+
+        header("Location: /finance/dashboard/" . $itineraryId . "?success=expense_added");
         exit();
     }
 
@@ -97,7 +119,7 @@ class ExpenseController extends Controller
         $shareModel->deleteByExpenseId($expenseId);
         $expenseModel->delete($expenseId);
 
-        header("Location: /finance/dashboard");
+        header("Location: /finance/dashboard/" . $expense->getTripFinanceId() . "?success=expense_deleted");
         exit();
     }
 

@@ -2,6 +2,9 @@
 /**
  * @var array $myTrips
  */
+
+use App\Helpers\Session;
+
 ?>
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
@@ -59,6 +62,10 @@
                     <h1 class="font-display text-display text-on-surface mb-3">Dashboard</h1>
                     <p class="text-body-lg text-on-surface-variant max-w-[640px]">
                         Manage your upcoming itineraries and past adventures.
+                    </p>
+                    <br>
+                    <p>
+                        <?php echo Session::getFlash(Session::FLASH_ERROR); ?>
                     </p>
                 </div>
                     <a href="/itinerary/create" class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-md px-8 py-4 shadow-sm hover:bg-on-primary-fixed-variant transition shrink-0">

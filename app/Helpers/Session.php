@@ -5,6 +5,9 @@ class Session
 {
     private static $sessionName = 'ItineraryPlannerSession';
     private static $cookieName  = 'ItineraryPlannerCookie';
+    public const FLASH_SUCCESS  = 'success';
+    public const FLASH_ERROR    = 'error';
+    public const FLASH_INFO     = 'info';
     /**
      * Resumes the existing session or starts a new one.
      */

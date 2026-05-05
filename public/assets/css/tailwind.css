@@ -769,6 +769,9 @@
   .w-24 {
     width: calc(var(--spacing) * 24);
   }
+  .w-32 {
+    width: calc(var(--spacing) * 32);
+  }
   .w-full {
     width: 100%;
   }
@@ -1259,6 +1262,12 @@
   .bg-outline-variant {
     background-color: var(--color-outline-variant);
   }
+  .bg-outline-variant\/30 {
+    background-color: color-mix(in srgb, #c1c6d6 30%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-outline-variant) 30%, transparent);
+    }
+  }
   .bg-primary {
     background-color: var(--color-primary);
   }
@@ -1327,6 +1336,12 @@
   }
   .bg-surface-variant {
     background-color: var(--color-surface-variant);
+  }
+  .bg-surface\/50 {
+    background-color: color-mix(in srgb, #fcf8f8 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-surface) 50%, transparent);
+    }
   }
   .bg-tertiary {
     background-color: var(--color-tertiary);
@@ -1422,6 +1437,9 @@
   }
   .p-0 {
     padding: calc(var(--spacing) * 0);
+  }
+  .p-1 {
+    padding: var(--spacing-1);
   }
   .p-3 {
     padding: var(--spacing-3);
@@ -1690,6 +1708,9 @@
   .text-\[13px\] {
     font-size: 13px;
   }
+  .text-\[14px\] {
+    font-size: 14px;
+  }
   .text-\[15px\] {
     font-size: 15px;
   }
@@ -1763,6 +1784,9 @@
   .tracking-widest {
     --tw-tracking: var(--tracking-widest);
     letter-spacing: var(--tracking-widest);
+  }
+  .text-ellipsis {
+    text-overflow: ellipsis;
   }
   .whitespace-nowrap {
     white-space: nowrap;
@@ -1866,6 +1890,9 @@
   .text-success {
     color: var(--color-success);
   }
+  .text-success-container {
+    color: var(--color-success-container);
+  }
   .text-tertiary {
     color: var(--color-tertiary);
   }
@@ -1892,6 +1919,9 @@
   }
   .uppercase {
     text-transform: uppercase;
+  }
+  .italic {
+    font-style: italic;
   }
   .underline {
     text-decoration-line: underline;
@@ -2067,6 +2097,13 @@
       }
     }
   }
+  .group-hover\:text-primary {
+    &:is(:where(.group):hover *) {
+      @media (hover: hover) {
+        color: var(--color-primary);
+      }
+    }
+  }
   .placeholder\:text-outline {
     &::placeholder {
       color: var(--color-outline);
@@ -2086,6 +2123,16 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-error-container);
+      }
+    }
+  }
+  .hover\:bg-error\/90 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: color-mix(in srgb, #ba1a1a 90%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--color-error) 90%, transparent);
+        }
       }
     }
   }
@@ -2226,6 +2273,12 @@
   .focus\:border-secondary {
     &:focus {
       border-color: var(--color-secondary);
+    }
+  }
+  .focus\:ring-1 {
+    &:focus {
+      --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
+      box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
     }
   }
   .focus\:ring-2 {
