@@ -54,12 +54,14 @@ use App\Helpers\Session;
                 </div>
                 <div class="flex items-center gap-3">
                     <a href="/profile" class="flex items-center gap-2 cursor-pointer">
-                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
-                            <?php
-                            $currentUser = \App\Helpers\Auth::user();
-                            echo $currentUser ? strtoupper(substr($currentUser->getFirstName(), 0, 1) . substr($currentUser->getLastName(), 0, 1)) : 'ME';
-                            ?>
-                        </div>
+                        <?php $currentUser = \App\Helpers\Auth::user(); ?>
+                        <?php if ($currentUser->getProfileImage()): ?>
+                            <img src="/<?= htmlspecialchars($currentUser->getProfileImage()) ?>" alt="Profile" class="h-8 w-8 rounded-full border-2 border-outline-variant object-cover">
+                        <?php else: ?>
+                            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
+                                <?= strtoupper(substr($currentUser->getFirstName(), 0, 1) . substr($currentUser->getLastName(), 0, 1)) ?>
+                            </div>
+                        <?php endif; ?>
                     </a>
                 </div>
             </div>

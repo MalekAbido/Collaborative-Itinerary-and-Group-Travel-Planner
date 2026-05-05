@@ -15,6 +15,7 @@ class User
     private $passwordHash;
     private $nationality;
     private $policyNumber;
+    private $profileImage;
     private $allergies         = [];
     private $emergencyContacts = [];
 
@@ -103,6 +104,16 @@ class User
         $this->policyNumber = $policyNumber;
     }
 
+    public function getProfileImage()
+    {
+        return $this->profileImage;
+    }
+
+    public function setProfileImage($profileImage)
+    {
+        $this->profileImage = $profileImage;
+    }
+
     public function getAllergies()
     {
         return $this->allergies;
@@ -141,6 +152,7 @@ class User
             $user->setPasswordHash($data['passwordHash']);
             $user->setNationality($data['nationality']);
             $user->setPolicyNumber($data['policyNumber']);
+            $user->setProfileImage($data['profileImage']);
             return $user;
         }
 
@@ -163,6 +175,7 @@ class User
             $user->setLastName($data['lastName']);
             $user->setEmail($data['email']);
             $user->setPasswordHash($data['passwordHash']);
+            $user->setProfileImage($data['profileImage']);
             return $user;
         }
 
@@ -172,8 +185,8 @@ class User
     public function create()
     {
         $this->userId = uniqid('usr_');
-        $sql          = "INSERT INTO User (userId, firstName, lastName, email, passwordHash, nationality, policyNumber)
-                VALUES (:userId, :firstName, :lastName, :email, :passwordHash, :nationality, :policyNumber)";
+        $sql          = "INSERT INTO User (userId, firstName, lastName, email, passwordHash, nationality, policyNumber, profileImage)
+                VALUES (:userId, :firstName, :lastName, :email, :passwordHash, :nationality, :policyNumber, :profileImage)";
         $stmt    = $this->db->prepare($sql);
         $success = $stmt->execute([
             ':userId'       => $this->userId,
@@ -183,6 +196,7 @@ class User
             ':passwordHash' => $this->passwordHash,
             ':nationality'  => $this->nationality,
             ':policyNumber' => $this->policyNumber,
+            ':profileImage' => $this->profileImage,
         ]);
 
         if ($success) {
@@ -208,6 +222,7 @@ class User
             $this->passwordHash = $data['passwordHash'];
             $this->nationality  = $data['nationality'];
             $this->policyNumber = $data['policyNumber'];
+            $this->profileImage = $data['profileImage'];
             return $this;
         }
 
@@ -216,7 +231,7 @@ class User
 
     public function update()
     {
-        $sql  = "UPDATE User SET firstName = :firstName, lastName = :lastName, email = :email, passwordHash = :passwordHash, nationality = :nationality, policyNumber = :policyNumber WHERE id = :id";
+        $sql  = "UPDATE User SET firstName = :firstName, lastName = :lastName, email = :email, passwordHash = :passwordHash, nationality = :nationality, policyNumber = :policyNumber, profileImage = :profileImage WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             ':firstName'    => $this->firstName,
@@ -225,6 +240,7 @@ class User
             ':passwordHash' => $this->passwordHash,
             ':nationality'  => $this->nationality,
             ':policyNumber' => $this->policyNumber,
+            ':profileImage' => $this->profileImage,
             ':id'           => $this->id,
         ]);
     }
@@ -273,6 +289,10 @@ class User
         $this->setEmail($data['email']);
         $this->setNationality($data['nationality']);
         $this->setPolicyNumber($data['policyNumber']);
+
+        if (isset($data['profileImage'])) {
+            $this->setProfileImage($data['profileImage']);
+        }
 
         foreach ($this->emergencyContacts as $emergencyContact) {
             $emergencyContact->update();

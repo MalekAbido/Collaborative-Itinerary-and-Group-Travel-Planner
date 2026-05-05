@@ -172,7 +172,7 @@ if ($percentage >= 100) {
                     <a href="/home" class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
                     <div class="hidden md:flex items-center gap-1">
                         <a href="/dashboard/" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Dashboard</a>
-                        <a href="/itinerary/dashboard/<?= htmlspecialchars($tripStringId) ?>" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Itinerary</a>
+                        <a href="/itinerary/dashboard/<?= htmlspecialchars($itineraryId) ?>" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Itinerary</a>
                         <a href="/itinerary/polls/<?= htmlspecialchars($itineraryId) ?>" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Polls</a>
                         <a href="/finance/dashboard/<?= htmlspecialchars($itineraryId) ?>" class="px-3 py-2 rounded-md text-body-sm font-medium text-primary border-b-2 border-primary">Finances</a>
                     </div>
@@ -182,12 +182,14 @@ if ($percentage >= 100) {
                         <span class="material-symbols-outlined text-base">warning</span>SOS
                     </button>
                     <a href="/profile" class="flex items-center gap-2 cursor-pointer">
-                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
-                            <?php
-                            $currentUser = \App\Helpers\Auth::user();
-                            echo $currentUser ? strtoupper(substr($currentUser->getFirstName(), 0, 1) . substr($currentUser->getLastName(), 0, 1)) : 'ME';
-                            ?>
-                        </div>
+                        <?php $currentUser = \App\Helpers\Auth::user(); ?>
+                        <?php if ($currentUser->getProfileImage()): ?>
+                            <img src="/<?= htmlspecialchars($currentUser->getProfileImage()) ?>" alt="Profile" class="h-8 w-8 rounded-full border-2 border-outline-variant object-cover">
+                        <?php else: ?>
+                            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
+                                <?= strtoupper(substr($currentUser->getFirstName(), 0, 1) . substr($currentUser->getLastName(), 0, 1)) ?>
+                            </div>
+                        <?php endif; ?>
                     </a>
                 </div>
             </div>

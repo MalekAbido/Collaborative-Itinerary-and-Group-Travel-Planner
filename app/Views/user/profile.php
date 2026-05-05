@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @var \App\Models\User $user
  * @var \App\Models\Allergy[] $allergies
@@ -43,22 +44,27 @@
     <div class="flex h-screen overflow-hidden">
 
         <nav class="fixed inset-x-0 top-0 z-50 h-navbar bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant shadow-sm">
-        <div class="mx-auto flex h-full max-w-[1280px] items-center justify-between px-6 lg:px-8">
-            <div class="flex items-center gap-8">
-                <a href="/dashboard" class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
-                <div class="hidden md:flex items-center gap-1">
-                    <a href="/dashboard/" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Dashboard</a>
+            <div class="mx-auto flex h-full max-w-[1280px] items-center justify-between px-6 lg:px-8">
+                <div class="flex items-center gap-8">
+                    <a href="/dashboard" class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
+                    <div class="hidden md:flex items-center gap-1">
+                        <a href="/dashboard/" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Dashboard</a>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="/profile" class="flex items-center gap-2 cursor-pointer">
+                        <?php $currentUser = \App\Helpers\Auth::user(); ?>
+                        <?php if ($currentUser->getProfileImage()): ?>
+                            <img src="/<?= htmlspecialchars($currentUser->getProfileImage()) ?>" alt="Profile" class="h-8 w-8 rounded-full border-2 border-outline-variant object-cover">
+                        <?php else: ?>
+                            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
+                                <?= strtoupper(substr($currentUser->getFirstName(), 0, 1) . substr($currentUser->getLastName(), 0, 1)) ?>
+                            </div>
+                        <?php endif; ?>
+                    </a>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
-                <a href="/profile" class="flex items-center gap-2 cursor-pointer">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
-                        <?= isset($user) ? strtoupper(substr($user->getFirstName(), 0, 1) . substr($user->getLastName(), 0, 1)) : 'ME' ?>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </nav>
+        </nav>
 
         <!-- MAIN CONTENT -->
         <main class="flex-1 mt-navbar h-[calc(100vh-theme(spacing.navbar))] overflow-y-auto bg-surface p-6 lg:p-8 scroll-thin">
@@ -76,7 +82,27 @@
                         <h2 class="font-display text-h3 text-on-surface m-0">General Information</h2>
                     </div>
 
-                    <form action="/profile/update" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <form action="/profile/update" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                        <!-- Profile Image Upload -->
+                        <div class="md:col-span-2 flex flex-col items-center gap-4 mb-4">
+                            <div class="relative group">
+                                <?php $currentUser = \App\Helpers\Auth::user(); ?>
+                                <?php if ($currentUser->getProfileImage()): ?>
+                                    <img src="/<?= htmlspecialchars($currentUser->getProfileImage()) ?>" alt="Profile" class="h-24 w-24 rounded-full border-2 border-outline-variant object-cover">
+                                <?php else: ?>
+                                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
+                                        <?= strtoupper(substr($currentUser->getFirstName(), 0, 1) . substr($currentUser->getLastName(), 0, 1)) ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="w-full max-w-xs">
+                                <label class="block text-label-caps uppercase text-on-surface-variant mb-2 text-center">Profile Picture</label>
+                                <input type="file" name="profileImage" accept="image/*"
+                                    class="w-full text-body-sm text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-body-sm file:font-semibold file:bg-primary-fixed file:text-primary hover:file:bg-primary-container transition" />
+                            </div>
+                        </div>
+
                         <div>
                             <label class="block text-label-caps uppercase text-on-surface-variant mb-2">First Name</label>
                             <input type="text" name="firstName" value="<?= htmlspecialchars($user->getFirstName()) ?>" required

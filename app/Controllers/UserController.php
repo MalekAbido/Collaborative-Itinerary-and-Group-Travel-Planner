@@ -12,6 +12,7 @@ class UserController extends Controller
 
     public function __construct()
     {
+        Auth::requireLogin();
         $this->userId = Auth::id();
     }
 
@@ -50,10 +51,6 @@ class UserController extends Controller
 
     public function updateUserProfile()
     {
-        // 1. Grab POST data directly
-        $data = $_POST;
-    {
-        // 1. Grab POST data directly
         $data = $_POST;
 
         if (!$this->validateProfileData($data)) {
@@ -61,23 +58,33 @@ class UserController extends Controller
         }
 
         $user = new User();
-        $user = new User();
 
         if ($user->read($this->userId)) {
+            // Handle image upload
+            if (isset($_FILES['profileImage']) && $_FILES['profileImage']['error'] === UPLOAD_ERR_OK) {
+                $fileTmpPath = $_FILES['profileImage']['tmp_name'];
+                $fileName = $_FILES['profileImage']['name'];
+                $fileNameCmps = explode(".", $fileName);
+                $fileExtension = strtolower(end($fileNameCmps));
+
+                $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg');
+                if (in_array($fileExtension, $allowedfileExtensions)) {
+                    $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
+                    $uploadFileDir = dirname(__DIR__, 2) . '/public/uploads/profiles/';
+                    $dest_path = $uploadFileDir . $newFileName;
+
+                    if(move_uploaded_file($fileTmpPath, $dest_path)) {
+                        $data['profileImage'] = 'uploads/profiles/' . $newFileName;
+                    }
+                }
+            }
+
             $user->updateProfile($data);
 
             header("Location: /profile");
             exit;
         }
-        if ($user->read($this->userId)) {
-            $user->updateProfile($data);
 
-            header("Location: /profile");
-            exit;
-        }
-
-        die('User not found.');
-    }
         die('User not found.');
     }
 

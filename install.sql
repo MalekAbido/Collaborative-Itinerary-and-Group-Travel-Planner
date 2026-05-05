@@ -384,6 +384,7 @@ CREATE TABLE User
   nationality  VARCHAR(50)  NULL    ,
   policyNumber CHAR(19)     NULL    ,
   sessionToken VarCHAR(255) NULL    ,
+  profileImage VARCHAR(255) NULL    ,
   PRIMARY KEY (id)
 );
 
@@ -594,10 +595,10 @@ ALTER TABLE TransportDetail
 
 
 -- 1. Independent Tables
-INSERT INTO User (userId, firstName, lastName, email, passwordHash, nationality, policyNumber) VALUES
-('user_00001', 'Ahmed', 'Ali', 'ahmed.ali@example.com', 'hashed_pw_1', 'Egyptian', 'POL1234567890123456'),
-('user_00002', 'Yousef', 'Hassan', 'yousef.h@example.com', 'hashed_pw_2', 'Egyptian', 'POL1234567890123457'),
-('user_00003', 'Hagar', 'Mahmoud', 'hagar.m@example.com', 'hashed_pw_3', 'Egyptian', 'POL1234567890123458');
+INSERT INTO User (userId, firstName, lastName, email, passwordHash, nationality, policyNumber, profileImage) VALUES
+('user_00001', 'Ahmed', 'Ali', 'ahmed.ali@example.com', 'hashed_pw_1', 'Egyptian', 'POL1234567890123456', 'uploads/profiles/user1.jpg'),
+('user_00002', 'Yousef', 'Hassan', 'yousef.h@example.com', 'hashed_pw_2', 'Egyptian', 'POL1234567890123457', 'uploads/profiles/user2.jpg'),
+('user_00003', 'Hagar', 'Mahmoud', 'hagar.m@example.com', 'hashed_pw_3', 'Egyptian', 'POL1234567890123458', 'uploads/profiles/user3.jpg');
 
 INSERT INTO Itinerary (itineraryId, title, description, startDate, endDate) VALUES
 ('itin_00001', 'Japan Tech & Culture Tour', 'Exploring AI research hubs and cultural sites in Tokyo and Kyoto.', '2026-05-10', '2026-05-20'),
