@@ -86,22 +86,42 @@
 
                         <!-- Profile Image Upload -->
                         <div class="md:col-span-2 flex flex-col items-center gap-4 mb-4">
-                            <div class="relative group">
-                                <?php $currentUser = \App\Helpers\Auth::user(); ?>
-                                <?php if ($currentUser->getProfileImage()): ?>
-                                    <img src="/<?= htmlspecialchars($currentUser->getProfileImage()) ?>" alt="Profile" class="h-24 w-24 rounded-full border-2 border-outline-variant object-cover">
+                            <div id="profile-preview-container" class="w-24 h-24 rounded-full overflow-hidden border-4 border-outline-variant shadow-sm shrink-0">
+                                <?php if ($user->getProfileImage()): ?>
+                                    <img id="profile-preview" src="/<?= htmlspecialchars($user->getProfileImage()) ?>" alt="Profile Picture" class="w-full h-full object-cover">
                                 <?php else: ?>
-                                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
-                                        <?= strtoupper(substr($currentUser->getFirstName(), 0, 1) . substr($currentUser->getLastName(), 0, 1)) ?>
+                                    <div id="profile-placeholder" class="w-full h-full bg-primary-fixed text-primary flex items-center justify-center text-3xl font-bold">
+                                        <?= strtoupper(substr($user->getFirstName(), 0, 1) . substr($user->getLastName(), 0, 1)) ?>
                                     </div>
                                 <?php endif; ?>
                             </div>
                             <div class="w-full max-w-xs">
                                 <label class="block text-label-caps uppercase text-on-surface-variant mb-2 text-center">Profile Picture</label>
-                                <input type="file" name="profileImage" accept="image/*"
+                                <input type="file" name="profileImage" id="profile-input" accept="image/*"
                                     class="w-full text-body-sm text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-body-sm file:font-semibold file:bg-primary-fixed file:text-primary hover:file:bg-primary-container transition" />
                             </div>
                         </div>
+
+                        <script>
+                            document.getElementById('profile-input').onchange = evt => {
+                                const [file] = evt.target.files
+                                if (file) {
+                                    const preview = document.getElementById('profile-preview');
+                                    const container = document.getElementById('profile-preview-container');
+
+                                    if (!preview) {
+                                        const newImg = document.createElement('img');
+                                        newImg.id = 'profile-preview';
+                                        newImg.className = 'w-full h-full object-cover';
+                                        container.innerHTML = '';
+                                        container.appendChild(newImg);
+                                        newImg.src = URL.createObjectURL(file);
+                                    } else {
+                                        preview.src = URL.createObjectURL(file);
+                                    }
+                                }
+                            }
+                        </script>
 
                         <div>
                             <label class="block text-label-caps uppercase text-on-surface-variant mb-2">First Name</label>

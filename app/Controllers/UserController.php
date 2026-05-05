@@ -64,13 +64,25 @@ class UserController extends Controller
             if (isset($_FILES['profileImage']) && $_FILES['profileImage']['error'] === UPLOAD_ERR_OK) {
                 $fileTmpPath = $_FILES['profileImage']['tmp_name'];
                 $fileName = $_FILES['profileImage']['name'];
-                $fileNameCmps = explode(".", $fileName);
-                $fileExtension = strtolower(end($fileNameCmps));
+                $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
                 $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg');
                 if (in_array($fileExtension, $allowedfileExtensions)) {
-                    $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
                     $uploadFileDir = dirname(__DIR__, 2) . '/public/uploads/profiles/';
+                    
+                    // Delete any existing files for this user (handles extension changes)
+                    $mask = $uploadFileDir . $user->getUserId() . '.*';
+                    $existingFiles = glob($mask);
+                    if ($existingFiles) {
+                        foreach ($existingFiles as $file) {
+                            if (is_file($file)) {
+                                unlink($file);
+                            }
+                        }
+                    }
+
+                    // New Naming: User ID
+                    $newFileName = $user->getUserId() . '.' . $fileExtension;
                     $dest_path = $uploadFileDir . $newFileName;
 
                     if(move_uploaded_file($fileTmpPath, $dest_path)) {
