@@ -159,7 +159,11 @@ $canManagePolls = Auth::hasRole('Editor', $userRole ?? 'Member');
                                         <div class="flex justify-between items-start mb-4">
                                             <div>
                                                 <span class="text-[12px] font-bold uppercase tracking-wider text-outline mb-1 block">Activity Poll</span>
-                                                <h3 class="font-display text-[20px] font-semibold text-on-surface"><?= htmlspecialchars($poll['activityName']) ?></h3>
+                                                <h3 class="font-display text-[20px] font-semibold text-on-surface">
+                                                    <a href="/itinerary/<?= htmlspecialchars($itinerary['id']) ?>/activity/<?= htmlspecialchars($poll['activityId']) ?>" class="hover:text-primary transition">
+                                                        <?= htmlspecialchars($poll['activityName']) ?>
+                                                    </a>
+                                                </h3>
                                             </div>
                                             <div class="flex flex-col items-end gap-1">
                                                 <span class="inline-flex items-center gap-1 rounded-full bg-secondary-fixed px-3 py-1 text-[11px] font-bold text-secondary">

@@ -5,6 +5,7 @@ namespace App\Controllers;
 use Core\Controller;
 use App\Helpers\Auth;
 use App\Helpers\TimeHelper;
+use App\Models\Activity;
 use App\Models\Itinerary;
 use App\Models\Poll;
 use App\Models\TripMember;
@@ -84,7 +85,7 @@ class PollController extends Controller
         }
 
         $tripMemberId = $member->getId();
-        
+
         $vote = Vote::getByMemberAndPoll($tripMemberId, $pollId);
 
         if ($vote) {
@@ -119,7 +120,7 @@ class PollController extends Controller
 
         $poll = new Poll();
         if ($poll->read($pollId)) {
-            $poll->closePoll();
+            $this->closePoll($itineraryId, $poll);
         }
 
         header("Location: " . $_SERVER['HTTP_REFERER']);
@@ -147,7 +148,7 @@ class PollController extends Controller
 
             if ($formattedDeadline) {
                 $poll->setDeadline($formattedDeadline);
-                $poll->openPoll();
+                $this->openPoll($itineraryId, $poll);
             } else {
                 die("Invalid datetime or timezone provided.");
             }
@@ -162,7 +163,7 @@ class PollController extends Controller
         $userId = Auth::id();
 
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
-        
+
         // Handle array or object
         if ($member) {
             $role = is_array($member) ? $member['role'] : $member->getRole();
@@ -185,7 +186,7 @@ class PollController extends Controller
         $userId = Auth::id() ?? 1;
 
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
-        
+
         if ($member) {
             $userRole = is_array($member) ? $member['role'] : $member->getRole();
         } else {
@@ -196,9 +197,9 @@ class PollController extends Controller
 
         $activePolls = [];
         $closedPolls = [];
-        
+
         // time() generates the current UTC timestamp because of our __construct setup
-        $currentTime = time(); 
+        $currentTime = time();
 
         foreach ($allPolls as $pollData) {
             // $pollData['deadline'] is fetched from the DB, so it's safely in UTC
@@ -207,7 +208,7 @@ class PollController extends Controller
             if ($pollData['status'] === 'OPEN' && $deadlineTime <= $currentTime) {
                 $pollObj = new Poll();
                 if ($pollObj->read($pollData['id'])) {
-                    $pollObj->closePoll();
+                    $this->closePoll($itineraryId, $pollObj);
                 }
                 $pollData['status'] = 'CLOSED';
             }
@@ -228,5 +229,19 @@ class PollController extends Controller
             'ratingChoices' => $ratingChoices,
             'userRole' => $userRole
         ]);
+    }
+
+    public function closePoll(int $itineraryId, Poll $poll)
+    {
+        $poll->closePoll();
+        $activity = Activity::getByIdAndItinerary($poll->getActivityId(), $itineraryId);
+        $activity->updateStatus('CONFIRMED');
+    }
+
+    public function openPoll(int $itineraryId, Poll $poll)
+    {
+        $poll->openPoll();
+        $activity = Activity::getByIdAndItinerary($poll->getActivityId(), $itineraryId);
+        $activity->updateStatus('PROPOSED');
     }
 }

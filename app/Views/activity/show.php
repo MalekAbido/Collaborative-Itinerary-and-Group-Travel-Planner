@@ -1,16 +1,16 @@
 <?php
 
     use App\Helpers\Auth;
-    $itineraryId         = $data['itineraryId'];
-    $activity            = $data['activity'];
-    $userRole            = $data['userRole'];
-    $currentMemberId     = $data['currentMemberId'];
-    $currentMemberStatus = $data['currentMemberStatus'];
-    $attendanceList      = $data['attendanceList'];
-    $goingMembers        = $data['goingMembers'];
-    $pendingMembers      = $data['pendingMembers'];
-    $notGoingMembers     = $data['notGoingMembers'];
-    $totalGoing          = $data['totalGoing'];
+    // $itineraryId         = $data['itineraryId'];
+    // $activity            = $data['activity'];
+    // $userRole            = $data['userRole'];
+    // $currentMemberId     = $data['currentMemberId'];
+    // $currentMemberStatus = $data['currentMemberStatus'];
+    // $attendanceList      = $data['attendanceList'];
+    // $goingMembers        = $data['goingMembers'];
+    // $pendingMembers      = $data['pendingMembers'];
+    // $notGoingMembers     = $data['notGoingMembers'];
+    // $totalGoing          = $data['totalGoing'];
     $totalMembers        = count($attendanceList->getMembers());
 ?>
 <!DOCTYPE html>
@@ -117,6 +117,7 @@
                                     </div>
                                 </div>
                                 <!-- RSVP Dropdown -->
+                                <?php if ($activity->getActivityStatus() == 'CONFIRMED'): ?>
                                 <div class="relative">
                                     <form
                                         action="/itinerary/<?php echo $itineraryId ?>/activity/<?php echo $activity->getId() ?>/updateAttendance"
@@ -145,6 +146,7 @@
                                             class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
                                     </form>
                                 </div>
+                                <?php endif; ?>
                             </div>
                             <div
                                 class="prose max-w-none text-on-surface-variant font-body-md text-body-md border-t border-surface-variant pt-4 mt-2">
@@ -153,8 +155,8 @@
                         </div>
                     </div>
                     <!-- Attendees Bento -->
-                    <div
-                        class="bg-surface rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)]  border border-surface-variant p-6">
+                    <?php if ($activity->getActivityStatus() == 'CONFIRMED'): ?>
+                    <div class="bg-surface rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)]  border border-surface-variant p-6">
                         <div class="flex items-center justify-between mb-4">
                             <h2 class="font-h3 text-h3 text-on-surface flex items-center gap-2">
                                 <span class="material-symbols-outlined text-tertiary">group</span> Attendees
@@ -244,13 +246,12 @@
                             </table>
                         </div>
                     </div>
+                    <?php endif; ?>
                 </div>
                 <!-- Right Sidebar Column -->
                 <div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
                     <!-- Danger Zone -->
-                    <?php
-
-                    if (Auth::hasRole("Editor", $userRole)): ?>
+                    <?php if (Auth::hasRole("Editor", $userRole) && $activity->getActivityStatus() == 'CONFIRMED'): ?>
                     <div class="mt-auto pt-6 flex justify-end border-surface-variant">
                         <form
                             action="/itinerary/<?php echo $itineraryId ?>/activity/<?php echo $activity->getId() ?>/delete"
