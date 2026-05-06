@@ -1,5 +1,7 @@
 <?php
     $itineraryId = $data['itineraryId'];
+    $pendingActivity = $data['pendingActivity'] ?? [];
+    $conflictingActivities = $data['conflictingActivities'] ?? [];
 ?>
 <!DOCTYPE html>
 <html lang="en" class="light">
@@ -31,7 +33,40 @@
         };
     </script>
 </head>
-<body class="bg-background text-on-background font-body min-h-screen">
+<body class="bg-background text-on-background font-body min-h-screen relative">
+    <?php if (!empty($conflictingActivities)): ?>
+        <div id="conflict-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div class="bg-surface rounded-xl shadow-lg p-6 max-w-lg w-full">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-error text-3xl">warning</span>
+                    <h2 class="text-xl font-bold text-on-surface">Time Conflict Detected</h2>
+                </div>
+                <p class="text-on-surface-variant mb-4">
+                    This activity overlaps with the following confirmed activities:
+                </p>
+                <ul class="list-disc list-inside mb-6 pl-5 text-on-surface-variant">
+                    <?php foreach ($conflictingActivities as $conflict): ?>
+                        <li>
+                            <strong><?= htmlspecialchars($conflict['name']) ?></strong> 
+                            (<?= htmlspecialchars(date('M d, H:i', strtotime($conflict['startTime']))) ?> - <?= htmlspecialchars(date('M d, H:i', strtotime($conflict['endTime']))) ?>)
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+                <p class="text-on-surface-variant mb-6">
+                    Do you still want to save this activity as a draft?
+                </p>
+                <div class="flex justify-end gap-4">
+                    <button type="button" onclick="document.getElementById('conflict-modal').style.display='none';" class="px-4 py-2 rounded-lg border border-outline-variant text-on-surface hover:bg-surface-container transition">
+                        Cancel
+                    </button>
+                    <button type="button" onclick="const form = document.getElementById('activity-form'); const input = document.createElement('input'); input.type = 'hidden'; input.name = 'confirm_override'; input.value = '1'; form.appendChild(input); form.submit();" class="px-4 py-2 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition font-semibold">
+                        Confirm & Save Draft
+                    </button>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <div class="max-w-2xl mx-auto py-10 px-6">
         <div class="flex items-center justify-between mb-8">
             <h1 class="font-display text-3xl font-bold text-on-surface flex items-center gap-2">
@@ -49,49 +84,50 @@
         <?php endif; ?>
 
         <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6">
-            <form action="/itinerary/<?= htmlspecialchars($itineraryId) ?>/activity/store" method="POST" class="space-y-6">
+            <form id="activity-form" action="/itinerary/<?= htmlspecialchars($itineraryId) ?>/activity/store" method="POST" class="space-y-6">
                 
                 <div>
                     <label class="block text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-2">Activity Name</label>
-                    <input type="text" name="name" required class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition" placeholder="e.g. Visit Louvre Museum">
+                    <input type="text" name="name" value="<?= htmlspecialchars($pendingActivity['name'] ?? '') ?>" required class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition" placeholder="e.g. Visit Louvre Museum">
                 </div>
 
                 <div>
                     <label class="block text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-2">Description</label>
-                    <textarea name="description" rows="3" class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition" placeholder="Activity details..."></textarea>
+                    <textarea name="description" rows="3" class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition" placeholder="Activity details..."><?= htmlspecialchars($pendingActivity['description'] ?? '') ?></textarea>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-2">Start Time</label>
-                        <input type="datetime-local" name="start_time" required class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition">
+                        <input type="datetime-local" name="start_time" value="<?= htmlspecialchars($pendingActivity['start_time'] ?? '') ?>" required class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition">
                     </div>
                     <div>
                         <label class="block text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-2">End Time</label>
-                        <input type="datetime-local" name="end_time" required class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition">
+                        <input type="datetime-local" name="end_time" value="<?= htmlspecialchars($pendingActivity['end_time'] ?? '') ?>" required class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-2">Category</label>
+                        <?php $selectedCategory = $pendingActivity['category'] ?? 'General'; ?>
                         <select name="category" class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition">
-                            <option value="General">General</option>
-                            <option value="Flight">Flight</option>
-                            <option value="Accommodation">Accommodation</option>
-                            <option value="Dining">Dining</option>
-                            <option value="Transport">Transport</option>
-                            <option value="Sightseeing">Sightseeing</option>
+                            <option value="General" <?= $selectedCategory === 'General' ? 'selected' : '' ?>>General</option>
+                            <option value="Flight" <?= $selectedCategory === 'Flight' ? 'selected' : '' ?>>Flight</option>
+                            <option value="Accommodation" <?= $selectedCategory === 'Accommodation' ? 'selected' : '' ?>>Accommodation</option>
+                            <option value="Dining" <?= $selectedCategory === 'Dining' ? 'selected' : '' ?>>Dining</option>
+                            <option value="Transport" <?= $selectedCategory === 'Transport' ? 'selected' : '' ?>>Transport</option>
+                            <option value="Sightseeing" <?= $selectedCategory === 'Sightseeing' ? 'selected' : '' ?>>Sightseeing</option>
                         </select>
                     </div>
                     <div class="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-2">Location Name</label>
-                            <input type="text" name="location_name" class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition" placeholder="e.g. Louvre Museum">
+                            <input type="text" name="location_name" value="<?= htmlspecialchars($pendingActivity['location_name'] ?? '') ?>" class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition" placeholder="e.g. Louvre Museum">
                         </div>
                         <div>
                             <label class="block text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-2">Location Address</label>
-                            <input type="text" name="location_address" class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition" placeholder="e.g. Paris, France">
+                            <input type="text" name="location_address" value="<?= htmlspecialchars($pendingActivity['location_address'] ?? '') ?>" class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition" placeholder="e.g. Paris, France">
                         </div>
                     </div>
                 </div>

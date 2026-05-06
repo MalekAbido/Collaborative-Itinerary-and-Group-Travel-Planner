@@ -134,12 +134,12 @@ class Activity extends ItineraryItem
         return $success;
     }
 
-    public static function hasOverlap($itineraryId, $startTime, $endTime)
+    public static function getConflictingConfirmedActivities($itineraryId, $startTime, $endTime)
     {
         $db  = Database::getInstance()->getConnection();
-        $sql = "SELECT COUNT(*) FROM Activity
+        $sql = "SELECT * FROM Activity
                 WHERE itineraryId = :itineraryId
-                AND status != 'Removed'
+                AND status = 'Confirmed'
                 AND (startTime < :endTime AND endTime > :startTime)";
 
         $stmt = $db->prepare($sql);
@@ -149,7 +149,16 @@ class Activity extends ItineraryItem
             ':endTime'     => $endTime,
         ]);
 
-        return $stmt->fetchColumn() > 0;
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $activities = [];
+        
+        foreach ($data as $row) {
+            $activity = new self();
+            $activity->fill($row);
+            $activities[] = $activity;
+        }
+        
+        return $activities;
     }
 
     public function read($id)

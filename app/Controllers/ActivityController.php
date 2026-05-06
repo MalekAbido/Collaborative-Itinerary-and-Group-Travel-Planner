@@ -31,7 +31,17 @@ class ActivityController extends Controller
             exit;
         }
 
-        $this->view('activity/create', ['itineraryId' => $itineraryId]);
+        $pendingActivity = Session::get('pending_activity');
+        $conflictingActivities = Session::get('conflicting_activities');
+
+        Session::set('pending_activity', null);
+        Session::set('conflicting_activities', null);
+
+        $this->view('activity/create', [
+            'itineraryId' => $itineraryId,
+            'pendingActivity' => $pendingActivity,
+            'conflictingActivities' => $conflictingActivities,
+        ]);
     }
 
     public function store($itineraryId)
@@ -47,13 +57,13 @@ class ActivityController extends Controller
 
         $name            = trim($_POST['name'] ?? '');
         $description     = trim($_POST['description'] ?? '');
-        $startTime       = $_POST['start_time'] ?? '';
-        $endTime         = $_POST['end_time'] ?? '';
+        $startTime       = date('Y-m-d H:i:s', strtotime($_POST['start_time'] ?? ''));
+        $endTime         = date('Y-m-d H:i:s', strtotime($_POST['end_time'] ?? ''));
         $category        = $_POST['category'] ?? 'General';
         $locationName    = trim($_POST['location_name'] ?? '');
         $locationAddress = trim($_POST['location_address'] ?? '');
 
-        if (empty($name) || empty($startTime) || empty($endTime)) {
+        if (empty($name) || empty($_POST['start_time']) || empty($_POST['end_time'])) {
             Session::setFlash(Session::FLASH_ERROR, 'Name, start time, and end time are required.');
             header("Location: /itinerary/{$itineraryId}/activity/create");
             exit;
@@ -65,10 +75,23 @@ class ActivityController extends Controller
             exit;
         }
 
-        if (Activity::hasOverlap($itineraryId, $startTime, $endTime)) {
-            Session::setFlash(Session::FLASH_ERROR, 'This activity overlaps with an existing activity.');
-            header("Location: /itinerary/{$itineraryId}/activity/create");
-            exit;
+        if (!isset($_POST['confirm_override'])) {
+            $conflictingConfirmed = Activity::getConflictingConfirmedActivities($itineraryId, $startTime, $endTime);
+            if (!empty($conflictingConfirmed)) {
+                $conflictData = array_map(function($activity) {
+                    return [
+                        'id' => $activity->getId(),
+                        'name' => $activity->getName(),
+                        'startTime' => $activity->getStartTime(),
+                        'endTime' => $activity->getEndTime()
+                    ];
+                }, $conflictingConfirmed);
+
+                Session::set('pending_activity', $_POST);
+                Session::set('conflicting_activities', $conflictData);
+                header("Location: /itinerary/{$itineraryId}/activity/create");
+                exit;
+            }
         }
 
         $locationId = 1;
