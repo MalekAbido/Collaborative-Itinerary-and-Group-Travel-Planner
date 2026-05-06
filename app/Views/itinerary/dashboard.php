@@ -184,26 +184,21 @@
                 </header>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5">
-                        <div class="flex items-start justify-between mb-3">
-                            <span class="text-label-caps uppercase text-outline">Trip Description</span>
+                    
+                    <div class="sm:col-span-2 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5">
+                        <div class="flex items-center gap-3 mb-3">
                             <div class="flex h-9 w-9 items-center justify-center rounded-full bg-tertiary-fixed"><span class="material-symbols-outlined text-[18px] text-tertiary">description</span></div>
+                            <span class="text-label-caps uppercase text-outline m-0">Trip Description</span>
                         </div>
                         <div class="text-body-md text-on-surface font-medium"><?= htmlspecialchars($data['trip']['description'] ?: 'No description provided.') ?></div>
                     </div>
-                    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5">
-                        <div class="flex items-start justify-between mb-3">
-                            <span class="text-label-caps uppercase text-outline">Group Balance</span>
-                            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-secondary-fixed"><span class="material-symbols-outlined text-[18px] text-secondary">account_balance_wallet</span></div>
-                        </div>
-                        <div class="font-display text-[28px] font-extrabold text-on-surface">EGP 0</div>
-                    </div>
-                    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5">
-                        <div class="flex items-start justify-between mb-3">
-                            <span class="text-label-caps uppercase text-outline">Members</span>
+                    
+                    <div class="sm:col-span-1 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5">
+                        <div class="flex items-center gap-3 mb-3">
                             <div class="flex h-9 w-9 items-center justify-center rounded-full bg-primary-fixed"><span class="material-symbols-outlined text-[18px] text-primary">group</span></div>
+                            <span class="text-label-caps uppercase text-outline m-0">Members</span>
                         </div>
-                        <div class="font-display text-[28px] font-extrabold text-on-surface">1</div>
+                        <div class="font-display text-[28px] font-extrabold text-on-surface"><?= count($data['members']) ?></div>
                     </div>
                 </div>
 

@@ -3,6 +3,8 @@ namespace App\Helpers;
 
 use App\Helpers\Session;
 use App\Models\User;
+use App\Models\TripMember;
+
 
 class Auth
 {
@@ -94,7 +96,7 @@ class Auth
 
         if (! self::hasRole($requiredRole, $currentRole)) {
             Session::setFlash(Session::FLASH_ERROR, 'You do not have permission to perform this action.');
-            header('Location: /dashboard');
+            header("Location: " . $_SERVER['HTTP_REFERER']);
             exit;
         }
     }
@@ -107,5 +109,18 @@ class Auth
             header('Location: /login');
             exit;
         }
+    }
+
+    public static function requireMembership($itineraryId) {
+        $userId = Auth::id();
+        $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
+
+        if (!$member) {
+            Session::setFlash(Session::FLASH_ERROR, 'Access denied. You are not a member of this itinerary.');
+            header("Location: /dashboard");
+            exit;
+        }
+
+        return $member;
     }
 }

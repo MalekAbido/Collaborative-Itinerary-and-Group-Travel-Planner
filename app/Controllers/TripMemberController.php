@@ -4,18 +4,12 @@ namespace App\Controllers;
 use Core\Controller;
 use App\Models\TripMember;
 use App\Models\Itinerary;
-// use App\Models\User; // You will likely need this to look up users by email!
 
 class TripMemberController extends Controller
 {
-    /**
-     * 1. View the Members Dashboard
-     * URL: GET /itinerary/members/{id}
-     */
     public function index($id)
     {
         $itineraryModel = new Itinerary();
-        // 1. Look up the trip by the string ID
         $tripData = $itineraryModel->findById($id);
 
         if (!$tripData) {
@@ -23,8 +17,6 @@ class TripMemberController extends Controller
             exit;
         }
 
-        // 2. Query the members using the internal integer ID ($tripData['id'])
-        // DO NOT use $id here, because $id is the string!
         $memberModel = new TripMember();
         $members = $memberModel->getAllByItineraryId($tripData['id']); 
 
@@ -34,23 +26,14 @@ class TripMemberController extends Controller
         ]);
     }
 
-    /**
-     * 2. Invite a New Member by Email
-     * URL: POST /itinerary/members/invite/{id}
-     */
     public function store($id)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = trim($_POST['email']);
-            $role = $_POST['role']; // 'Member' or 'Editor'
+            $role = $_POST['role'];
 
-            // --- IMPORTANT LOGIC MISSING HERE ---
-            // In a real app, you need to search your `users` table for this email
-            // to get their real `$userId`. For now, we will mock a fake user ID.
-            // Example: $user = $userModel->findByEmail($email);
-            // $userId = $user['id'];
             
-            $userId = rand(100, 999); // Fake ID for testing until User search is built
+            $userId = rand(100, 999);
 
             $newMember = new TripMember();
             $newMember->setItineraryId($id);
@@ -60,16 +43,11 @@ class TripMemberController extends Controller
             
             $newMember->create();
 
-            // 3. Refresh the page to see them in the list!
             header("Location: /itinerary/members/" . $id . "?status=invited");
             exit;
         }
     }
 
-    /**
-     * 3. Update a Member's Role
-     * URL: POST /itinerary/members/updateRole/{id}
-     */
     public function updateRole($id)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -78,7 +56,6 @@ class TripMemberController extends Controller
 
             $member = new TripMember();
             
-            // Find the member, change the role, and save it
             if ($member->read($memberId)) {
                 $member->setRole($newRole);
                 $member->update();
@@ -89,10 +66,6 @@ class TripMemberController extends Controller
         }
     }
 
-    /**
-     * 4. Remove a Member
-     * URL: POST /itinerary/members/remove/{id}
-     */
     public function destroy($id)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
