@@ -91,3 +91,5 @@ $this->post('/fund/contribute/{id}', 'CommonPoolController', 'contribute');
 
 
 $this->post('/finance/expense/refund', 'ExpenseController', 'refundExpense');
+
+$this->get('/join/{token}', 'TripMemberController', 'joinTrip');

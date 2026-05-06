@@ -42,25 +42,21 @@ class TripMemberController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = trim($_POST['email']);
-            $role = $_POST['role']; // 'Member' or 'Editor'
-
-            // --- IMPORTANT LOGIC MISSING HERE ---
-            // In a real app, you need to search your `users` table for this email
-            // to get their real `$userId`. For now, we will mock a fake user ID.
-            // Example: $user = $userModel->findByEmail($email);
-            // $userId = $user['id'];
+            $role = $_POST['role'];
             
-            $userId = rand(100, 999); // Fake ID for testing until User search is built
+            $invitationModel = new \App\Models\Invitation();
+            $token = $invitationModel->createToken($id, $email, $role);
 
-            $newMember = new TripMember();
-            $newMember->setItineraryId($id);
-            $newMember->setUserId($userId);
-            $newMember->setRole($role);
-            $newMember->setJoinedAt(date('Y-m-d H:i:s'));
-            
-            $newMember->create();
+            if ($token) {
+                $baseUrl = $_ENV['APP_URL'] ?? 'http://localhost:8080';
+                $joinLink = $baseUrl . "/join/" . $token;
+                
+                $subject = "You've been invited to join a trip!";
+                $body = "Click here to join: $joinLink";
+                
+                \App\Helpers\Mailer::send($email, $subject, $body);
+            }
 
-            // 3. Refresh the page to see them in the list!
             header("Location: /itinerary/members/" . $id . "?status=invited");
             exit;
         }
@@ -105,5 +101,36 @@ class TripMemberController extends Controller
             header("Location: /itinerary/members/" . $id . "?status=removed");
             exit;
         }
+    }
+
+    public function joinTrip($token)
+    {
+        \App\Helpers\Auth::requireLogin();
+        $userId = \App\Helpers\Auth::id();
+        
+        $invitationModel = new \App\Models\Invitation();
+        $invitation = $invitationModel->findByToken($token);
+        
+        if (!$invitation) {
+            die("Invalid or expired invitation.");
+        }
+        
+        $existing = \App\Models\TripMember::getByUserAndItinerary($userId, $invitation['itineraryId']);
+        if ($existing) {
+            header("Location: /itinerary/dashboard/" . $invitation['itineraryId']);
+            exit;
+        }
+        
+        $newMember = new \App\Models\TripMember();
+        $newMember->setItineraryId($invitation['itineraryId']);
+        $newMember->setUserId($userId);
+        $newMember->setRole($invitation['role']);
+        $newMember->setJoinedAt(date('Y-m-d H:i:s'));
+        $newMember->create();
+        
+        $invitationModel->markUsed($token);
+        
+        header("Location: /itinerary/dashboard/" . $invitation['itineraryId']);
+        exit;
     }
 }

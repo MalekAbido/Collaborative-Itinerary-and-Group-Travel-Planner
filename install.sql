@@ -708,3 +708,17 @@ INSERT INTO Vote (voteId, voteWeight, timestamp, pollId, tripMemberId, ratingCho
 ('vote_001', 1.00, '2026-03-15 10:00:00', 1, 1, 1), 
 ('vote_002', 1.00, '2026-03-16 11:00:00', 1, 2, 1), 
 ('vote_003', 1.00, '2026-03-17 12:00:00', 1, 3, 2);
+
+CREATE TABLE Invitation
+(
+  id           INT          NOT NULL AUTO_INCREMENT,
+  itineraryId  INT          NOT NULL,
+  email        VARCHAR(255) NOT NULL,
+  token        VARCHAR(64)  NOT NULL,
+  role         VARCHAR(30)  DEFAULT 'Member',
+  createdAt    DATETIME     NOT NULL,
+  expiresAt    DATETIME     NOT NULL,
+  used         BOOLEAN      DEFAULT FALSE,
+  PRIMARY KEY (id),
+  UNIQUE KEY (token)
+);
