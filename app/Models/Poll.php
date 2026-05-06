@@ -194,6 +194,29 @@ class Poll
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getVoteStats()
+    {
+        $sql = "SELECT ratingChoiceId, COUNT(*) as count 
+                FROM Vote 
+                WHERE pollId = :pollId 
+                GROUP BY ratingChoiceId";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':pollId' => $this->id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getVoterDetails()
+    {
+        $sql = "SELECT v.*, u.firstName, u.lastName, u.profileImage, tm.role 
+                FROM Vote v
+                JOIN TripMember tm ON v.tripMemberId = tm.id
+                JOIN User u ON tm.userId = u.id
+                WHERE v.pollId = :pollId";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':pollId' => $this->id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public static function getByActivityId($activityId)
     {
         $db = Database::getInstance()->getConnection();
@@ -206,7 +229,7 @@ class Poll
     public static function getPollsByItinerary($itineraryId)
     {
         $db = Database::getInstance()->getConnection();
-        $sql = "SELECT p.*, a.name as activityName 
+        $sql = "SELECT p.*, a.name as activityName, a.isAnonymous as activityIsAnonymous 
                 FROM Poll p 
                 JOIN Activity a ON p.activityId = a.id 
                 WHERE a.itineraryId = :itineraryId

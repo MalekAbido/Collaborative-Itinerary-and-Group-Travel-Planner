@@ -202,16 +202,23 @@ class PollController extends Controller
         $currentTime = time();
 
         foreach ($allPolls as $pollData) {
+            $pollObj = new Poll();
+            $pollObj->read($pollData['id']);
+
             // $pollData['deadline'] is fetched from the DB, so it's safely in UTC
             $deadlineTime = strtotime($pollData['deadline']);
 
             if ($pollData['status'] === 'OPEN' && $deadlineTime <= $currentTime) {
-                $pollObj = new Poll();
                 if ($pollObj->read($pollData['id'])) {
                     $this->closePoll($itineraryId, $pollObj);
                 }
                 $pollData['status'] = 'CLOSED';
             }
+
+            // Fetch extra data for the popup
+            $pollData['stats'] = $pollObj->getVoteStats();
+            $pollData['voters'] = $pollObj->getVoterDetails();
+            $pollData['totalVotes'] = array_sum(array_column($pollData['stats'], 'count'));
 
             if ($pollData['status'] === 'OPEN') {
                 $activePolls[] = $pollData;
