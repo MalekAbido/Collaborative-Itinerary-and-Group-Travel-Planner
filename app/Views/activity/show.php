@@ -21,7 +21,8 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>VoyageSync - Activity Detail</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;900&amp;family=Inter:wght@400;600;700&amp;display=swap"
         rel="stylesheet" />
@@ -31,175 +32,57 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
-    <script id="tailwind-config">
-    tailwind.config = {
-        darkMode: "class",
-        theme: {
-            extend: {
-                "colors": {
-                    "secondary-fixed-dim": "#ffb4a7",
-                    "on-error": "#ffffff",
-                    "inverse-surface": "#2f3131",
-                    "on-secondary-container": "#71160b",
-                    "tertiary-container": "#367f85",
-                    "on-primary-fixed": "#3f0200",
-                    "on-error-container": "#93000a",
-                    "surface-tint": "#b32a17",
-                    "on-primary-container": "#fffbff",
-                    "on-secondary": "#ffffff",
-                    "surface-container-high": "#e8e8e8",
-                    "secondary-container": "#fd7d69",
-                    "secondary-fixed": "#ffdad4",
-                    "inverse-primary": "#ffb4a6",
-                    "surface-container-lowest": "#ffffff",
-                    "on-secondary-fixed": "#400100",
-                    "on-tertiary-fixed-variant": "#004f54",
-                    "primary-container": "#d2402a",
-                    "on-tertiary": "#ffffff",
-                    "primary-fixed": "#ffdad4",
-                    "on-tertiary-container": "#f5feff",
-                    "surface-bright": "#f9f9f9",
-                    "secondary": "#a43b2c",
-                    "on-tertiary-fixed": "#002022",
-                    "on-primary-fixed-variant": "#900e00",
-                    "background": "#f9f9f9",
-                    "surface": "#f9f9f9",
-                    "on-surface-variant": "#5a413c",
-                    "on-secondary-fixed-variant": "#842417",
-                    "on-background": "#1a1c1c",
-                    "surface-container-low": "#f3f3f4",
-                    "primary-fixed-dim": "#ffb4a6",
-                    "error": "#ba1a1a",
-                    "surface-dim": "#dadada",
-                    "outline-variant": "#e2beb8",
-                    "tertiary": "#14666c",
-                    "tertiary-fixed-dim": "#8cd2d9",
-                    "surface-container": "#eeeeee",
-                    "error-container": "#ffdad6",
-                    "surface-container-highest": "#e2e2e2",
-                    "inverse-on-surface": "#f0f1f1",
-                    "tertiary-fixed": "#a7eff5",
-                    "on-surface": "#1a1c1c",
-                    "surface-variant": "#e2e2e2",
-                    "primary": "#af2714",
-                    "outline": "#8e706b",
-                    "on-primary": "#ffffff"
-                },
-                "borderRadius": {
-                    "DEFAULT": "0.25rem",
-                    "lg": "0.5rem",
-                    "xl": "0.75rem",
-                    "full": "9999px"
-                },
-                "spacing": {
-                    "xs": "4px",
-                    "gutter": "24px",
-                    "xl": "80px",
-                    "sm": "12px",
-                    "lg": "48px",
-                    "base": "8px",
-                    "container-max": "1280px",
-                    "md": "24px"
-                },
-                "fontFamily": {
-                    "body-sm": ["Inter"],
-                    "label-caps": ["Inter"],
-                    "h3": ["Plus Jakarta Sans"],
-                    "h1": ["Plus Jakarta Sans"],
-                    "body-md": ["Inter"],
-                    "body-lg": ["Inter"],
-                    "h2": ["Plus Jakarta Sans"],
-                    "button": ["Inter"]
-                },
-                "fontSize": {
-                    "body-sm": ["14px", {
-                        "lineHeight": "1.5",
-                        "fontWeight": "400"
-                    }],
-                    "label-caps": ["12px", {
-                        "lineHeight": "1",
-                        "letterSpacing": "0.05em",
-                        "fontWeight": "700"
-                    }],
-                    "h3": ["20px", {
-                        "lineHeight": "1.4",
-                        "fontWeight": "600"
-                    }],
-                    "h1": ["36px", {
-                        "lineHeight": "1.2",
-                        "letterSpacing": "-0.02em",
-                        "fontWeight": "700"
-                    }],
-                    "body-md": ["16px", {
-                        "lineHeight": "1.5",
-                        "fontWeight": "400"
-                    }],
-                    "body-lg": ["18px", {
-                        "lineHeight": "1.6",
-                        "fontWeight": "400"
-                    }],
-                    "h2": ["28px", {
-                        "lineHeight": "1.3",
-                        "fontWeight": "600"
-                    }],
-                    "button": ["14px", {
-                        "lineHeight": "1",
-                        "fontWeight": "600"
-                    }]
-                }
-            }
-        }
-    }
-    </script>
+    <link rel="stylesheet" href="/assets/css/tailwind.css">
 </head>
 
-<body class="bg-background text-on-background font-body-md h-screen overflow-hidden flex flex-col">
+<body class="bg-background text-on-background font-body text-body-md m-0 overflow-hidden">
     <!-- TopNavBar -->
-    <header
-        class="bg-white dark:bg-zinc-950 font-['Plus_Jakarta_Sans'] antialiased docked full-width top-0 z-50 border-b border-zinc-100 dark:border-zinc-800 shadow-sm dark:shadow-none hidden md:block">
-        <div class="flex justify-between items-center w-full px-6 py-3 max-w-[1280px] mx-auto">
-            <div class="flex items-center gap-6">
-                <div class="text-2xl font-black tracking-tight text-orange-600 dark:text-orange-500">VoyageSync</div>
-                <nav class="flex items-center gap-4">
-                    <a class="text-orange-600 dark:text-orange-400 font-bold border-b-2 border-orange-600 pb-1"
-                        href="#">Itinerary</a>
-                    <a class="text-zinc-500 dark:text-zinc-400 font-medium hover:text-orange-600 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors duration-200 Active: opacity-80 transition-opacity px-3 py-1 rounded"
-                        href="#">Leaderboard</a>
-                    <a class="text-zinc-500 dark:text-zinc-400 font-medium hover:text-orange-600 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors duration-200 Active: opacity-80 transition-opacity px-3 py-1 rounded"
-                        href="#">Members</a>
-                </nav>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="relative w-64">
-                    <span
-                        class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
-                        data-icon="search">search</span>
-                    <input
-                        class="w-full bg-surface-container-low text-on-surface border border-surface-variant rounded-full py-2 pl-4 pr-10 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-body-sm font-body-sm"
-                        placeholder="Search..." type="text" />
+
+    <div class="flex h-screen overflow-hidden">
+        <nav
+            class="fixed inset-x-0 top-0 z-50 h-navbar bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant shadow-sm">
+            <div class="mx-auto flex h-full max-w-[1280px] items-center justify-between px-6 lg:px-8">
+                <div class="flex items-center gap-8">
+                    <a href="/dashboard"
+                        class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
+                    <div class="hidden md:flex items-center gap-1">
+                        <a href="/dashboard"
+                            class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Dashboard</a>
+                        <a href="#"
+                            class="px-3 py-2 rounded-md text-body-sm font-medium text-primary border-b-2 border-primary">Itinerary</a>
+                        <a href="/itinerary/polls/<?= htmlspecialchars($itineraryId) ?>"
+                            class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Polls</a>
+                        <a href="/finance/dashboard/<?= htmlspecialchars($itineraryId) ?>"
+                            class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Finances</a>
+                    </div>
                 </div>
-                <button
-                    class="text-zinc-500 hover:text-orange-600 transition-colors duration-200 p-2 rounded-full hover:bg-zinc-50">
-                    <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
-                </button>
-                <button
-                    class="text-zinc-500 hover:text-orange-600 transition-colors duration-200 p-2 rounded-full hover:bg-zinc-50">
-                    <span class="material-symbols-outlined" data-icon="settings">settings</span>
-                </button>
-                <img alt="User profile photo"
-                    class="w-8 h-8 rounded-full border-2 border-surface-container-highest cursor-pointer"
-                    data-alt="A small circular profile picture of a young professional man with short dark hair, wearing a casual grey shirt, smiling warmly against a blurred, light background. The style is modern, bright, and professional, fitting a corporate travel app UI."
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqO1N54yLVUPs-ZhPND_95OONb1qUcd69U9ynSKYF5R4X7V1Jtg8DDRzTuH7uyxrTEulPzv7qSh3pFh_rSlt9O8m3OtmJUjft9Eb0XCyAZoK8DNpYHBJqSJhPLjsyyILrSzNd4ZeQ3csLg6qhDMuLPw8z2xqNR9BrVX5w76TQNOb6jZRVbq6ev9LapJhE-1kyx8X_qwUNq76jrf9-DwnfY08FKJTmVgfre1wT1R4xpx04TnJklx8TzE5S6f8C-QOuhQRhdpJ_pVLs" />
+                <div class="flex items-center gap-3">
+                    <button
+                        class="inline-flex items-center gap-1 rounded-lg border-2 border-error px-3 py-1.5 text-body-xs font-bold tracking-wide text-error hover:bg-error-container transition">
+                        <span class="material-symbols-outlined text-base">warning</span>SOS
+                    </button>
+                    <a href="/profile" class="flex items-center gap-2 cursor-pointer">
+                        <?php $currentUser = \App\Helpers\Auth::user(); ?>
+                        <?php if ($currentUser->getProfileImage()): ?>
+                        <img src="/<?= htmlspecialchars($currentUser->getProfileImage()) ?>" alt="Profile"
+                            class="h-8 w-8 rounded-full border-2 border-outline-variant object-cover">
+                        <?php else: ?>
+                        <div
+                            class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
+                            <?= strtoupper(substr($currentUser->getFirstName(), 0, 1) . substr($currentUser->getLastName(), 0, 1)) ?>
+                        </div>
+                        <?php endif; ?>
+                    </a>
+                </div>
             </div>
-        </div>
-    </header>
-    <div class="flex flex-1 overflow-hidden">
+        </nav>
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto bg-surface-container-low p-gutter">
-            <div class="max-w-[1280px] mx-auto grid grid-cols-12 gap-gutter">
+        <main
+            class="flex-1 mt-navbar h-[calc(100vh-theme(spacing.navbar))] overflow-y-auto bg-surface p-6 lg:p-8 scroll-thin">
+            <div class="max-w-[1280px] mx-auto grid grid-cols-12 gap-6">
                 <!-- Activity Header & Detail Column -->
-                <div class="col-span-12 lg:col-span-8 flex flex-col gap-gutter">
+                <div class="col-span-12 lg:col-span-8 flex flex-col gap-6">
                     <!-- Hero Card -->
                     <div
                         class="bg-surface rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] border-l-4 border-primary overflow-hidden relative">
@@ -271,7 +154,7 @@
                     </div>
                     <!-- Attendees Bento -->
                     <div
-                        class="bg-surface rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-surface-variant p-6">
+                        class="bg-surface rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)]  border border-surface-variant p-6">
                         <div class="flex items-center justify-between mb-4">
                             <h2 class="font-h3 text-h3 text-on-surface flex items-center gap-2">
                                 <span class="material-symbols-outlined text-tertiary">group</span> Attendees
@@ -363,7 +246,7 @@
                     </div>
                 </div>
                 <!-- Right Sidebar Column -->
-                <div class="col-span-12 lg:col-span-4 flex flex-col gap-gutter">
+                <div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
                     <!-- Danger Zone -->
                     <?php
 

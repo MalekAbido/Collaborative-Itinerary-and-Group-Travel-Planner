@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Models\TripMember;
 use Core\Database;
 
 abstract class ItineraryItem
@@ -105,19 +106,23 @@ abstract class ItineraryItem
     public function getItinerary()
     {
 
-        // if ($this->itineraryObject === null) {
-        //     $this->itineraryObject = (new Itinerary())->read($this->itineraryId);
-        // }
+        if ($this->itineraryObject === null) {
+            $this->itineraryObject = (new Itinerary())->read($this->itineraryId);
+        }
 
         return $this->itineraryObject;
     }
 
-    public function getCreator()
+    public function getTripMember()
     {
 
-        // if ($this->creatorObject === null) {
-        //     $this->creatorObject = (new TripMember())->read($this->creatorId);
-        // }
+        if ($this->creatorObject === null && $this->getTripMemberId()) {
+            $member = new TripMember();
+
+            if ($member->read($this->getTripMemberId())) {
+                $this->creatorObject = $member;
+            }
+        }
 
         return $this->creatorObject;
     }

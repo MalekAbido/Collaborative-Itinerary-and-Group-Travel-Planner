@@ -12,6 +12,7 @@ CREATE TABLE Activity
   tripMemberId INT          NOT NULL,
   subtripId    INT          NULL    ,
   locationId   INT          NOT NULL,
+  isAnonymous  BOOLEAN      DEFAULT FALSE,
   PRIMARY KEY (id)
 );
 

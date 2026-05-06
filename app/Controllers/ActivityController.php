@@ -5,9 +5,8 @@ use App\Helpers\Auth;
 use App\Helpers\Session;
 use App\Models\Activity;
 use App\Models\AttendanceMember;
-use App\Models\TripMember;
-use App\Models\Itinerary;
 use App\Models\Location;
+use App\Models\TripMember;
 use Core\Controller;
 
 class ActivityController extends Controller
@@ -71,8 +70,10 @@ class ActivityController extends Controller
             exit;
         }
 
-        $locationId = 1; // Fallback
-        if (!empty($locationName) || !empty($locationAddress)) {
+        $locationId = 1;
+
+// Fallback
+        if (! empty($locationName) || ! empty($locationAddress)) {
             $location = new Location();
             $location->setName($locationName);
             $location->setAddress($locationAddress);
@@ -91,7 +92,7 @@ class ActivityController extends Controller
         $activity->setActivityStatus('Draft');
         $activity->setItineraryId($itineraryId);
         $activity->setTripMemberId($tripMember->getId());
-        
+
         if ($activity->create()) {
             Session::setFlash(Session::FLASH_SUCCESS, 'Activity created successfully as a Draft.');
             header("Location: /itinerary/dashboard/{$itineraryId}");
@@ -116,7 +117,7 @@ class ActivityController extends Controller
 
         $activity = Activity::getByIdAndItinerary($activityId, $itineraryId);
 
-        if ($activity === null) {
+        if ($activity === null || $activity->getActivityStatus() === "REMOVED") {
             Session::setFlash(Session::FLASH_ERROR, 'Activity not found or does not belong to this trip.');
             header("Location: /itinerary/dashboard/{$itineraryId}");
             exit;

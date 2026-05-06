@@ -5,6 +5,7 @@ use App\Models\ItineraryItem;
 use Core\Database;
 use PDO;
 use \App\Models\AttendanceList;
+use \App\Models\Location;
 
 class Activity extends ItineraryItem
 {
@@ -12,8 +13,10 @@ class Activity extends ItineraryItem
     private $activityStatus;
     private $subtripId;
     private $locationId;
+    private $isAnonymous          = false;
     private $inventoryItemsList   = null;
     private $attendanceListObject = null;
+    private $locationObject       = null;
 
     public function getCategory()
     {
@@ -55,6 +58,16 @@ class Activity extends ItineraryItem
         $this->locationId = $locationId;
     }
 
+    public function getIsAnonymous()
+    {
+        return (bool) $this->isAnonymous;
+    }
+
+    public function setIsAnonymous($isAnonymous)
+    {
+        $this->isAnonymous = $isAnonymous;
+    }
+
     public function fill(array $row)
     {
         $this->setId($row['id']);
@@ -69,6 +82,7 @@ class Activity extends ItineraryItem
         $this->setTripMemberId($row['tripMemberId']);
         $this->setSubtripId($row['subtripId']);
         $this->setLocationId($row['locationId']);
+        $this->setIsAnonymous($row['isAnonymous'] ?? false);
     }
 
     public static function getByActivityId($activityId)
@@ -91,13 +105,13 @@ class Activity extends ItineraryItem
     public function create()
     {
         $db = Database::getInstance()->getConnection();
-        
+
         $this->itemId = uniqid('act_');
-        
-        $sql = "INSERT INTO Activity (itemId, name, description, startTime, endTime, category, status, itineraryId, tripMemberId, subtripId, locationId) 
-                VALUES (:itemId, :name, :description, :startTime, :endTime, :category, :status, :itineraryId, :tripMemberId, :subtripId, :locationId)";
-        
-        $stmt = $db->prepare($sql);
+
+        $sql = "INSERT INTO Activity (itemId, name, description, startTime, endTime, category, status, itineraryId, tripMemberId, subtripId, locationId, isAnonymous)
+                VALUES (:itemId, :name, :description, :startTime, :endTime, :category, :status, :itineraryId, :tripMemberId, :subtripId, :locationId, :isAnonymous)";
+
+        $stmt    = $db->prepare($sql);
         $success = $stmt->execute([
             ':itemId'       => $this->itemId,
             ':name'         => $this->name,
@@ -109,7 +123,8 @@ class Activity extends ItineraryItem
             ':itineraryId'  => $this->itineraryId,
             ':tripMemberId' => $this->tripMemberId,
             ':subtripId'    => $this->subtripId,
-            ':locationId'   => $this->locationId
+            ':locationId'   => $this->locationId,
+            ':isAnonymous'  => $this->isAnonymous ? 1 : 0,
         ]);
 
         if ($success) {
@@ -121,19 +136,19 @@ class Activity extends ItineraryItem
 
     public static function hasOverlap($itineraryId, $startTime, $endTime)
     {
-        $db = Database::getInstance()->getConnection();
-        $sql = "SELECT COUNT(*) FROM Activity 
-                WHERE itineraryId = :itineraryId 
+        $db  = Database::getInstance()->getConnection();
+        $sql = "SELECT COUNT(*) FROM Activity
+                WHERE itineraryId = :itineraryId
                 AND status != 'Removed'
                 AND (startTime < :endTime AND endTime > :startTime)";
-        
+
         $stmt = $db->prepare($sql);
         $stmt->execute([
             ':itineraryId' => $itineraryId,
             ':startTime'   => $startTime,
-            ':endTime'     => $endTime
+            ':endTime'     => $endTime,
         ]);
-        
+
         return $stmt->fetchColumn() > 0;
     }
 
@@ -142,7 +157,7 @@ class Activity extends ItineraryItem
         $db   = Database::getInstance()->getConnection();
         $sql  = "SELECT * FROM Activity WHERE id = :activityId LIMIT 1";
         $stmt = $db->prepare($sql);
-        $stmt->execute([':activityId' => $activityId]);
+        $stmt->execute([':activityId' => $id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($data) {
@@ -180,7 +195,7 @@ class Activity extends ItineraryItem
     public function delete()
     {
         $db   = Database::getInstance()->getConnection();
-        $sql  = "UPDATE Activity SET status = 'Removed' WHERE id = :id";
+        $sql  = "UPDATE Activity SET status = 'REMOVED' WHERE id = :id";
         $stmt = $db->prepare($sql);
         return $stmt->execute([':id' => ($this->id)]);
     }
@@ -214,6 +229,39 @@ class Activity extends ItineraryItem
         return $activityObjects;
     }
 
+    public static function getAllByStatusAndItinerary($status, $itineraryId)
+    {
+        $db   = Database::getInstance()->getConnection();
+        $sql  = "SELECT * FROM Activity WHERE status = :status AND itineraryId = :itineraryId ORDER BY startTime ASC";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([
+            ':status'      => $status,
+            ':itineraryId' => $itineraryId,
+        ]);
+        $data            = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $activityObjects = [];
+
+        foreach ($data as $row) {
+            $activity = new self();
+            $activity->fill($row);
+            $activityObjects[] = $activity;
+        }
+
+        return $activityObjects;
+    }
+
+    public function updateStatus($status)
+    {
+        $db                   = Database::getInstance()->getConnection();
+        $sql                  = "UPDATE Activity SET status = :status WHERE id = :id";
+        $stmt                 = $db->prepare($sql);
+        $this->activityStatus = $status;
+        return $stmt->execute([
+            ':status' => $status,
+            ':id'     => $this->id,
+        ]);
+    }
+
     public function getAttendanceList()
     {
 
@@ -222,5 +270,19 @@ class Activity extends ItineraryItem
         }
 
         return $this->attendanceListObject;
+    }
+
+    public function getLocation()
+    {
+
+        if ($this->locationObject === null && $this->getLocationId()) {
+            $location = new Location();
+
+            if ($location->read($this->getLocationId())) {
+                $this->locationObject = $location;
+            }
+        }
+
+        return $this->locationObject;
     }
 }
