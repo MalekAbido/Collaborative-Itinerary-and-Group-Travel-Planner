@@ -150,9 +150,9 @@ class User
             $user->setLastName($data['lastName']);
             $user->setEmail($data['email']);
             $user->setPasswordHash($data['passwordHash']);
-            $user->setNationality($data['nationality']);
-            $user->setPolicyNumber($data['policyNumber']);
-            $user->setProfileImage($data['profileImage']);
+            $user->setNationality($data['nationality'] ?? null);
+            $user->setPolicyNumber($data['policyNumber'] ?? null);
+            $user->setProfileImage($data['profileImage'] ?? null); 
             return $user;
         }
 
@@ -175,7 +175,7 @@ class User
             $user->setLastName($data['lastName']);
             $user->setEmail($data['email']);
             $user->setPasswordHash($data['passwordHash']);
-            $user->setProfileImage($data['profileImage']);
+            $user->setProfileImage($data['profileImage'] ?? null); 
             return $user;
         }
 
@@ -220,9 +220,9 @@ class User
             $this->lastName     = $data['lastName'];
             $this->email        = $data['email'];
             $this->passwordHash = $data['passwordHash'];
-            $this->nationality  = $data['nationality'];
-            $this->policyNumber = $data['policyNumber'];
-            $this->profileImage = $data['profileImage'];
+            $this->nationality  = $data['nationality'] ?? null;
+            $this->policyNumber = $data['policyNumber'] ?? null;
+            $this->profileImage = $data['profileImage'] ?? null;
             return $this;
         }
 
