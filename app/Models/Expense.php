@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Helpers\HistoryLogger;
+use App\Models\TransactionType;
 use Core\Database;
 use PDO;
 
@@ -19,6 +21,7 @@ class Expense
     private $paidByKitty;
     private $tripFinanceId;
     private $tripMemberId;
+    private $deletedAt;
 
     public array $expenseShares = [];
 
@@ -83,6 +86,11 @@ class Expense
         return $this->tripMemberId;
     }
 
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
+
     public function getExpenseShares()
     {
         return $this->expenseShares;
@@ -141,6 +149,11 @@ class Expense
     public function setTripMemberId($tripMemberId)
     {
         $this->tripMemberId = $tripMemberId;
+    }
+
+    public function setDeletedAt($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
     }
 
     public function setExpenseShares(array $expenseShares)
@@ -203,17 +216,18 @@ class Expense
             $expense->setPaidByKitty($data['paidByKitty']);
             $expense->setTripFinanceId($data['tripFinanceId']);
             $expense->setTripMemberId($data['tripMemberId']);
+            $expense->setDeletedAt($data['deletedAt'] ?? null);
             return $expense;
         }
         return null;
     }
 
-    public function delete($id)
+    public function delete($deletedByTripMemberId)
     {
-        $sql = "DELETE FROM Expense WHERE id = :id";
-
+        $sql = "UPDATE Expense SET deletedAt = NOW() WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['id' => $id]);
+        $success = $stmt->execute(['id' => $this->id]);
+        return $success;
     }
 
     public function update()
@@ -229,7 +243,8 @@ class Expense
                     isNonCash = :isNonCash,
                     paidByKitty = :paidByKitty,
                     tripFinanceId = :tripFinanceId,
-                    tripMemberId = :tripMemberId
+                    tripMemberId = :tripMemberId,
+                    deletedAt = :deletedAt
                 WHERE id = :id";
 
         $stmt = $pdo->prepare($sql);
@@ -244,6 +259,7 @@ class Expense
             'paidByKitty' => $this->paidByKitty,
             'tripFinanceId' => $this->tripFinanceId,
             'tripMemberId' => $this->tripMemberId,
+            'deletedAt' => $this->deletedAt,
             'id' => $this->id
         ]);
     }

@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Helpers\HistoryLogger;
+use App\Models\FundContribution;
+use App\Models\TransactionType;
 use Core\Database;
 use PDO;
 
@@ -54,12 +57,24 @@ class GroupFund
                    VALUES (:contributionId, :amount, NOW(), :groupFundId, :tripMemberId)";
         
         $logStmt = $this->db->prepare($logSql);
-        return $logStmt->execute([
+        $success = $logStmt->execute([
             ':contributionId' => $contributionId,
             ':amount'         => $amount,
             ':groupFundId'    => $this->fundId,
             ':tripMemberId'   => $contributorId
         ]);
+
+        if ($success) {
+            $lastId = $this->db->lastInsertId();
+            $contribution = new FundContribution();
+            if ($contribution->read($lastId)) {
+                $itineraryId = $contribution->getItineraryId();
+                // move this to fund contribution controller
+                HistoryLogger::log($itineraryId, TransactionType::FUND_CONTRIBUTION_ADDED, $contribution, $contributorId);
+            }
+        }
+
+        return $success;
     }
 
     public function deductExpense($amount)

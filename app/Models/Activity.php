@@ -195,9 +195,10 @@ class Activity extends ItineraryItem
     public function delete()
     {
         $db   = Database::getInstance()->getConnection();
-        $sql  = "UPDATE Activity SET status = 'REMOVED' WHERE id = :id";
+        $sql  = "UPDATE Activity SET status = 'Removed' WHERE id = :id";
         $stmt = $db->prepare($sql);
-        return $stmt->execute([':id' => ($this->id)]);
+        $success = $stmt->execute([':id' => ($this->id)]);
+        return $success;
     }
 
     public function getInventoryItems()
@@ -214,7 +215,7 @@ class Activity extends ItineraryItem
     public static function getAllByItineraryId($itineraryId)
     {
         $db   = Database::getInstance()->getConnection();
-        $sql  = "SELECT * FROM Activity WHERE itineraryId = :itineraryId ORDER BY startTime ASC";
+        $sql  = "SELECT * FROM Activity WHERE itineraryId = :itineraryId AND status != 'Removed' ORDER BY startTime ASC";
         $stmt = $db->prepare($sql);
         $stmt->execute([':itineraryId' => $itineraryId]);
         $data            = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -232,7 +233,7 @@ class Activity extends ItineraryItem
     public static function getAllByStatusAndItinerary($status, $itineraryId)
     {
         $db   = Database::getInstance()->getConnection();
-        $sql  = "SELECT * FROM Activity WHERE status = :status AND itineraryId = :itineraryId ORDER BY startTime ASC";
+        $sql  = "SELECT * FROM Activity WHERE status = :status AND itineraryId = :itineraryId AND status != 'Removed' ORDER BY startTime ASC";
         $stmt = $db->prepare($sql);
         $stmt->execute([
             ':status'      => $status,
