@@ -968,6 +968,9 @@
   .grid-cols-\[1fr_120px_120px_100px\] {
     grid-template-columns: 1fr 120px 120px 100px;
   }
+  .grid-cols-\[1fr_120px_140px\] {
+    grid-template-columns: 1fr 120px 140px;
+  }
   .flex-col {
     flex-direction: column;
   }
@@ -1999,6 +2002,9 @@
   .text-on-primary-fixed {
     color: var(--color-on-primary-fixed);
   }
+  .text-on-primary-fixed-variant {
+    color: var(--color-on-primary-fixed-variant);
+  }
   .text-on-primary\/30 {
     color: color-mix(in srgb, #ffffff 30%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
@@ -2326,6 +2332,13 @@
       }
     }
   }
+  .hover\:border-primary {
+    &:hover {
+      @media (hover: hover) {
+        border-color: var(--color-primary);
+      }
+    }
+  }
   .hover\:bg-error-container {
     &:hover {
       @media (hover: hover) {
@@ -2606,6 +2619,11 @@
   .sm\:grid-cols-\[1fr_120px_120px_100px\] {
     @media (width >= 40rem) {
       grid-template-columns: 1fr 120px 120px 100px;
+    }
+  }
+  .sm\:grid-cols-\[1fr_120px_140px\] {
+    @media (width >= 40rem) {
+      grid-template-columns: 1fr 120px 140px;
     }
   }
   .sm\:flex-row {

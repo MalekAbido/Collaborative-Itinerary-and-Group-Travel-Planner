@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" class="light">
 <head>
-    <meta charset="UTF-8">
+    <?php $trip = $data['trip'] ?? []; ?>
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($data['trip']['title']) ?> - VoyageSync</title>
+    <title><?= htmlspecialchars($trip['title']) ?> - VoyageSync</title>
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries,typography"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -160,7 +161,7 @@
                                 <span class="material-symbols-outlined text-primary">group</span>
                                 <h2 class="font-display text-h3 text-on-surface m-0">Members</h2>
                             </div>
-                            <a href="/itinerary/members/<?= htmlspecialchars($data['trip']['itineraryId']) ?>" class="text-body-sm font-semibold text-primary hover:underline">Manage</a>                        
+                            <a href="/itinerary/members/<?= htmlspecialchars($trip['id']) ?>" class="text-body-sm font-semibold text-primary hover:underline">Manage</a>                        
                         </div> <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-4">
                             <div class="flex items-center gap-3">
                                 <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-fixed text-primary text-sm font-semibold">ME</div>

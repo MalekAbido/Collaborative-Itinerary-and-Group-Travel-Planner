@@ -4,6 +4,9 @@ namespace App\Controllers;
 use Core\Controller;
 use App\Models\TripMember;
 use App\Models\Itinerary;
+use App\Models\Invitation;
+use App\Helpers\Auth;
+use App\Helpers\Mailer;
 // use App\Models\User; // You will likely need this to look up users by email!
 
 class TripMemberController extends Controller
@@ -14,48 +17,63 @@ class TripMemberController extends Controller
      */
     public function index($id)
     {
-        // 1. Get the trip details so the view has the title and ID
         $itineraryModel = new Itinerary();
-        $tripData = $itineraryModel->findById($id);
+        $tripData = $itineraryModel->findByIdNumeric($id);
 
         if (!$tripData) {
             header("Location: /dashboard");
             exit;
         }
 
-        // 2. Get all members for this specific trip
         $memberModel = new TripMember();
         $members = $memberModel->getAllByItineraryId($id); 
 
-        // 3. Load the view we just built
+        $invitationModel = new Invitation();
+        $pendingInvites = $invitationModel->getPendingByItinerary($id);
+        $appUrl = $_ENV['APP_URL'] ?? 'http://localhost:8080';
+
+        $generalToken = $invitationModel->getOrCreateGeneralToken($id);
+        $generalLink = $appUrl . "/join/" . $generalToken;
+
+        $currentUserId = Auth::id();
+        $currentMember = TripMember::getByUserAndItinerary($currentUserId, $id);
+        
+        $currentUserRole = 'Member'; // Default
+        if ($currentMember) {
+            $currentUserRole = is_array($currentMember) ? $currentMember['role'] : $currentMember->getRole();
+        }
+
         $this->view("itinerary/members", [
             'trip' => $tripData,
-            'members' => $members
+            'members' => $members,
+            'pendingInvites' => $pendingInvites,
+            'appUrl' => $appUrl,
+            'generalLink' => $generalLink,
+            'currentUserRole' => $currentUserRole
         ]);
     }
 
-    /**
-     * 2. Invite a New Member by Email
-     * URL: POST /itinerary/members/invite/{id}
-     */
     public function store($id)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = trim($_POST['email']);
             $role = $_POST['role'];
             
-            $invitationModel = new \App\Models\Invitation();
+            $invitationModel = new Invitation();
             $token = $invitationModel->createToken($id, $email, $role);
 
-            if ($token) {
-                $baseUrl = $_ENV['APP_URL'] ?? 'http://localhost:8080';
-                $joinLink = $baseUrl . "/join/" . $token;
-                
-                $subject = "You've been invited to join a trip!";
-                $body = "Click here to join: $joinLink";
-                
-                \App\Helpers\Mailer::send($email, $subject, $body);
-            }
+            if (!$token) { die("Failed to generate invitation token."); }
+
+            $baseUrl = $_ENV['APP_URL'] ?? 'http://localhost:8080';
+            $joinLink = $baseUrl . "/join/" . $token;
+
+            $subject = "You've been invited to a trip on Itinerary!";
+            
+            $body = "<h2>You have a new trip invitation!</h2>
+                     <p>Click the link below to join the itinerary:</p>
+                     <a href='{$joinLink}' style='display:inline-block; padding:10px 20px; background:#f65a41; color:#fff; text-decoration:none; border-radius:5px;'>Join Trip</a>";
+
+            Mailer::send($email, $subject, $body);
 
             header("Location: /itinerary/members/" . $id . "?status=invited");
             exit;
@@ -105,32 +123,42 @@ class TripMemberController extends Controller
 
     public function joinTrip($token)
     {
-        \App\Helpers\Auth::requireLogin();
-        $userId = \App\Helpers\Auth::id();
-        
-        $invitationModel = new \App\Models\Invitation();
+        Auth::requireLogin();
+        $userId = Auth::id();
+
+        $invitationModel = new Invitation();
         $invitation = $invitationModel->findByToken($token);
-        
+
         if (!$invitation) {
-            die("Invalid or expired invitation.");
+            die("This invitation link is invalid or has expired.");
         }
-        
-        $existing = \App\Models\TripMember::getByUserAndItinerary($userId, $invitation['itineraryId']);
-        if ($existing) {
-            header("Location: /itinerary/dashboard/" . $invitation['itineraryId']);
+
+        $itineraryId = $invitation['itineraryId'];
+        $role = $invitation['role'];
+
+        $existingMember = TripMember::getByUserAndItinerary($userId, $itineraryId);
+        if ($existingMember) {
+            header("Location: /itinerary/dashboard/" . $itineraryId . "?status=already_joined");
             exit;
         }
-        
-        $newMember = new \App\Models\TripMember();
-        $newMember->setItineraryId($invitation['itineraryId']);
+
+        $newMember = new TripMember();
+        $newMember->setItineraryId($itineraryId);
         $newMember->setUserId($userId);
-        $newMember->setRole($invitation['role']);
+        $newMember->setRole($role);
         $newMember->setJoinedAt(date('Y-m-d H:i:s'));
-        $newMember->create();
-        
-        $invitationModel->markUsed($token);
-        
-        header("Location: /itinerary/dashboard/" . $invitation['itineraryId']);
-        exit;
+        $newMember->setMembershipId(uniqid('mem_')); 
+
+        if ($newMember->create()) {
+            
+            if ($invitation['email'] !== null) {
+                $invitationModel->markUsed($invitation['secureToken']);
+            }
+            
+            header("Location: /itinerary/dashboard/" . $itineraryId . "?status=joined");
+            exit;
+        } else {
+            die("An error occurred while adding you to the trip.");
+        }
     }
 }

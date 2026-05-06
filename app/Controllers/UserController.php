@@ -17,8 +17,8 @@ class UserController extends Controller
 
     public function showUserProfile()
     {
+        Auth::requireLogin();
         $user = new User();
-
         if ($user->read($this->userId)) {
             $user->loadAllergies();
             $user->loadEmergencyContacts();
@@ -29,31 +29,25 @@ class UserController extends Controller
                 'emergencyContacts' => $user->getEmergencyContacts(),
             ]);
         }
-
-        return json_encode(['status' => 'error', 'message' => 'User profile not found.']);
+        die('User profile not found.');
     }
 
     public function showUserTripsDashboard()
     {
+        Auth::requireLogin();
         $user = new User();
-
         if ($user->read($this->userId)) {
-            $myTrips = $user->getUserItineraries();
+            $myTrips = method_exists($user, 'getUserItineraries') ? $user->getUserItineraries() : [];
 
             return $this->view('user/dashboard', [
                 'myTrips' => $myTrips,
             ]);
         }
-
-        return json_encode(['status' => 'error', 'message' => 'User profile not found.']);
+        die('User profile not found.');
     }
 
     public function updateUserProfile()
     {
-        // 1. Grab POST data directly
-        $data = $_POST;
-    {
-        // 1. Grab POST data directly
         $data = $_POST;
 
         if (!$this->validateProfileData($data)) {
@@ -61,23 +55,12 @@ class UserController extends Controller
         }
 
         $user = new User();
-        $user = new User();
-
         if ($user->read($this->userId)) {
             $user->updateProfile($data);
-
-            header("Location: /profile");
-            exit;
-        }
-        if ($user->read($this->userId)) {
-            $user->updateProfile($data);
-
             header("Location: /profile");
             exit;
         }
 
-        die('User not found.');
-    }
         die('User not found.');
     }
 
@@ -88,7 +71,6 @@ class UserController extends Controller
         $validator->required('Last Name', $data['lastName']);
         $validator->required('Email', $data['email']);
         $validator->email('Email', $data['email']);
-
         return $validator->passes();
     }
 }

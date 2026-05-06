@@ -51,7 +51,9 @@ class Auth
         
         if ($userId) {
             $user = new User();
-            return $user->getById($userId); 
+            if ($user->read($userId)) {
+                return $user;
+            }
         }
 
         return null;
@@ -103,6 +105,8 @@ class Auth
     {
 
         if (! self::check()) {
+            Session::set('intended_url', $_SERVER['REQUEST_URI']);
+            
             Session::setFlash(Session::FLASH_ERROR, 'Please log in to continue.');
             header('Location: /login');
             exit;

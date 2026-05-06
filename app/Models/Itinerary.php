@@ -144,7 +144,8 @@ class Itinerary
                 VALUES (:id, :title, :desc, :start, :end)";
 
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([
+        
+        $success = $stmt->execute([
             ':id'    => $this->itineraryId,
             ':title' => $title,
             ':desc'  => $description,
@@ -152,7 +153,11 @@ class Itinerary
             ':end'   => $endDate,
         ]);
 
-        return $this->itineraryId;
+        if ($success) {
+            return $this->db->lastInsertId();
+        }
+
+        return false;
     }
 
     public function read($id)

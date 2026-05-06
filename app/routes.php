@@ -80,6 +80,8 @@ $this->get('/itinerary/members/{id}', 'TripMemberController', 'index');
 // 2. Invite a new member
 $this->post('/itinerary/members/invite/{id}', 'TripMemberController', 'store');
 
+$this->get('/join/{token}', 'TripMemberController', 'joinTrip');
+
 // 3. Update a member's role
 $this->post('/itinerary/members/updateRole/{id}', 'TripMemberController', 'updateRole');
 

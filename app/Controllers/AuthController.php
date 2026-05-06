@@ -33,12 +33,19 @@ class AuthController extends Controller
             $user = new User();
 
             if ($user->login($email, $password)) {
-                Auth::login($user->getId());
+                if (session_status() === PHP_SESSION_NONE) { session_start(); }
+                $_SESSION['user_id'] = $user->getId();
+                if ($rememberMe) {
+                    setcookie('remember_user', $user->getId(), time() + (86400 * 30), "/", "", false, true);
+                }
 
-                echo json_encode(['success' => true, 'redirect' => '/dashboard']);
-                exit();
-            } else {
-                echo json_encode(['success' => false, 'errors' => ["Invalid email or password."]]);
+                $redirectUrl = '/dashboard'; 
+                if (isset($_SESSION['intended_url'])) {
+                    $redirectUrl = $_SESSION['intended_url'];
+                    unset($_SESSION['intended_url']); 
+                }
+
+                echo json_encode(['success' => true, 'redirect' => $redirectUrl]);
                 exit();
             }
         }
