@@ -160,9 +160,9 @@ $canManagePolls = Auth::hasRole('Editor', $userRole ?? 'Member');
                                             <div>
                                                 <span class="text-[12px] font-bold uppercase tracking-wider text-outline mb-1 block">Activity Poll</span>
                                                 <h3 class="font-display text-[20px] font-semibold text-on-surface">
-                                                    <a href="/itinerary/<?= htmlspecialchars($itinerary['id']) ?>/activity/<?= htmlspecialchars($poll['activityId']) ?>" class="hover:text-primary transition">
+                                                    <button type="button" onclick='showPollDetails(<?= json_encode($poll) ?>)' class="hover:text-primary transition text-left">
                                                         <?= htmlspecialchars($poll['activityName']) ?>
-                                                    </a>
+                                                    </button>
                                                 </h3>
                                             </div>
                                             <div class="flex flex-col items-end gap-1">
@@ -254,7 +254,11 @@ $canManagePolls = Auth::hasRole('Editor', $userRole ?? 'Member');
                                     <?php foreach ($closedPolls as $closedPoll): ?>
                                         <div class="p-3 bg-surface-container rounded-lg border border-outline-variant/50">
                                             <div class="flex justify-between items-start mb-1">
-                                                <h4 class="font-semibold text-on-surface text-[15px]"><?= htmlspecialchars($closedPoll['activityName']) ?></h4>
+                                                <h4 class="font-semibold text-on-surface text-[15px]">
+                                                    <button type="button" onclick='showPollDetails(<?= json_encode($closedPoll) ?>)' class="hover:text-primary transition text-left">
+                                                        <?= htmlspecialchars($closedPoll['activityName']) ?>
+                                                    </button>
+                                                </h4>
                                                 <span class="inline-flex items-center gap-1 rounded bg-surface-container-highest px-1.5 py-0.5 text-[10px] font-bold uppercase text-outline">Closed</span>
                                             </div>
                                             <div class="flex justify-between items-end mt-2">
@@ -322,8 +326,177 @@ $canManagePolls = Auth::hasRole('Editor', $userRole ?? 'Member');
         </div>
     </div>
 
-    <script src="/assets/js/timezone.js"></script>
+    <!-- Poll Details Modal -->
+    <div id="pollDetailsModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-on-background/50 backdrop-blur-sm transition-opacity">
+        <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-surface-container-lowest shadow-lg border border-outline-variant scroll-thin">
+            <div class="sticky top-0 z-10 flex items-center justify-between border-b border-outline-variant px-6 py-4 bg-surface">
+                <h3 id="modalPollTitle" class="font-display text-[20px] font-semibold text-on-surface m-0 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">poll</span> Poll Details
+                </h3>
+                <button type="button" onclick="closePollDetailsModal()" class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition">
+                    <span class="material-symbols-outlined text-[20px]">close</span>
+                </button>
+            </div>
+            <div class="p-6">
+                <!-- Analytics Section -->
+                <div class="bg-surface-container-low rounded-xl p-6 mb-8 border border-outline-variant">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="font-display text-lg font-bold text-on-surface">Group Sentiment</h3>
+                        <div class="flex items-center gap-3">
+                            <span id="modalTotalPoints" class="font-display text-xs font-bold bg-primary-fixed text-on-primary-fixed-variant px-3 py-1.5 rounded-lg">0 Total Points</span>
+                            <span id="modalTotalVotes" class="font-display text-xs font-bold bg-surface-container px-3 py-1.5 rounded-lg text-on-surface-variant tracking-wide">0 Voted</span>
+                        </div>
+                    </div>
+                    <div id="analyticsBars" class="space-y-5">
+                        <!-- Bars will be injected here -->
+                    </div>
+                </div>
 
+                <!-- Voter Details Section -->
+                <div id="voterDetailsContainer">
+                    <details class="bg-surface-container-low rounded-xl shadow-sm border border-outline-variant group overflow-hidden">
+                        <summary class="p-4 cursor-pointer list-none flex items-center justify-between font-display text-lg font-bold text-on-surface select-none hover:bg-surface-container-low/80 transition-colors">
+                            Voter Details
+                            <span class="material-symbols-outlined group-open:rotate-180 transition-transform duration-200">expand_more</span>
+                        </summary>
+                        <div class="p-6 pt-0 border-t border-outline-variant">
+                            <div id="voterDetailsList" class="space-y-6 mt-4">
+                                <!-- Voter categories will be injected here -->
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/timezone.js"></script>
+    <script>
+        const ratingChoices = <?= json_encode($ratingChoices) ?>;
+
+        function showPollDetails(poll) {
+            document.getElementById('modalPollTitle').innerText = poll.activityName;
+            document.getElementById('modalTotalPoints').innerText = `${parseFloat(poll.weightedTotal).toFixed(1)} Total Points`;
+            document.getElementById('modalTotalVotes').innerText = `${poll.totalVotes} Voted`;
+
+            // Analytics Bars
+            const barsContainer = document.getElementById('analyticsBars');
+            barsContainer.innerHTML = '';
+
+            ratingChoices.forEach(choice => {
+                const stat = poll.stats.find(s => s.ratingChoiceId == choice.id) || { count: 0 };
+                const percentage = poll.totalVotes > 0 ? (stat.count / poll.totalVotes * 100).toFixed(1) : 0;
+                
+                let icon = 'block';
+                let colorClass = 'bg-error';
+                let iconColorClass = 'text-error';
+                
+                if (choice.value === 'MUST_HAVE') {
+                    icon = 'star';
+                    colorClass = 'bg-primary';
+                    iconColorClass = 'text-primary';
+                } else if (choice.value === 'NICE_TO_HAVE') {
+                    icon = 'thumb_up';
+                    colorClass = 'bg-secondary';
+                    iconColorClass = 'text-secondary';
+                }
+
+                barsContainer.innerHTML += `
+                    <div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-on-surface font-semibold flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px] ${iconColorClass}">${icon}</span> ${choice.label}
+                            </span>
+                            <span class="text-on-surface-variant font-medium">${percentage}% (${stat.count})</span>
+                        </div>
+                        <div class="w-full bg-surface-container-highest rounded-full h-3 overflow-hidden">
+                            <div class="${colorClass} h-3 rounded-full" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Voter Details
+            const voterDetailsContainer = document.getElementById('voterDetailsContainer');
+            if (poll.activityIsAnonymous == 0) {
+                voterDetailsContainer.classList.remove('hidden');
+                const voterList = document.getElementById('voterDetailsList');
+                voterList.innerHTML = '';
+
+                ratingChoices.forEach(choice => {
+                    const votersForChoice = poll.voters.filter(v => v.ratingChoiceId == choice.id);
+                    if (votersForChoice.length > 0) {
+                        let icon = 'block';
+                        let textColorClass = 'text-error';
+                        if (choice.value === 'MUST_HAVE') {
+                            icon = 'star';
+                            textColorClass = 'text-primary';
+                        } else if (choice.value === 'NICE_TO_HAVE') {
+                            icon = 'thumb_up';
+                            textColorClass = 'text-secondary';
+                        }
+
+                        let votersHtml = votersForChoice.map(v => `
+                            <div class="flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-full border border-outline-variant">
+                                ${v.profileImage 
+                                    ? `<img src="/${v.profileImage}" class="w-6 h-6 rounded-full border border-outline-variant object-cover">`
+                                    : `<div class="w-6 h-6 rounded-full bg-primary-fixed text-primary flex items-center justify-center text-[10px] font-bold border border-outline-variant">${v.firstName[0]}${v.lastName[0]}</div>`
+                                }
+                                <span class="text-sm font-medium">${v.firstName} ${v.lastName[0]}.</span>
+                            </div>
+                        `).join('');
+
+                        voterList.innerHTML += `
+                            <div>
+                                <h4 class="text-sm font-semibold ${textColorClass} mb-3 flex items-center gap-2 uppercase tracking-wide font-display">
+                                    <span class="material-symbols-outlined text-[16px]">${icon}</span> ${choice.label} (${votersForChoice.length})
+                                </h4>
+                                <div class="flex flex-wrap gap-3">
+                                    ${votersHtml}
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+
+                if (voterList.innerHTML === '') {
+                    voterList.innerHTML = '<p class="text-sm text-on-surface-variant italic">No votes yet.</p>';
+                }
+            } else {
+                voterDetailsContainer.classList.add('hidden');
+            }
+
+            document.getElementById('pollDetailsModal').classList.remove('hidden');
+        }
+
+        function closePollDetailsModal() {
+            document.getElementById('pollDetailsModal').classList.add('hidden');
+        }
+
+        function openReopenModal(pollId) {
+            document.getElementById('reopenPollId').value = pollId;
+            document.getElementById('reopenPollModal').classList.remove('hidden');
+        }
+
+        function closeReopenModal() {
+            document.getElementById('reopenPollModal').classList.add('hidden');
+        }
+
+        // Close on escape or outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('pollDetailsModal');
+            const reopenModal = document.getElementById('reopenPollModal');
+            if (event.target == modal) closePollDetailsModal();
+            if (event.target == reopenModal) closeReopenModal();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closePollDetailsModal();
+                closeReopenModal();
+            }
+        });
+    </script>
 </body>
 
 </html>
