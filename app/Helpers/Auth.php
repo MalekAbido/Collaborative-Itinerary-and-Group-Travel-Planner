@@ -2,13 +2,14 @@
 namespace App\Helpers;
 
 use App\Helpers\Session;
+use App\Models\TripMember;
 use App\Models\User;
 
 class Auth
 {
     private static $roles = [
-        'Member' => 1,
-        'Editor' => 2,
+        'Member'    => 1,
+        'Editor'    => 2,
         'Organizer' => 3,
     ];
 
@@ -48,10 +49,10 @@ class Auth
     public static function user()
     {
         $userId = self::id();
-        
+
         if ($userId) {
             $user = new User();
-            return $user->getById($userId); 
+            return $user->getById($userId);
         }
 
         return null;
@@ -107,5 +108,19 @@ class Auth
             header('Location: /login');
             exit;
         }
+    }
+
+    public static function requireMembership($itineraryId)
+    {
+        $userId     = Auth::id();
+        $tripMember = TripMember::getByUserAndItinerary($userId, $itineraryId);
+
+        if ($tripMember === null) {
+            Session::setFlash(Session::FLASH_ERROR, 'You do not have access to this itinerary.');
+            header('Location: /dashboard');
+            exit;
+        }
+
+        return $tripMember;
     }
 }
