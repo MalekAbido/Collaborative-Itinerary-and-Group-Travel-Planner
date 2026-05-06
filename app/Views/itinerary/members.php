@@ -111,13 +111,26 @@
 
     <main class="max-w-[900px] mx-auto mt-[100px] px-6 pb-12">
 
+        <!-- Reverted this header back to normal -->
         <div class="flex items-center gap-2 pb-3 mb-8 border-b border-outline-variant">
             <span class="material-symbols-outlined text-primary text-[28px]">group</span>
             <h2 class="font-display text-h2 text-on-surface m-0">Manage Members</h2>
         </div>
 
         <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 mb-8">
-            <h3 class="font-display text-h4 text-on-surface mb-4">Invite to Trip</h3>
+
+            <!-- NEW: Flex container to hold the title and the Master Link button side-by-side -->
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-display text-h4 text-on-surface m-0">Invite to Trip</h3>
+
+                <?php if (isset($currentUserRole) && $currentUserRole === 'Leader'): ?>
+                <button onclick="copyInviteLink('<?= htmlspecialchars($generalLink) ?>')"
+                    class="inline-flex items-center gap-1.5 rounded-lg border-2 border-outline-variant bg-surface-container-lowest text-on-surface-variant font-semibold text-body-sm px-3 py-1.5 shadow-sm hover:text-primary hover:border-primary transition">
+                    <span class="material-symbols-outlined text-[18px]">link</span> Copy General Link
+                </button>
+                <?php endif; ?>
+            </div>
+
             <form action="/itinerary/members/invite/<?= htmlspecialchars($trip['id'] ?? '') ?>" method="POST"
                 class="flex flex-col sm:flex-row items-end gap-4">
                 <div class="flex-1 w-full">

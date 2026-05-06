@@ -20,37 +20,37 @@ class AuthController extends Controller
             $email    = trim($_POST['email']);
             $password = $_POST['password'];
 
-            $rememberMe = isset($_POST['remember_me']);
-
-            $errors = [];
-
             if (empty($email) || empty($password)) {
-                $errors[] = "All fields are required.";
-                echo json_encode(['success' => false, 'errors' => $errors]);
+                echo json_encode(['success' => false, 'errors' => ["All fields are required."]]);
                 exit();
             }
 
             $user = new User();
 
             if ($user->login($email, $password)) {
-                if (session_status() === PHP_SESSION_NONE) { session_start(); }
-                $_SESSION['user_id'] = $user->getId();
-                if ($rememberMe) {
-                    setcookie('remember_user', $user->getId(), time() + (86400 * 30), "/", "", false, true);
-                }
+                
+                \App\Helpers\Auth::login($user->getId());
 
-                $redirectUrl = '/dashboard'; 
-                if (isset($_SESSION['intended_url'])) {
-                    $redirectUrl = $_SESSION['intended_url'];
-                    unset($_SESSION['intended_url']); 
+                $redirectUrl = '/dashboard';
+                $intended = \App\Helpers\Session::get('intended_url');
+                
+                if ($intended) {
+                    if (strpos($intended, 'login') === false) {
+                        $redirectUrl = $intended;
+                    }
+                    \App\Helpers\Session::set('intended_url', null); 
                 }
 
                 echo json_encode(['success' => true, 'redirect' => $redirectUrl]);
                 exit();
+                
+            } else {
+                echo json_encode(['success' => false, 'errors' => ["Invalid email or password."]]);
+                exit();
             }
         }
     }
-
+    
     public function register()
     {
         $this->view("auth/register");

@@ -60,6 +60,8 @@ class Router
 
     public function __construct()
     {
+        \App\Helpers\Session::start();
+
         require_once '../app/routes.php';
         $url = $this->parseUrl();
         $httpMethod = $_SERVER['REQUEST_METHOD'];

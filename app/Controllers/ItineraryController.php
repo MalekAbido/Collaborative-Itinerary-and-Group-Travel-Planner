@@ -37,10 +37,10 @@ class ItineraryController extends Controller{
                         if ($token) {
                             $joinLink = $baseUrl . "/join/" . $token;
                             $subject = "You've been invited to a trip on Itinerary!";
+                            
                             $body = "<h2>You have a new trip invitation!</h2>
                                      <p>Click the link below to join the itinerary:</p>
-                                     <a href='{$joinLink}' style='display:inline-block; padding:10px 20px; background:#f65a41; color:#fff; text-decoration:none; border-radius:5px;'>Join Trip</a>
-                                     <p>Or copy this link: {$joinLink}</p>";
+                                     <a href='{$joinLink}' style='display:inline-block; padding:10px 20px; background:#f65a41; color:#fff; text-decoration:none; border-radius:5px;'>Join Trip</a>";
                             
                             \App\Helpers\Mailer::send($email, $subject, $body);
                         }
