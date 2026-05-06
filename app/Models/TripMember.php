@@ -137,8 +137,39 @@ class TripMember
 
     public function delete()
     {
+        if (empty($this->itineraryId)) {
+            $this->read($this->id);
+        }
+
+        // 1. Clean up participation records (These are safe to delete)
+        $this->db->prepare("DELETE FROM AttendanceMember WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+        $this->db->prepare("DELETE FROM Vote WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+        $this->db->prepare("DELETE FROM ExpenseShare WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+        $this->db->prepare("DELETE FROM FundContribution WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+        $this->db->prepare("DELETE FROM HistoryLogEntry WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+        $this->db->prepare("DELETE FROM InventoryItem WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+
+        $stmt = $this->db->prepare("SELECT id FROM TripMember WHERE itineraryId = :itinId AND role IN ('Leader', 'Organizer') AND id != :myId LIMIT 1");
+        $stmt->execute([
+            ':itinId' => $this->itineraryId, 
+            ':myId'   => $this->id
+        ]);
+        $organizer = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if ($organizer) {
+            $newOwnerId = $organizer['id'];
+            
+            $this->db->prepare("UPDATE Activity SET tripMemberId = :newId WHERE tripMemberId = :oldId")->execute([':newId' => $newOwnerId, ':oldId' => $this->id]);
+            $this->db->prepare("UPDATE Subtrip SET tripMemberId = :newId WHERE tripMemberId = :oldId")->execute([':newId' => $newOwnerId, ':oldId' => $this->id]);
+            $this->db->prepare("UPDATE Expense SET tripMemberId = :newId WHERE tripMemberId = :oldId")->execute([':newId' => $newOwnerId, ':oldId' => $this->id]);
+        } else {
+            $this->db->prepare("DELETE FROM Activity WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+            $this->db->prepare("DELETE FROM Subtrip WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+            $this->db->prepare("DELETE FROM Expense WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+        }
         $sql  = "DELETE FROM TripMember WHERE id = :id";
         $stmt = $this->db->prepare($sql);
+        
         return $stmt->execute([':id' => $this->id]);
     }
 

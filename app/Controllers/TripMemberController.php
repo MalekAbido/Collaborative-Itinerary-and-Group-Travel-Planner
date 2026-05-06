@@ -70,8 +70,7 @@ class TripMemberController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $memberId = $_POST['memberId'];
-
-            $member = new TripMember();
+            $member = new \App\Models\TripMember();
             $member->setId($memberId);
             $member->delete();
 

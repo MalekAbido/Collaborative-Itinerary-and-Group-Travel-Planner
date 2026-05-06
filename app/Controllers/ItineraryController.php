@@ -83,6 +83,15 @@ class ItineraryController extends Controller {
             header("Location: /itinerary/dashboard/" . $id);
             exit;
         }
+        $startDate = $_POST['startDate'];
+        $endDate = $_POST['endDate'];
+            if (strtotime($endDate) < strtotime($startDate)) {
+                \App\Helpers\Session::setFlash('date_error', 'The end date cannot be before the start date.');
+                \App\Helpers\Session::setFlash('old_title', $_POST['title']);
+                \App\Helpers\Session::setFlash('old_description', $_POST['description']);
+                header("Location: " . $_SERVER['HTTP_REFERER']);
+                exit;
+            }
         $member = Auth::requireMembership($tripData['id']);
         $role = $member->getRole();
         Auth::requireRole('Organizer', $role);
@@ -97,7 +106,7 @@ class ItineraryController extends Controller {
                 $_POST['endDate']
             );
 
-            header("Location: /itinerary/settings/" . $id . "?status=updated");
+            header("Location: " . $_SERVER['HTTP_REFERER']);
             exit;
         }
     }
@@ -138,7 +147,8 @@ class ItineraryController extends Controller {
         
         $this->view("itinerary/dashboard", [
             'trip' => $tripData, 
-            'members' => $members
+            'members' => $members,
+            'userRole' => $member->getRole(),
         ]);
     }
 }
