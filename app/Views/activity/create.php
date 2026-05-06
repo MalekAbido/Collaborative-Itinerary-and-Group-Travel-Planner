@@ -120,6 +120,10 @@
                             <option value="Sightseeing" <?= $selectedCategory === 'Sightseeing' ? 'selected' : '' ?>>Sightseeing</option>
                         </select>
                     </div>
+                    <div class="flex items-center mt-6">
+                        <input type="checkbox" name="is_anonymous" id="is_anonymous" value="1" <?= !empty($pendingActivity['is_anonymous']) ? 'checked' : '' ?> class="h-5 w-5 rounded border-outline-variant text-primary focus:ring-primary transition">
+                        <label for="is_anonymous" class="ml-3 text-body-md font-semibold text-on-surface">Anonymous Voting</label>
+                    </div>
                     <div class="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-2">Location Name</label>

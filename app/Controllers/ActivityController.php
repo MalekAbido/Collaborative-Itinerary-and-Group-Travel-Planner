@@ -60,6 +60,7 @@ class ActivityController extends Controller
         $startTime       = date('Y-m-d H:i:s', strtotime($_POST['start_time'] ?? ''));
         $endTime         = date('Y-m-d H:i:s', strtotime($_POST['end_time'] ?? ''));
         $category        = $_POST['category'] ?? 'General';
+        $isAnonymous     = isset($_POST['is_anonymous']) ? true : false;
         $locationName    = trim($_POST['location_name'] ?? '');
         $locationAddress = trim($_POST['location_address'] ?? '');
 
@@ -117,6 +118,7 @@ class ActivityController extends Controller
         $activity->setStartTime($startTime);
         $activity->setEndTime($endTime);
         $activity->setCategory($category);
+        $activity->setIsAnonymous($isAnonymous);
         $activity->setLocationId($locationId);
         $activity->setActivityStatus('Draft');
         $activity->setItineraryId($itineraryId);
