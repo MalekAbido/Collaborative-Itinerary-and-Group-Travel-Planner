@@ -2,10 +2,12 @@
 namespace App\Controllers;
 
 use App\Helpers\Auth;
+use App\Helpers\HistoryLogger;
 use App\Helpers\Session;
 use App\Models\Activity;
 use App\Models\AttendanceMember;
 use App\Models\Location;
+use App\Models\TransactionType;
 use App\Models\TripMember;
 use Core\Controller;
 
@@ -94,6 +96,7 @@ class ActivityController extends Controller
         $activity->setTripMemberId($tripMember->getId());
 
         if ($activity->create()) {
+            HistoryLogger::log($itineraryId, TransactionType::ACTIVITY_ADDED, $activity, $tripMember->getId());
             Session::setFlash(Session::FLASH_SUCCESS, 'Activity created successfully as a Draft.');
             header("Location: /itinerary/dashboard/{$itineraryId}");
             exit;
@@ -209,6 +212,7 @@ class ActivityController extends Controller
         }
 
         if ($activity->delete()) {
+            HistoryLogger::log($itineraryId, TransactionType::ACTIVITY_REMOVED, $activity, $tripMember->getId());
             Session::setFlash(Session::FLASH_SUCCESS, 'Activity removed successfully.');
         } else {
             Session::setFlash(Session::FLASH_ERROR, 'Failed to remove the activity.');

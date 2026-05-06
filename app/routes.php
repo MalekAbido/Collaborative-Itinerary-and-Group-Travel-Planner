@@ -95,5 +95,8 @@ $this->post('/itinerary/members/remove/{id}', 'TripMemberController', 'destroy')
 
 // Group Fund (Kitty)
 $this->post('/fund/contribute/{id}', 'CommonPoolController', 'contribute');
-
 $this->post('/finance/expense/refund', 'ExpenseController', 'refundExpense');
+
+// History & Audit Log
+$this->get('/itinerary/{id}/history', 'HistoryController', 'index');
+$this->post('/itinerary/{id}/history/revert/{entryId}', 'HistoryController', 'revert');
