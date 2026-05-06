@@ -76,7 +76,12 @@ class ActivityController extends Controller
         }
 
         if (!isset($_POST['confirm_override'])) {
-            $conflictingConfirmed = Activity::getConflictingConfirmedActivities($itineraryId, $startTime, $endTime);
+            $checkActivity = new Activity();
+            $checkActivity->setItineraryId($itineraryId);
+            $checkActivity->setStartTime($startTime);
+            $checkActivity->setEndTime($endTime);
+
+            $conflictingConfirmed = $checkActivity->getConflictingConfirmedActivities();
             if (!empty($conflictingConfirmed)) {
                 $conflictData = array_map(function($activity) {
                     return [

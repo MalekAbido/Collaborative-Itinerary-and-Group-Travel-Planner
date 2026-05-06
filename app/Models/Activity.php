@@ -134,7 +134,7 @@ class Activity extends ItineraryItem
         return $success;
     }
 
-    public static function getConflictingConfirmedActivities($itineraryId, $startTime, $endTime)
+    public function getConflictingConfirmedActivities()
     {
         $db  = Database::getInstance()->getConnection();
         $sql = "SELECT * FROM Activity
@@ -142,12 +142,19 @@ class Activity extends ItineraryItem
                 AND status = 'Confirmed'
                 AND (startTime < :endTime AND endTime > :startTime)";
 
+        $params = [
+            ':itineraryId' => $this->itineraryId,
+            ':startTime'   => $this->startTime,
+            ':endTime'     => $this->endTime,
+        ];
+
+        if ($this->id) {
+            $sql .= " AND id != :id";
+            $params[':id'] = $this->id;
+        }
+
         $stmt = $db->prepare($sql);
-        $stmt->execute([
-            ':itineraryId' => $itineraryId,
-            ':startTime'   => $startTime,
-            ':endTime'     => $endTime,
-        ]);
+        $stmt->execute($params);
 
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $activities = [];
