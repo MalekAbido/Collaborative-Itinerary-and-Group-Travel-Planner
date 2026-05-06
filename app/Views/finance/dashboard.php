@@ -213,9 +213,11 @@ if ($percentage >= 100) {
                         <h1 class="font-display text-display text-on-surface mb-2">Finance Dashboard</h1>
                         <p class="text-body-lg text-on-surface-variant">Track group expenses and monitor budget limits.</p>
                     </div>
+                    <?php if ($userRole !== 'Member'): ?>
                     <button type="button" onclick="document.getElementById('financeSettingsModal').classList.remove('hidden')" class="inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-body-sm px-6 py-2.5 hover:bg-surface-container transition">
                         <span class="material-symbols-outlined text-[18px]">settings</span> Settings
                     </button>
+                    <?php endif; ?>
                 </header>
 
                 <?php if (isset($alert) && $alert['status'] === 'warning'): ?>
@@ -486,7 +488,7 @@ if ($percentage >= 100) {
                     </div>
                     <div>
                         <label class="block text-label-caps uppercase text-on-surface-variant mb-2">Total Budget Limit</label>
-                        <input type="number" name="budgetLimit" min="0" step="0.01" value="<?= htmlspecialchars($totalBudget) ?>" placeholder="0.00" class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-md focus:border-primary focus:ring-primary focus:outline-none transition">
+                        <input type="number" name="budgetLimit" min="0" max="999999999" step="1" value="<?= htmlspecialchars($totalBudget) ?>" placeholder="0.00" class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-md focus:border-primary focus:ring-primary focus:outline-none transition">
                         <p class="text-body-xs text-outline mt-2">Set to 0 for no limit.</p>
                     </div>
                     <div class="mt-2 flex justify-end gap-3">
