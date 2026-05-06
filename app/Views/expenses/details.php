@@ -77,6 +77,7 @@
                 </div>
             </div>
             
+            <?php if (!$expense->getPaidByKitty()): ?>
             <div class="p-6">
                 <!-- Who Paid Section -->
                 <div class="mb-8">
@@ -120,6 +121,7 @@
                     <?php endif; ?>
                 </div>
             </div>
+            <?php endif; ?>
             
             <!-- Actions Footer -->
             <div class="p-4 border-t border-outline-variant bg-surface/50 flex justify-end">
