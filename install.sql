@@ -94,6 +94,7 @@ CREATE TABLE Expense
   paidByKitty     BOOLEAN       NULL    ,
   tripFinanceId   INT           NOT NULL,
   tripMemberId    INT           NOT NULL,
+  deletedAt       DATETIME      NULL DEFAULT NULL,
   PRIMARY KEY (id)
 );
 
@@ -128,6 +129,7 @@ CREATE TABLE FundContribution
   timestamp      DATETIME      NULL    ,
   groupFundId    INT           NOT NULL,
   tripMemberId   INT           NOT NULL,
+  deletedAt       DATETIME      NULL DEFAULT NULL,
   PRIMARY KEY (id)
 );
 
@@ -158,6 +160,7 @@ CREATE TABLE HistoryLog
   id          INT         NOT NULL AUTO_INCREMENT,
   logId       VARCHAR(55) NOT NULL,
   itineraryId INT         NOT NULL,
+  createdAt   DATETIME    DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
 );
 
@@ -171,10 +174,10 @@ CREATE TABLE HistoryLogEntry
 (
   id                 INT          NOT NULL AUTO_INCREMENT,
   entryId            VARCHAR(55)  NOT NULL,
-  transactionType    VARCHAR(50)  NULL    ,
-  timestamp          DATETIME     NULL    ,
-  changedEntityId    VARCHAR(55)  NULL    ,
-  changedEntityType  VARCHAR(100) NULL    ,
+  transactionType    VARCHAR(50)  NOT NULL,
+  timestamp          DATETIME     DEFAULT CURRENT_TIMESTAMP,
+  changedEntityId    VARCHAR(55)  NOT NULL,
+  changedEntityType  VARCHAR(100) NOT NULL,
   historyLogId       INT          NOT NULL,
   tripMemberId       INT          NOT NULL,
   previousSnapshotId INT          NULL    ,
@@ -197,6 +200,7 @@ CREATE TABLE InventoryItem
   isPacked     BOOLEAN      NULL    ,
   activityId   INT          NOT NULL,
   tripMemberId INT          NULL    ,
+  deletedAt       DATETIME      NULL DEFAULT NULL,
   PRIMARY KEY (id)
 );
 
@@ -300,6 +304,7 @@ CREATE TABLE Subtrip
   endTime      DATETIME     NULL    ,
   itineraryId  INT          NOT NULL,
   tripMemberId INT          NOT NULL,
+  deletedAt       DATETIME      NULL DEFAULT NULL,
   PRIMARY KEY (id)
 );
 
