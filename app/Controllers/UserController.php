@@ -18,8 +18,8 @@ class UserController extends Controller
 
     public function showUserProfile()
     {
+        Auth::requireLogin();
         $user = new User();
-
         if ($user->read($this->userId)) {
             $user->loadAllergies();
             $user->loadEmergencyContacts();
@@ -30,23 +30,21 @@ class UserController extends Controller
                 'emergencyContacts' => $user->getEmergencyContacts(),
             ]);
         }
-
-        return json_encode(['status' => 'error', 'message' => 'User profile not found.']);
+        die('User profile not found.');
     }
 
     public function showUserTripsDashboard()
     {
+        Auth::requireLogin();
         $user = new User();
-
         if ($user->read($this->userId)) {
-            $myTrips = $user->getUserItineraries();
+            $myTrips = method_exists($user, 'getUserItineraries') ? $user->getUserItineraries() : [];
 
             return $this->view('user/dashboard', [
                 'myTrips' => $myTrips,
             ]);
         }
-
-        return json_encode(['status' => 'error', 'message' => 'User profile not found.']);
+        die('User profile not found.');
     }
 
     public function updateUserProfile()
@@ -58,9 +56,7 @@ class UserController extends Controller
         }
 
         $user = new User();
-
         if ($user->read($this->userId)) {
-            // Handle image upload
             if (isset($_FILES['profileImage']) && $_FILES['profileImage']['error'] === UPLOAD_ERR_OK) {
                 $fileTmpPath = $_FILES['profileImage']['tmp_name'];
                 $fileName = $_FILES['profileImage']['name'];
@@ -69,8 +65,7 @@ class UserController extends Controller
                 $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg');
                 if (in_array($fileExtension, $allowedfileExtensions)) {
                     $uploadFileDir = dirname(__DIR__, 2) . '/public/uploads/profiles/';
-                    
-                    // Delete any existing files for this user (handles extension changes)
+
                     $mask = $uploadFileDir . $user->getUserId() . '.*';
                     $existingFiles = glob($mask);
                     if ($existingFiles) {
@@ -81,7 +76,6 @@ class UserController extends Controller
                         }
                     }
 
-                    // New Naming: User ID
                     $newFileName = $user->getUserId() . '.' . $fileExtension;
                     $dest_path = $uploadFileDir . $newFileName;
 
@@ -92,7 +86,7 @@ class UserController extends Controller
             }
 
             $user->updateProfile($data);
-
+            
             header("Location: /profile");
             exit;
         }
@@ -107,7 +101,6 @@ class UserController extends Controller
         $validator->required('Last Name', $data['lastName']);
         $validator->required('Email', $data['email']);
         $validator->email('Email', $data['email']);
-
         return $validator->passes();
     }
 }

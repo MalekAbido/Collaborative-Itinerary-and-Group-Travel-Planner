@@ -213,6 +213,8 @@ CREATE TABLE Invitation
   secureToken  VARCHAR(255) NULL    ,
   isActive     BOOLEAN      NULL    ,
   itineraryId  INT          NOT NULL,
+  email        VARCHAR(255) NULL    ,
+  role         VARCHAR(30)  NULL    ,
   PRIMARY KEY (id)
 );
 
@@ -221,7 +223,6 @@ ALTER TABLE Invitation
 
 ALTER TABLE Invitation
   ADD CONSTRAINT UQ_invitationId UNIQUE (invitationId);
-
 CREATE TABLE Itinerary
 (
   id          INT          NOT NULL AUTO_INCREMENT,
@@ -639,9 +640,9 @@ INSERT INTO TripMember (membershipId, role, joinedAt, userId, itineraryId) VALUE
 ('mem_004', 'Organizer', '2026-04-01 14:00:00', 1, 2),
 ('mem_005', 'Member', '2026-04-02 16:45:00', 2, 2);
 
-INSERT INTO Invitation (invitationId, secureToken, isActive, itineraryId) VALUES
-('inv_001', 'token_abc123', TRUE, 1),
-('inv_002', 'token_xyz789', TRUE, 2);
+INSERT INTO Invitation (invitationId, secureToken, isActive, itineraryId, email, role) VALUES
+('inv_001', 'token_abc123', TRUE, 1, 'dummy1@example.com', 'Member'),
+('inv_002', 'token_xyz789', TRUE, 2, 'dummy2@example.com', 'Editor');
 
 INSERT INTO TripFinance (financeId, baseCurrency, budgetLimit, itineraryId) VALUES
 ('fin_001', 'JPY', 500000.00, 1),
@@ -710,3 +711,17 @@ INSERT INTO Vote (voteId, voteWeight, timestamp, pollId, tripMemberId, ratingCho
 ('vote_001', 1.00, '2026-03-15 10:00:00', 1, 1, 1), 
 ('vote_002', 1.00, '2026-03-16 11:00:00', 1, 2, 1), 
 ('vote_003', 1.00, '2026-03-17 12:00:00', 1, 3, 2);
+
+CREATE TABLE Invitation
+(
+  id           INT          NOT NULL AUTO_INCREMENT,
+  itineraryId  INT          NOT NULL,
+  email        VARCHAR(255) NOT NULL,
+  token        VARCHAR(64)  NOT NULL,
+  role         VARCHAR(30)  DEFAULT 'Member',
+  createdAt    DATETIME     NOT NULL,
+  expiresAt    DATETIME     NOT NULL,
+  used         BOOLEAN      DEFAULT FALSE,
+  PRIMARY KEY (id),
+  UNIQUE KEY (token)
+);

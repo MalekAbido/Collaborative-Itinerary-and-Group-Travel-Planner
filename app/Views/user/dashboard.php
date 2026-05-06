@@ -5,8 +5,8 @@
  */
 
 use App\Helpers\Session;
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 
@@ -17,26 +17,30 @@ use App\Helpers\Session;
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+        rel="stylesheet" />
 
     <!-- Link to your compiled Tailwind CSS -->
     <link rel="stylesheet" href="/assets/css/tailwind.css">
 
     <style>
-        /* Fallback for custom scrollbar */
-        .scroll-thin::-webkit-scrollbar {
-            width: 6px;
-        }
+    /* Fallback for custom scrollbar */
+    .scroll-thin::-webkit-scrollbar {
+        width: 6px;
+    }
 
-        .scroll-thin::-webkit-scrollbar-track {
-            background: transparent;
-        }
+    .scroll-thin::-webkit-scrollbar-track {
+        background: transparent;
+    }
 
-        .scroll-thin::-webkit-scrollbar-thumb {
-            background-color: #c1c6d6;
-            border-radius: 9999px;
-        }
+    .scroll-thin::-webkit-scrollbar-thumb {
+        background-color: #c1c6d6;
+        border-radius: 9999px;
+    }
     </style>
 </head>
 
@@ -44,23 +48,30 @@ use App\Helpers\Session;
 
     <div class="flex h-screen overflow-hidden">
 
-        <nav class="fixed inset-x-0 top-0 z-50 h-navbar bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant shadow-sm">
+        <nav
+            class="fixed inset-x-0 top-0 z-50 h-navbar bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant shadow-sm">
             <div class="mx-auto flex h-full max-w-[1280px] items-center justify-between px-6 lg:px-8">
                 <div class="flex items-center gap-8">
-                    <a href="/dashboard" class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
+                    <a href="/dashboard"
+                        class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
                     <div class="hidden md:flex items-center gap-1">
-                        <a href="/dashboard/" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Dashboard</a>
+                        <a href="/dashboard/"
+                            class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Dashboard</a>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
                     <a href="/profile" class="flex items-center gap-2 cursor-pointer">
-                        <?php $currentUser = \App\Helpers\Auth::user(); ?>
-                        <?php if ($currentUser->getProfileImage()): ?>
-                            <img src="/<?= htmlspecialchars($currentUser->getProfileImage()) ?>" alt="Profile" class="h-8 w-8 rounded-full border-2 border-outline-variant object-cover">
+                        <?php
+                        $currentUser = \App\Helpers\Auth::user();
+                        if ($currentUser && method_exists($currentUser, 'getProfileImage') && $currentUser->getProfileImage()):
+                        ?>
+                        <img src="/<?= htmlspecialchars($currentUser->getProfileImage()) ?>" alt="Profile"
+                            class="h-8 w-8 rounded-full border-2 border-outline-variant object-cover">
                         <?php else: ?>
-                            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
-                                <?= strtoupper(substr($currentUser->getFirstName(), 0, 1) . substr($currentUser->getLastName(), 0, 1)) ?>
-                            </div>
+                        <div
+                            class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
+                            <?= $currentUser ? strtoupper(substr($currentUser->getFirstName(), 0, 1) . substr($currentUser->getLastName(), 0, 1)) : 'ME' ?>
+                        </div>
                         <?php endif; ?>
                     </a>
                 </div>
@@ -68,7 +79,8 @@ use App\Helpers\Session;
         </nav>
 
         <!-- MAIN CONTENT (Sidebar margin removed) -->
-        <main class="flex-1 mt-navbar h-[calc(100vh-theme(spacing.navbar))] overflow-y-auto bg-surface p-6 lg:p-8 scroll-thin">
+        <main
+            class="flex-1 mt-navbar h-[calc(100vh-theme(spacing.navbar))] overflow-y-auto bg-surface p-6 lg:p-8 scroll-thin">
             <div class="max-w-content mx-auto">
 
                 <!-- Page Hero -->
@@ -83,7 +95,8 @@ use App\Helpers\Session;
                             <?php echo Session::getFlash(Session::FLASH_ERROR); ?>
                         </p>
                     </div>
-                    <a href="/itinerary/create" class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-md px-8 py-4 shadow-sm hover:bg-on-primary-fixed-variant transition shrink-0">
+                    <a href="/itinerary/create"
+                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-md px-8 py-4 shadow-sm hover:bg-on-primary-fixed-variant transition shrink-0">
                         <span class="material-symbols-outlined text-[20px]">add</span> Create Trip
                     </a>
                 </header>
@@ -91,42 +104,50 @@ use App\Helpers\Session;
                 <!-- Trips Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <?php if (!empty($myTrips)): ?>
-                        <?php foreach ($myTrips as $trip): ?>
-                            <article class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden hover:shadow-md transition">
-                                <div class="relative h-40 bg-gradient-primary">
-                                    <span class="material-symbols-outlined absolute bottom-3 left-3 text-5xl text-on-primary/30">travel_explore</span>
+                    <?php foreach ($myTrips as $trip): ?>
+                    <article
+                        class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden hover:shadow-md transition">
+                        <div class="relative h-40 bg-gradient-primary">
+                            <span
+                                class="material-symbols-outlined absolute bottom-3 left-3 text-5xl text-on-primary/30">travel_explore</span>
 
-                                    <span class="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full bg-surface-container-lowest/20 backdrop-blur px-3 py-1 text-label-xs font-bold uppercase text-on-primary">
-                                        <?= htmlspecialchars($trip['role']) ?>
-                                    </span>
-                                </div>
-
-                                <div class="p-5 border-l-4 border-primary flex-1 flex flex-col">
-                                    <h4 class="font-display text-h4 text-on-surface mb-1"><?= htmlspecialchars($trip['title']) ?></h4>
-
-                                    <p class="text-body-xs text-on-surface-variant mb-3">
-                                        <?= date('M j', strtotime($trip['startDate'])) ?> – <?= date('M j, Y', strtotime($trip['endDate'])) ?>
-                                    </p>
-
-                                    <p class="text-body-sm text-on-surface-variant mb-4 line-clamp-2">
-                                        <?= htmlspecialchars($trip['description']) ?>
-                                    </p>
-
-                                    <a href="/itinerary/dashboard/<?= htmlspecialchars($trip['id']) ?>" class="mt-auto inline-flex items-center gap-1 text-body-sm font-semibold text-primary hover:underline group">
-                                        View Dashboard <span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                                    </a>
-                                </div>
-                            </article>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <!-- Empty State -->
-                        <div class="col-span-full flex flex-col items-center justify-center py-20 border-2 border-dashed border-outline-variant rounded-xl bg-surface-container-lowest">
-                            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-surface-container mb-4">
-                                <span class="material-symbols-outlined text-[32px] text-outline">flight_takeoff</span>
-                            </div>
-                            <h3 class="font-display text-h3 text-on-surface mb-1">No trips yet</h3>
-                            <p class="text-body-md text-on-surface-variant mb-4">You aren't a member of any itineraries.</p>
+                            <span
+                                class="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full bg-surface-container-lowest/20 backdrop-blur px-3 py-1 text-label-xs font-bold uppercase text-on-primary">
+                                <?= htmlspecialchars($trip['role']) ?>
+                            </span>
                         </div>
+
+                        <div class="p-5 border-l-4 border-primary flex-1 flex flex-col">
+                            <h4 class="font-display text-h4 text-on-surface mb-1">
+                                <?= htmlspecialchars($trip['title']) ?></h4>
+
+                            <p class="text-body-xs text-on-surface-variant mb-3">
+                                <?= date('M j', strtotime($trip['startDate'])) ?> –
+                                <?= date('M j, Y', strtotime($trip['endDate'])) ?>
+                            </p>
+
+                            <p class="text-body-sm text-on-surface-variant mb-4 line-clamp-2">
+                                <?= htmlspecialchars($trip['description']) ?>
+                            </p>
+
+                            <a href="/itinerary/dashboard/<?= htmlspecialchars($trip['id']) ?>"
+                                class="mt-auto inline-flex items-center gap-1 text-body-sm font-semibold text-primary hover:underline group">
+                                View Dashboard <span
+                                    class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            </a>
+                        </div>
+                    </article>
+                    <?php endforeach; ?>
+                    <?php else: ?>
+                    <!-- Empty State -->
+                    <div
+                        class="col-span-full flex flex-col items-center justify-center py-20 border-2 border-dashed border-outline-variant rounded-xl bg-surface-container-lowest">
+                        <div class="flex h-16 w-16 items-center justify-center rounded-full bg-surface-container mb-4">
+                            <span class="material-symbols-outlined text-[32px] text-outline">flight_takeoff</span>
+                        </div>
+                        <h3 class="font-display text-h3 text-on-surface mb-1">No trips yet</h3>
+                        <p class="text-body-md text-on-surface-variant mb-4">You aren't a member of any itineraries.</p>
+                    </div>
                     <?php endif; ?>
                 </div>
 
