@@ -3,24 +3,27 @@
 namespace App\Controllers;
 
 use Core\Controller;
-use App\Models\Poll;
-use App\Models\Vote;
-use App\Models\TripMember;
-use App\Models\Itinerary;
 use App\Helpers\Auth;
+use App\Helpers\TimeHelper;
+use App\Models\Itinerary;
+use App\Models\Poll;
+use App\Models\TripMember;
+use App\Models\Vote;
 
 class PollController extends Controller
 {
     public function __construct()
     {
         Auth::requireLogin();
-        date_default_timezone_set('Africa/Cairo');
+        // Crucial: Set the baseline server time to UTC for all PHP time functions
+        date_default_timezone_set('UTC');
     }
 
     public function store()
     {
         $activityId = $_POST['activityId'] ?? null;
         $deadlineRaw = $_POST['deadline'] ?? null;
+        $clientTimezoneStr = $_POST['timezone'] ?? 'UTC';
         $isAnonymous = isset($_POST['isAnonymous']);
 
         if (!$activityId || !$deadlineRaw) {
@@ -28,7 +31,11 @@ class PollController extends Controller
             exit();
         }
 
-        $formattedDeadline = date('Y-m-d H:i:s', strtotime($deadlineRaw));
+        $formattedDeadline = TimeHelper::convertToUTC($deadlineRaw, $clientTimezoneStr);
+
+        if (!$formattedDeadline) {
+            die("Invalid datetime or timezone provided.");
+        }
 
         $poll = new Poll();
         $poll->setActivityId($activityId);
@@ -62,7 +69,6 @@ class PollController extends Controller
             die("Poll not found.");
         }
 
-        // Check if manually closed OR deadline passed
         if ($poll->getStatus() === 'CLOSED' || strtotime($poll->getDeadline()) <= time()) {
             if ($poll->getStatus() === 'OPEN') {
                 $poll->closePoll();
@@ -125,6 +131,7 @@ class PollController extends Controller
         $pollId = $_POST['pollId'] ?? null;
         $itineraryId = $_POST['itineraryId'] ?? null;
         $newDeadlineRaw = $_POST['newDeadline'] ?? null;
+        $clientTimezoneStr = $_POST['timezone'] ?? 'UTC'; // Fallback to UTC if not sent
 
         if (!$pollId || !$itineraryId || !$newDeadlineRaw) {
             header("Location: " . $_SERVER['HTTP_REFERER']);
@@ -135,16 +142,22 @@ class PollController extends Controller
 
         $poll = new Poll();
         if ($poll->read($pollId)) {
-            $formattedDeadline = date('Y-m-d H:i:s', strtotime($newDeadlineRaw));
-            $poll->setDeadline($formattedDeadline);
-            $poll->openPoll();
+            // Convert the client's local deadline to a UTC string using the helper
+            $formattedDeadline = TimeHelper::convertToUTC($newDeadlineRaw, $clientTimezoneStr);
+
+            if ($formattedDeadline) {
+                $poll->setDeadline($formattedDeadline);
+                $poll->openPoll();
+            } else {
+                die("Invalid datetime or timezone provided.");
+            }
         }
 
         header("Location: " . $_SERVER['HTTP_REFERER']);
         exit();
     }
 
-    private function enforceEditorRole($itineraryId)
+    private function enforceEditorRole(int $itineraryId)
     {
         $userId = Auth::id();
 
@@ -160,7 +173,7 @@ class PollController extends Controller
         Auth::requireRole('Editor', $role);
     }
 
-    public function index($itineraryId)
+    public function index(int $itineraryId)
     {
         $itineraryModel = new Itinerary();
         $itinerary = $itineraryModel->findByIdNumeric($itineraryId);
@@ -183,9 +196,12 @@ class PollController extends Controller
 
         $activePolls = [];
         $closedPolls = [];
-        $currentTime = time();
+        
+        // time() generates the current UTC timestamp because of our __construct setup
+        $currentTime = time(); 
 
         foreach ($allPolls as $pollData) {
+            // $pollData['deadline'] is fetched from the DB, so it's safely in UTC
             $deadlineTime = strtotime($pollData['deadline']);
 
             if ($pollData['status'] === 'OPEN' && $deadlineTime <= $currentTime) {

@@ -12,6 +12,7 @@ use App\Helpers\Auth;
 
 // Determine if the current user has permission to manage polls
 $canManagePolls = Auth::hasRole('Editor', $userRole ?? 'Member');
+
 ?>
 <!DOCTYPE html>
 <html lang="en" class="light">
@@ -107,9 +108,9 @@ $canManagePolls = Auth::hasRole('Editor', $userRole ?? 'Member');
                     <a href="/profile" class="flex items-center gap-2 cursor-pointer">
                         <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
                             <?php $currentUser = \App\Helpers\Auth::user(); ?>
-                            <?php if ($currentUser->getProfileImage()): ?>
+                            <?php if ($currentUser && $currentUser->getProfileImage()): ?>
                                 <img src="/<?= htmlspecialchars($currentUser->getProfileImage()) ?>" alt="Profile" class="h-8 w-8 rounded-full border-2 border-outline-variant object-cover">
-                            <?php else: ?>
+                            <?php elseif ($currentUser): ?>
                                 <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
                                     <?= strtoupper(substr($currentUser->getFirstName(), 0, 1) . substr($currentUser->getLastName(), 0, 1)) ?>
                                 </div>
@@ -163,7 +164,7 @@ $canManagePolls = Auth::hasRole('Editor', $userRole ?? 'Member');
                                             <div class="flex flex-col items-end gap-1">
                                                 <span class="inline-flex items-center gap-1 rounded-full bg-secondary-fixed px-3 py-1 text-[11px] font-bold text-secondary">
                                                     <span class="material-symbols-outlined text-sm">schedule</span>
-                                                    Ends: <?= date('M j, g:i A', strtotime($poll['deadline'])) ?>
+                                                    Ends: <span class="local-time ml-1" data-utc="<?= date('c', strtotime($poll['deadline'])) ?>" data-format="datetime"></span>
                                                 </span>
 
                                                 <?php if ($canManagePolls): ?>
@@ -254,7 +255,8 @@ $canManagePolls = Auth::hasRole('Editor', $userRole ?? 'Member');
                                             </div>
                                             <div class="flex justify-between items-end mt-2">
                                                 <div class="flex flex-col">
-                                                    <span class="text-[12px] text-on-surface-variant">Ended: <?= date('M j', strtotime($closedPoll['deadline'])) ?></span>
+
+                                                    <span class="text-[12px] text-on-surface-variant">Ended: <span class="local-time ml-1" data-utc="<?= date('c', strtotime($closedPoll['deadline'])) ?>" data-format="date"></span></span>
 
                                                     <!-- REOPEN BUTTON (Editors/Leaders only) -->
                                                     <?php if ($canManagePolls): ?>
@@ -295,6 +297,8 @@ $canManagePolls = Auth::hasRole('Editor', $userRole ?? 'Member');
                     <input type="hidden" name="pollId" id="reopenPollId" value="">
                     <input type="hidden" name="itineraryId" value="<?= htmlspecialchars($itinerary['id']) ?>">
 
+                    <input type="hidden" name="timezone" id="clientTimezoneReopen" value="">
+
                     <div>
                         <label class="block text-[12px] font-bold uppercase tracking-wider text-on-surface-variant mb-2">New Deadline</label>
                         <input type="datetime-local" name="newDeadline" required
@@ -314,16 +318,7 @@ $canManagePolls = Auth::hasRole('Editor', $userRole ?? 'Member');
         </div>
     </div>
 
-    <script>
-        function openReopenModal(pollId) {
-            document.getElementById('reopenPollId').value = pollId;
-            document.getElementById('reopenPollModal').classList.remove('hidden');
-        }
-
-        function closeReopenModal() {
-            document.getElementById('reopenPollModal').classList.add('hidden');
-        }
-    </script>
+    <script src="/assets/js/timezone.js"></script>
 
 </body>
 
