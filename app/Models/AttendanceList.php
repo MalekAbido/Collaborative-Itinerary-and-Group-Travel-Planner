@@ -34,6 +34,22 @@ class AttendanceList
         return $this->activityId;
     }
 
+    public function create($activityId)
+    {
+        $db = Database::getInstance()->getConnection();
+        $sql = "INSERT INTO AttendanceList (totalAttendeeCount, activityId) VALUES (0, :activityId)";
+        $stmt = $db->prepare($sql);
+        
+        if ($stmt->execute([':activityId' => $activityId])) {
+            $this->id = $db->lastInsertId();
+            $this->activityId = $activityId;
+            $this->totalAttendeeCount = 0;
+            return true;
+        }
+        
+        return false;
+    }
+
     public function fill(array $row)
     {
         $this->id                 = $row['id'];

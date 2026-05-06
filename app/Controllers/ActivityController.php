@@ -4,6 +4,7 @@ namespace App\Controllers;
 use App\Helpers\Auth;
 use App\Helpers\Session;
 use App\Models\Activity;
+use App\Models\AttendanceList;
 use App\Models\AttendanceMember;
 use App\Models\Location;
 use App\Models\TripMember;
@@ -94,6 +95,14 @@ class ActivityController extends Controller
         $activity->setTripMemberId($tripMember->getId());
 
         if ($activity->create()) {
+            $attendanceList = new AttendanceList();
+            if ($attendanceList->create($activity->getId())) {
+                $allMembers = $tripMember->getAllByItineraryId($itineraryId);
+                foreach ($allMembers as $memberData) {
+                    $attendanceList->updateStatus($memberData['id'], 'PENDING');
+                }
+            }
+
             Session::setFlash(Session::FLASH_SUCCESS, 'Activity created successfully as a Draft.');
             header("Location: /itinerary/dashboard/{$itineraryId}");
             exit;
