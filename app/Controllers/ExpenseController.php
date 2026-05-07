@@ -34,7 +34,7 @@ class ExpenseController extends Controller
             'members' => $members,
             'financeId' => $financeId,
             'itineraryId' => $id,
-            'groupFundBalance' => $groupFundBalance
+            'groupFundBalance' => $groupFundBalance,
             'activeTab' => 'addExpense'
         ]);
     }
