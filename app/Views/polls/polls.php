@@ -71,7 +71,7 @@
                                             <div class="grid grid-cols-3 gap-3">
                                                 <?php foreach ($ratingChoices as $choice): ?>
                                                     <label class="relative flex flex-col items-center justify-center p-4 border-2 rounded-xl cursor-pointer hover:bg-surface-container transition group">
-                                                        <input type="radio" name="ratingChoiceId" value="<?= $choice['id'] ?>" class="peer sr-only">
+                                                        <input type="radio" name="ratingChoice" value="<?= $choice['value'] ?>" class="peer sr-only">
                                                         <div class="w-full h-full absolute inset-0 border-primary rounded-xl opacity-0 peer-checked:opacity-100 peer-checked:border-4 transition-all"></div>
 
                                                         <span class="material-symbols-outlined mb-2 text-outline group-hover:text-primary transition">
@@ -82,7 +82,7 @@
                                                             ?>
                                                         </span>
                                                         <span class="font-display text-[14px] font-bold text-on-surface-variant group-hover:text-primary transition text-center"><?= htmlspecialchars($choice['label']) ?></span>
-                                                        <span class="text-[10px] font-bold text-outline mt-1"><?= ($choice['id'] == 1 ? '+3' : ($choice['id'] == 2 ? '+1' : '-1')) ?> pts</span>
+                                                        <span class="text-[10px] font-bold text-outline mt-1"><?= ($choice['value'] === 'MUST_HAVE' ? '+3' : ($choice['value'] === 'NICE_TO_HAVE' ? '+1' : '-1')) ?> pts</span>
                                                     </label>
                                                 <?php endforeach; ?>
                                             </div>
@@ -263,7 +263,7 @@
             barsContainer.innerHTML = '';
 
             ratingChoices.forEach(choice => {
-                const stat = poll.stats.find(s => s.ratingChoiceId == choice.id) || { count: 0 };
+                const stat = poll.stats.find(s => s.ratingChoice == choice.value) || { count: 0 };
                 const percentage = poll.totalVotes > 0 ? (stat.count / poll.totalVotes * 100).toFixed(1) : 0;
                 
                 let icon = 'block';
@@ -303,7 +303,7 @@
                 voterList.innerHTML = '';
 
                 ratingChoices.forEach(choice => {
-                    const votersForChoice = poll.voters.filter(v => v.ratingChoiceId == choice.id);
+                    const votersForChoice = poll.voters.filter(v => v.ratingChoice == choice.value);
                     if (votersForChoice.length > 0) {
                         let icon = 'block';
                         let textColorClass = 'text-error';

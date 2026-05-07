@@ -164,14 +164,14 @@ class Poll
 
     public function calculateTotalPoints()
     {
-        $sql = "SELECT ratingChoiceId, voteWeight FROM Vote WHERE pollId = :pollId";
+        $sql = "SELECT ratingChoice FROM Vote WHERE pollId = :pollId";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':pollId' => $this->id]);
         $votes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $total = 0;
         foreach ($votes as $vote) {
-            $total += Vote::getWeight($vote['ratingChoiceId']) * $vote['voteWeight'];
+            $total += Vote::getWeight($vote['ratingChoice']);
         }
 
         $this->weightedTotal = $total;
@@ -196,10 +196,10 @@ class Poll
 
     public function getVoteStats()
     {
-        $sql = "SELECT ratingChoiceId, COUNT(*) as count 
+        $sql = "SELECT ratingChoice, COUNT(*) as count 
                 FROM Vote 
                 WHERE pollId = :pollId 
-                GROUP BY ratingChoiceId";
+                GROUP BY ratingChoice";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':pollId' => $this->id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

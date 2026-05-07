@@ -376,11 +376,10 @@ CREATE TABLE Vote
 (
   id             INT           NOT NULL AUTO_INCREMENT,
   voteId         VARCHAR(55)   NOT NULL,
-  voteWeight     DECIMAL(10,5) NULL    ,
   timestamp      DATETIME      NULL    ,
   pollId         INT           NOT NULL,
   tripMemberId   INT           NOT NULL,
-  ratingChoiceId INT           NOT NULL,
+  ratingChoice   VARCHAR(20)   NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -655,7 +654,7 @@ INSERT INTO AttendanceMember (status, note, attendanceListId, tripMemberId) VALU
 ('Not Going', 'Feeling sick', 2, 2),
 ('Not Going', 'Feeling tired', 2, 3);
 
-INSERT INTO Vote (voteId, voteWeight, timestamp, pollId, tripMemberId, ratingChoiceId) VALUES
-('vote_001', 1.00, '2026-03-15 10:00:00', 1, 1, 1), 
-('vote_002', 1.00, '2026-03-16 11:00:00', 1, 2, 2), 
-('vote_003', 1.00, '2026-03-17 12:00:00', 1, 3, 0);
+INSERT INTO Vote (voteId, timestamp, pollId, tripMemberId, ratingChoice) VALUES
+('vote_001', '2026-03-15 10:00:00', 1, 1, 'MUST_HAVE'), 
+('vote_002', '2026-03-16 11:00:00', 1, 2, 'NICE_TO_HAVE'), 
+('vote_003', '2026-03-17 12:00:00', 1, 3, 'NOT_NEEDED');

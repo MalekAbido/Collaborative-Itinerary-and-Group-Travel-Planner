@@ -55,11 +55,11 @@ class PollController extends Controller
     public function vote()
     {
         $pollId = $_POST['pollId'] ?? null;
-        $ratingChoiceId = $_POST['ratingChoiceId'] ?? null;
+        $ratingChoice = $_POST['ratingChoice'] ?? null;
         $userId = $_SESSION['user_id'] ?? Auth::id();
         $itineraryId = $_POST['itineraryId'] ?? null;
 
-        if (!$pollId || !$ratingChoiceId || !$itineraryId) {
+        if (!$pollId || !$ratingChoice || !$itineraryId) {
             header("Location: " . $_SERVER['HTTP_REFERER']);
             exit();
         }
@@ -88,14 +88,13 @@ class PollController extends Controller
         $vote = Vote::getByMemberAndPoll($tripMemberId, $pollId);
 
         if ($vote) {
-            $vote->setRatingChoiceId($ratingChoiceId);
+            $vote->setRatingChoice($ratingChoice);
             $vote->update();
         } else {
             $vote = new Vote();
             $vote->setPollId($pollId);
             $vote->setTripMemberId($tripMemberId);
-            $vote->setRatingChoiceId($ratingChoiceId);
-            $vote->setVoteWeight(1.0);
+            $vote->setRatingChoice($ratingChoice);
             $vote->create();
         }
 
@@ -191,6 +190,8 @@ class PollController extends Controller
             $userRole = 'Member';
         }
 
+        $canManagePolls = Auth::hasRole('Editor', $userRole);
+
         $allPolls = Poll::getPollsByItinerary($itineraryId);
 
         $activePolls = [];
@@ -226,10 +227,13 @@ class PollController extends Controller
 
         $this->view('polls/polls', [
             'itinerary' => $itinerary,
+            'itineraryId' => $itineraryId,
+            'activeTab' => 'polls',
             'activePolls' => $activePolls,
             'closedPolls' => $closedPolls,
             'ratingChoices' => $ratingChoices,
-            'userRole' => $userRole
+            'userRole' => $userRole,
+            'canManagePolls' => $canManagePolls
         ]);
     }
 
