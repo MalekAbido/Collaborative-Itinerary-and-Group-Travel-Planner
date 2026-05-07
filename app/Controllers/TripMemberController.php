@@ -11,6 +11,11 @@ use App\Helpers\Mailer;
 
 class TripMemberController extends Controller
 {
+    public function __construct()
+    {
+        Auth::requireLogin();
+    }
+    
     public function index($id)
     {
         $itineraryModel = new Itinerary();
@@ -53,6 +58,9 @@ class TripMemberController extends Controller
 
     public function store($id)
     {
+        $member = Auth::requireMembership($id);
+        $memberRole = $member->getRole();
+        Auth::requireRole('Organizer', $memberRole);
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = trim($_POST['email']);
             $role = $_POST['role'];
@@ -83,6 +91,10 @@ class TripMemberController extends Controller
 
     public function updateRole($id)
     {
+        $member = Auth::requireMembership($id);
+        $memberRole = $member->getRole();
+        Auth::requireRole('Organizer', $memberRole);
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $memberId = $_POST['memberId'];
             $newRole = $_POST['newRole'];
@@ -101,6 +113,10 @@ class TripMemberController extends Controller
 
     public function destroy($id)
     {
+        $member = Auth::requireMembership($id);
+        $memberRole = $member->getRole();
+        Auth::requireRole('Organizer', $memberRole);
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $memberId = $_POST['memberId'];
             $member = new \App\Models\TripMember();

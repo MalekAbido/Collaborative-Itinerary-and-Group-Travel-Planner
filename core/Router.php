@@ -352,7 +352,7 @@ class Router
         http_response_code(404);
 
         // Try custom 404 page
-        $errorPage = __DIR__ . '/../views/errors/404.php';
+        $errorPage = __DIR__ . '/../app/Views/errors/404.php';
 
         if (file_exists($errorPage)) {
             require_once $errorPage;
