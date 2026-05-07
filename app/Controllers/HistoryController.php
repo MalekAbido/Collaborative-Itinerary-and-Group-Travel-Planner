@@ -63,6 +63,7 @@ class HistoryController extends Controller
             'groupedEntries' => $groupedEntries,
             'counts'         => $counts,
             'itineraryId'    => $itineraryId,
+            'memberRole'     => $member->getRole(),
             'activeTab'      => 'history',
         ]);
     }

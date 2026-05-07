@@ -1,5 +1,7 @@
 <?php
 require __DIR__ . '/../layouts/header.php';
+
+use App\Helpers\Auth;
 use App\Models\HistoryLogEntry;
 ?>
 
@@ -156,7 +158,7 @@ use App\Models\HistoryLogEntry;
                                 <?php endif; ?>
                             </div>                            
 
-                            <?php if ($entry->isUndoable): ?>
+                            <?php if ($entry->isUndoable && Auth::hasRole('Editor', $memberRole)): ?>
                             <div class="mt-4 flex justify-end">
                                 <form action="/itinerary/<?php echo $itineraryId; ?>/history/revert/<?php echo $entry->getId(); ?>" method="POST">
                                     <button type="submit" 

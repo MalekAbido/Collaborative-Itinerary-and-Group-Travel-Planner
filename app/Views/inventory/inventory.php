@@ -3,8 +3,7 @@
 <div class="max-w-[1280px] mx-auto">
     <header class="mb-10 flex justify-between items-end">
         <div>
-            <span class="inline-flex items-center rounded-full bg-primary-fixed px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary mb-3">Trip Inventory</span>
-            <h1 class="font-display text-[36px] font-bold text-on-surface mb-2"><?= htmlspecialchars($itinerary['title']) ?></h1>
+            <h1 class="font-display text-display text-on-surface mb-2"><?= htmlspecialchars($itinerary['title']) ?></h1>
             <p class="text-[18px] text-on-surface-variant">Coordinate items and equipment needed for the trip.</p>
         </div>
         <div class="flex gap-3">
