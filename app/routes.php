@@ -24,6 +24,7 @@ $this->post('/allergy/remove', 'AllergyController', 'removeAllergy');
 $this->post('/emergency-contact/add', 'EmergencyController', 'addEmergencyContact');
 $this->post('/emergency-contact/update', 'EmergencyController', 'updateEmergencyContact');
 $this->post('/emergency-contact/remove', 'EmergencyController', 'removeEmergencyContact');
+$this->post('/sos/trigger', 'EmergencyController', 'triggerSOS');
 
 // Home Route
 $this->get('/', 'HomeController', 'index');

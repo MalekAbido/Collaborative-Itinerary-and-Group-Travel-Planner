@@ -5,6 +5,8 @@ namespace App\Controllers;
 use App\Helpers\Auth;
 use App\Models\EmergencyContact;
 use Core\Controller;
+use App\Models\User;
+use App\Helpers\Mailer;
 
 class EmergencyController extends Controller
 {
@@ -78,6 +80,48 @@ class EmergencyController extends Controller
         }
 
         die("Failed to update contact or unauthorized.");
+    }
+
+    public function triggerSOS()
+    {
+        $user = new User();
+        if (!$user->read($this->userId)) {
+            header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? '/dashboard'));
+            exit;
+        }
+
+        $user->loadEmergencyContacts();
+        $contacts = $user->getEmergencyContacts();
+
+        if (empty($contacts)) {
+            header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? '/dashboard'));
+            exit;
+        }
+
+        $userName = trim($user->getFirstName() . ' ' . $user->getLastName());
+        $subject = "🚨 URGENT: Emergency SOS Alert from " . $userName;
+        
+        $baseBody = "
+            <div style='font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 2px solid #ef4444; padding: 20px; border-radius: 10px;'>
+                <h2 style='color: #ef4444; text-align: center;'>EMERGENCY SOS ALERT</h2>
+                <p>This is an automated emergency message from the VoyageSync application on behalf of <strong>{$userName}</strong>.</p>
+                <p>They have just triggered the SOS button in their travel itinerary app, indicating they may be in trouble or need immediate assistance.</p>
+                <p><strong>Please try to contact them immediately.</strong></p>
+            </div>
+        ";
+
+        foreach ($contacts as $contact) {
+            $email = $contact->getEmail();
+            $contactName = $contact->getName();
+            
+            if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $personalizedBody = "<h3 style='color: #333;'>Dear {$contactName},</h3>" . $baseBody; 
+                Mailer::send($email, $subject, $personalizedBody);
+            }
+        }
+
+        header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? '/dashboard'));
+        exit;
     }
 
     public function triggerEmergencyAlert($location) {}

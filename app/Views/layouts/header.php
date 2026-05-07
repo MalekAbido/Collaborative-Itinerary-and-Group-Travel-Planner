@@ -84,10 +84,12 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <?php if ($itineraryId ?? false): ?>
-                        <button
-                            class="inline-flex items-center gap-1 rounded-lg border-2 border-error px-3 py-1.5 text-body-xs font-bold tracking-wide text-error hover:bg-error-container transition">
-                            <span class="material-symbols-outlined text-base">warning</span>SOS
-                        </button>
+                        <form action="/sos/trigger" method="POST" class="m-0 flex items-center" onsubmit="return confirm('⚠️ WARNING: This will immediately send an emergency email to all your saved emergency contacts. Are you sure you want to proceed?');">
+                            <button type="submit"
+                                class="inline-flex items-center gap-1 rounded-lg border-2 border-error px-3 py-1.5 text-body-xs font-bold tracking-wide text-error hover:bg-error-container transition focus:ring-2 focus:ring-error focus:outline-none">
+                                <span class="material-symbols-outlined text-base">warning</span>SOS
+                            </button>
+                        </form>
                     <?php endif; ?>
                     <a href="/profile" class="flex items-center gap-2 cursor-pointer">
                         <?php
