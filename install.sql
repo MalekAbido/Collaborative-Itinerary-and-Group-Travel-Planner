@@ -389,6 +389,26 @@ ALTER TABLE Vote
 ALTER TABLE Vote
   ADD CONSTRAINT UQ_voteId UNIQUE (voteId);
 
+
+CREATE TABLE InventoryItem
+(
+  id           INT          NOT NULL AUTO_INCREMENT,
+  itemId       VARCHAR(55)  NOT NULL,
+  name         VARCHAR(150) NULL    ,
+  quantity     INT          NULL    ,
+  description  VARCHAR(255) NULL    ,
+  isPacked     BOOLEAN      NULL    ,
+  activityId   INT          NOT NULL,
+  tripMemberId INT          NULL    ,
+  PRIMARY KEY (id)
+);
+
+ALTER TABLE InventoryItem
+  ADD CONSTRAINT UQ_id UNIQUE (id);
+
+ALTER TABLE InventoryItem
+  ADD CONSTRAINT UQ_itemId UNIQUE (itemId);
+
 ALTER TABLE EmergencyContact
   ADD CONSTRAINT FK_User_TO_EmergencyContact
     FOREIGN KEY (userId)
@@ -550,6 +570,16 @@ ALTER TABLE TransportDetail
     REFERENCES TransportMode (id);
 
 
+ALTER TABLE InventoryItem
+  ADD CONSTRAINT FK_Activity_TO_InventoryItem
+    FOREIGN KEY (activityId)
+    REFERENCES Activity (id);
+
+ALTER TABLE InventoryItem
+  ADD CONSTRAINT FK_TripMember_TO_InventoryItem
+    FOREIGN KEY (tripMemberId)
+    REFERENCES TripMember (id);
+
 -- 1. Independent Tables
 INSERT INTO User (userId, firstName, lastName, email, passwordHash, nationality, policyNumber, profileImage) VALUES
 ('user_00001', 'Ahmed', 'Ali', 'ahmed.ali@example.com', '$2y$10$jcfUGlVgsAMXB4qwxEbUd.fW..I9Rqiy3ZJnmebMcw8pT4RrRlNNO', 'Egyptian', 'POL1234567890123456', 'uploads/profiles/user1.jpg'),
@@ -660,3 +690,7 @@ INSERT INTO Vote (voteId, timestamp, pollId, tripMemberId, ratingChoice) VALUES
 ('vote_001', '2026-03-15 10:00:00', 1, 1, 'MUST_HAVE'), 
 ('vote_002', '2026-03-16 11:00:00', 1, 2, 'NICE_TO_HAVE'), 
 ('vote_003', '2026-03-17 12:00:00', 1, 3, 'NOT_NEEDED');
+
+INSERT INTO InventoryItem (itemId, name, quantity, description, isPacked, activityId, tripMemberId) VALUES
+('inv_001', 'Camera', 1, 'we need this Electronics', TRUE, 2, 1),
+('inv_002', 'Travel Guide', 1, 'we need this Misc', FALSE, 3, 2);
