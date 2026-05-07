@@ -9,6 +9,9 @@ class Itinerary
 {
     private $db;
 
+    private $id;
+    private $itineraryItems;
+
     private $itineraryId;
     private $title;
     private $description;
@@ -205,19 +208,31 @@ class Itinerary
                 WHERE itineraryId = :id";
 
         $stmt = $this->db->prepare($sql);
+        
         return $stmt->execute([
-            ':title'       => $this->title,
-            ':description' => $this->description,
-            ':startDate'   => $this->startDate,
-            ':endDate'     => $this->endDate,
-            ':id'          => $this->id,
+            ':title' => $title,
+            ':desc'  => $description,
+            ':start' => $startDate,
+            ':end'   => $endDate,
+            ':id'    => $id,
         ]);
     }
 
     public function delete($id)
     {
+        $trip = $this->findById($id);
+        if (!$trip) {
+            return false;
+        }
+        $numericId = $trip['id'];
+        $this->db->prepare("DELETE FROM TripMember WHERE itineraryId = ?")->execute([$numericId]);
+        $this->db->prepare("DELETE FROM TripFinance WHERE itineraryId = ?")->execute([$numericId]);
+        $this->db->prepare("DELETE FROM Invitation WHERE itineraryId = ?")->execute([$numericId]);
+        $this->db->prepare("DELETE FROM HistoryLog WHERE itineraryId = ?")->execute([$numericId]);
+
         $sql  = "DELETE FROM Itinerary WHERE itineraryId = :id";
         $stmt = $this->db->prepare($sql);
+        
         return $stmt->execute([':id' => $id]);
     }
 
@@ -247,9 +262,6 @@ class Itinerary
         return $this->activities;
     }
 
-    /**
-     * Fetches all subtrips attached to this itinerary.
-     */
     public function getSubtrips()
     {
 

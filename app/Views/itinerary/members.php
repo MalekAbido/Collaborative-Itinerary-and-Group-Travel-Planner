@@ -100,11 +100,9 @@
 
 <body class="bg-surface overflow-y-auto">
 
-    <nav
-        class="fixed inset-x-0 top-0 z-50 h-[64px] bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant shadow-sm flex items-center justify-between px-6">
-        <a href="/home" class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
-        <a href="/itinerary/dashboard/<?= htmlspecialchars($trip['id'] ?? '') ?>"
-            class="inline-flex items-center gap-1 text-body-sm font-semibold text-outline hover:text-primary transition">
+    <nav class="fixed inset-x-0 top-0 z-50 h-[64px] bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant shadow-sm flex items-center justify-between px-6">
+        <a href="/dashboard" class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
+        <a href="/itinerary/dashboard/<?= htmlspecialchars($data['trip']['itineraryId'] ?? '') ?>" class="inline-flex items-center gap-1 text-body-sm font-semibold text-outline hover:text-primary transition">
             <span class="material-symbols-outlined text-[18px]">arrow_back</span> Back to Dashboard
         </a>
     </nav>
@@ -169,9 +167,52 @@
                         class="text-right">Actions</span>
                 </div>
 
-                <?php if (!empty($members)): ?>
-                <?php foreach ($members as $member): ?>
-                <div class="grid grid-cols-1 sm:grid-cols-[1fr_120px_120px_100px] gap-4 py-4 sm:py-3 items-center">
+                <?php if (!empty($data['members'])): ?>
+                    <?php foreach ($data['members'] as $member): ?>
+                        <div class="grid grid-cols-1 sm:grid-cols-[1fr_120px_120px_100px] gap-4 py-4 sm:py-3 items-center">
+                            
+                            <div class="flex items-center gap-3">
+                                <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-fixed text-primary text-sm font-semibold">
+                                    <?= strtoupper(substr($member['firstName'], 0, 1) . substr($member['lastName'], 0, 1)) ?>
+                                </div>
+                                <div>
+                                    <div class="font-display text-h4 text-on-surface"><?= htmlspecialchars($member['firstName'] . ' ' . $member['lastName']) ?></div>
+                                    <div class="text-body-xs text-outline"><?= htmlspecialchars($member['email']) ?></div>
+                                </div>
+                            </div>
+
+                            <div class="text-left sm:text-center">
+                                <?php if ($member['role'] === 'Leader' || $member['role'] === 'Organizer'): ?>
+                                    <span class="inline-flex items-center rounded-full bg-primary-fixed px-3 py-1 text-label-xs font-bold uppercase text-primary">👑 <?= htmlspecialchars($member['role']) ?></span>
+                                <?php elseif ($member['role'] === 'Editor'): ?>
+                                    <span class="inline-flex items-center rounded-full bg-secondary-fixed px-3 py-1 text-label-xs font-bold uppercase text-secondary">✏️ Editor</span>
+                                <?php else: ?>
+                                    <span class="inline-flex items-center rounded-full bg-surface-container-highest px-3 py-1 text-label-xs font-bold uppercase text-outline">👤 <?= htmlspecialchars($member['role']) ?></span>
+                                <?php endif; ?>
+                            </div>
+
+                            <span class="text-body-xs text-on-surface-variant hidden sm:block">
+                                <?= !empty($member['joinedAt']) ? date('M j, Y', strtotime($member['joinedAt'])) : 'Just now' ?>
+                            </span>
+
+                            <div class="flex justify-start sm:justify-end gap-2">
+                                <?php if ($member['role'] !== 'Leader' && $member['role'] !== 'Organizer'): ?>
+                                    <form action="/itinerary/members/updateRole/<?= htmlspecialchars($data['trip']['itineraryId']) ?>" method="POST" class="inline">
+                                        <input type="hidden" name="memberId" value="<?= htmlspecialchars($member['memberId'] ?? $member['id'] ?? '') ?>">
+                                        <input type="hidden" name="newRole" value="<?= $member['role'] === 'Member' ? 'Editor' : 'Member' ?>">
+                                        <button type="submit" title="Toggle Role" class="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary text-primary hover:bg-primary-fixed transition">
+                                            <span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>
+                                        </button>
+                                    </form>
+
+                                    <form action="/itinerary/members/remove/<?= htmlspecialchars($data['trip']['itineraryId']) ?>" method="POST" class="inline" onsubmit="return confirm('Remove this user from the trip?');">
+                                        <input type="hidden" name="memberId" value="<?= htmlspecialchars($member['memberId'] ?? $member['id'] ?? '') ?>">
+                                        <button type="submit" title="Remove Member" class="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-error text-error hover:bg-error-container transition">
+                                            <span class="material-symbols-outlined text-[16px]">person_remove</span>
+                                        </button>
+                                    </form>
+                                <?php endif; ?>
+                            </div>
 
                     <div class="flex items-center gap-3">
                         <div

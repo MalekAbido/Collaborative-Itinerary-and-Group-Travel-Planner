@@ -4,24 +4,61 @@ namespace App\Controllers;
 use Core\Controller;
 use App\Models\Itinerary;
 use App\Models\TripFinance;
+use App\Models\TripMember;
+use App\Helpers\Auth;
+use App\Helpers\Session;
 
-class ItineraryController extends Controller{
+class ItineraryController extends Controller {
 
     public function create(){
+        Auth::requireLogin();
         $this->view("itinerary/create");
     }
 
-    public function store()
+public function store()
     {
+        // 1. Require user to be logged in
+        Auth::requireLogin();
+        
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            
+            $startDate = $_POST['startDate'];
+            $endDate = $_POST['endDate'];
+
+            // 2. Inline Validation Check (Dates)
+            if (strtotime($endDate) < strtotime($startDate)) {
+                \App\Helpers\Session::setFlash('date_error', 'The end date cannot be before the start date.');
+                \App\Helpers\Session::setFlash('old_title', $_POST['title']);
+                \App\Helpers\Session::setFlash('old_description', $_POST['description']);
+                
+                header("Location: /itinerary/create");
+                exit;
+            }
+
+            // 3. Create the Itinerary
             $itineraryModel = new Itinerary();
-            $newTripId = $itineraryModel->create(
+            $stringTripId = $itineraryModel->create(
                 $_POST['title'],
                 $_POST['description'],
-                $_POST['startDate'],
-                $_POST['endDate']
+                $startDate, 
+                $endDate
             );
             
+            // Grab the numeric ID for database relationships
+            $numericTripId = $itineraryModel->getId();
+
+            // 4. Add the Creator as the Organizer
+            $tripMember = new TripMember();
+            $tripMember->setItineraryId($numericTripId);
+            $tripMember->setUserId(Auth::id());
+            $tripMember->setRole('Organizer');
+            $tripMember->setJoinedAt(date('Y-m-d H:i:s'));
+            $tripMember->create();
+            
+            // 5. Initialize Trip Finances
+            $tripFinance = new \App\Models\TripFinance(); 
+
+            // 6. Handle Email Invitations
             $inviteEmailsRaw = $_POST['inviteEmails'] ?? '';
             
             if (!empty(trim($inviteEmailsRaw))) {
@@ -31,12 +68,14 @@ class ItineraryController extends Controller{
 
                 foreach ($emails as $rawEmail) {
                     $email = trim($rawEmail);
+                    
                     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                        $token = $invitationModel->createToken($newTripId, $email, 'Member');
+                        // NOTE: Using $numericTripId here because your DB schema requires an INT
+                        $token = $invitationModel->createToken($numericTripId, $email, 'Member');
                         
                         if ($token) {
                             $joinLink = $baseUrl . "/join/" . $token;
-                            $subject = "You've been invited to a trip on Itinerary!";
+                            $subject = "You've been invited to a trip on VoyageSync!";
                             
                             $body = "<h2>You have a new trip invitation!</h2>
                                      <p>Click the link below to join the itinerary:</p>
@@ -48,22 +87,48 @@ class ItineraryController extends Controller{
                 }
             }
 
-            $tripFinance = new \App\Models\TripFinance();
-            header("Location: /itinerary/dashboard/" . $newTripId);
+            // 7. Redirect to the new dashboard using the String ID
+            header("Location: /itinerary/dashboard/" . $stringTripId);
             exit;
         }
     }
-
+    
     public function settings($id){
+        Auth::requireLogin();
+        $member = Auth::requireMembership($id);
+        $role = $member->getRole();
+        Auth::requireRole('Organizer', $role);
+
         $itineraryModel = new Itinerary();
         $tripData = $itineraryModel->findByIdNumeric($id);
+        
         $this->view("itinerary/settings", ['trip' => $tripData]);
     }
 
     public function update($id){
+        Auth::requireLogin();    
+        $itineraryModel = new Itinerary();
+        $tripData = $itineraryModel->findById($id);
+
+        if (!$tripData) {
+            header("Location: /itinerary/dashboard/" . $id);
+            exit;
+        }
+        $startDate = $_POST['startDate'];
+        $endDate = $_POST['endDate'];
+            if (strtotime($endDate) < strtotime($startDate)) {
+                \App\Helpers\Session::setFlash('date_error', 'The end date cannot be before the start date.');
+                \App\Helpers\Session::setFlash('old_title', $_POST['title']);
+                \App\Helpers\Session::setFlash('old_description', $_POST['description']);
+                header("Location: " . $_SERVER['HTTP_REFERER']);
+                exit;
+            }
+        $member = Auth::requireMembership($tripData['id']);
+        $role = $member->getRole();
+        Auth::requireRole('Organizer', $role);
+
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             
-            $itineraryModel = new Itinerary();
             $itineraryModel->update(
                 $id,
                 $_POST['title'],
@@ -72,24 +137,34 @@ class ItineraryController extends Controller{
                 $_POST['endDate']
             );
 
-            header("Location: /itinerary/settings/" . $id . "?status=updated");
+            header("Location: " . $_SERVER['HTTP_REFERER']);
             exit;
         }
     }
 
     public function destroy($id){
-        if($_SERVER['REQUEST_METHOD'] === 'POST'){
-            
-            $itineraryModel = new Itinerary();
-            $itineraryModel->delete($id);
+        Auth::requireLogin();   
+        $itineraryModel = new Itinerary();
+        $tripData = $itineraryModel->findById($id);
+        if (!$tripData) {
+            header("Location: /dashboard");
+            exit;
+        }
 
+        $member = Auth::requireMembership($tripData['id']); 
+        $role = $member->getRole();
+        Auth::requireRole('Organizer', $role);
+
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $itineraryModel->delete($id);
             header("Location: /dashboard");
             exit;
         }
     }
 
     public function getDashboard($id){
-        \App\Helpers\Auth::requireLogin();
+        Auth::requireLogin();
+        
         $itineraryModel = new Itinerary();
         $tripData = $itineraryModel->findByIdNumeric($id);
 
@@ -97,6 +172,14 @@ class ItineraryController extends Controller{
             header("Location: /dashboard");
             exit;
         }
-        $this->view("itinerary/dashboard", ['trip' => $tripData]);
+        $member = Auth::requireMembership($tripData['id']);
+        $memberModel = new TripMember();
+        $members = $memberModel->getAllByItineraryId($tripData['id']); 
+        
+        $this->view("itinerary/dashboard", [
+            'trip' => $tripData, 
+            'members' => $members,
+            'userRole' => $member->getRole(),
+        ]);
     }
 }

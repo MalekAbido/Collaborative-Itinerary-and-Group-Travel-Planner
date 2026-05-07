@@ -11,10 +11,6 @@ use App\Helpers\Mailer;
 
 class TripMemberController extends Controller
 {
-    /**
-     * 1. View the Members Dashboard
-     * URL: GET /itinerary/members/{id}
-     */
     public function index($id)
     {
         $itineraryModel = new Itinerary();
@@ -26,7 +22,7 @@ class TripMemberController extends Controller
         }
 
         $memberModel = new TripMember();
-        $members = $memberModel->getAllByItineraryId($id); 
+        $members = $memberModel->getAllByItineraryId($tripData['id']); 
 
         $invitationModel = new Invitation();
         $pendingInvites = $invitationModel->getPendingByItinerary($id);
@@ -62,6 +58,9 @@ class TripMemberController extends Controller
             $invitationModel = new Invitation();
             $token = $invitationModel->createToken($id, $email, $role);
 
+            
+            $userId = rand(100, 999);
+
             if (!$token) { die("Failed to generate invitation token."); }
 
             $baseUrl = $_ENV['APP_URL'] ?? 'http://localhost:8080';
@@ -80,10 +79,6 @@ class TripMemberController extends Controller
         }
     }
 
-    /**
-     * 3. Update a Member's Role
-     * URL: POST /itinerary/members/updateRole/{id}
-     */
     public function updateRole($id)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -92,7 +87,6 @@ class TripMemberController extends Controller
 
             $member = new TripMember();
             
-            // Find the member, change the role, and save it
             if ($member->read($memberId)) {
                 $member->setRole($newRole);
                 $member->update();
@@ -103,16 +97,11 @@ class TripMemberController extends Controller
         }
     }
 
-    /**
-     * 4. Remove a Member
-     * URL: POST /itinerary/members/remove/{id}
-     */
     public function destroy($id)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $memberId = $_POST['memberId'];
-
-            $member = new TripMember();
+            $member = new \App\Models\TripMember();
             $member->setId($memberId);
             $member->delete();
 

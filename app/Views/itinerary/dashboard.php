@@ -193,43 +193,34 @@
                         </p>
                     </div>
                     <div class="flex gap-3">
-                        <a href="/itinerary/settings/<?= htmlspecialchars($data['trip']['id']) ?>"
-                            class="inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-body-sm px-6 py-2.5 hover:bg-surface-container transition">
+                        <?php if($userRole !== 'Member'):?>
+                        <a href="/itinerary/settings/<?= htmlspecialchars($data['trip']['id']) ?>" class="inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-body-sm px-6 py-2.5 hover:bg-surface-container transition">
                             <span class="material-symbols-outlined text-[18px]">settings</span> Settings
                         </a>
-                        <a href="/itinerary/<?= htmlspecialchars($data['trip']['id']) ?>/activity/create"
-                            class="inline-flex items-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition">
+                        <?php endif;?>
+                        <button class="inline-flex items-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition">
                             <span class="material-symbols-outlined text-[18px]">add</span> Add Activity
-                        </a>
+                        </button>
                     </div>
                 </header>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5">
-                        <div class="flex items-start justify-between mb-3">
-                            <span class="text-label-caps uppercase text-outline">Trip Description</span>
-                            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-tertiary-fixed"><span
-                                    class="material-symbols-outlined text-[18px] text-tertiary">description</span></div>
+                    
+                    <div class="sm:col-span-2 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-tertiary-fixed"><span class="material-symbols-outlined text-[18px] text-tertiary">description</span></div>
+                            <span class="text-label-caps uppercase text-outline m-0">Trip Description</span>
                         </div>
                         <div class="text-body-md text-on-surface font-medium">
                             <?= htmlspecialchars($data['trip']['description'] ?: 'No description provided.') ?></div>
                     </div>
-                    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5">
-                        <div class="flex items-start justify-between mb-3">
-                            <span class="text-label-caps uppercase text-outline">Group Balance</span>
-                            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-secondary-fixed"><span
-                                    class="material-symbols-outlined text-[18px] text-secondary">account_balance_wallet</span>
-                            </div>
+                    
+                    <div class="sm:col-span-1 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-primary-fixed"><span class="material-symbols-outlined text-[18px] text-primary">group</span></div>
+                            <span class="text-label-caps uppercase text-outline m-0">Members</span>
                         </div>
-                        <div class="font-display text-[28px] font-extrabold text-on-surface">EGP 0</div>
-                    </div>
-                    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5">
-                        <div class="flex items-start justify-between mb-3">
-                            <span class="text-label-caps uppercase text-outline">Members</span>
-                            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-primary-fixed"><span
-                                    class="material-symbols-outlined text-[18px] text-primary">group</span></div>
-                        </div>
-                        <div class="font-display text-[28px] font-extrabold text-on-surface">1</div>
+                        <div class="font-display text-[28px] font-extrabold text-on-surface"><?= count($data['members']) ?></div>
                     </div>
                 </div>
 
@@ -255,32 +246,48 @@
                         </article>
                     </div>
 
-                    <div class="space-y-8">
-                        <div>
-                            <div class="flex items-center justify-between pb-3 mb-4 border-b border-outline-variant">
-                                <div class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-primary">group</span>
-                                    <h2 class="font-display text-h3 text-on-surface m-0">Members</h2>
-                                </div>
-                                <a href="/itinerary/members/<?= htmlspecialchars($trip['id'] ?? $data['trip']['id'] ?? '') ?>"
-                                    class="text-body-sm font-semibold text-primary hover:underline">Manage</a>
+                <div class="space-y-8">
+                    <div>
+                        <div class="flex items-center justify-between pb-3 mb-4 border-b border-outline-variant">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">group</span>
+                                <h2 class="font-display text-h3 text-on-surface m-0">Members</h2>
                             </div>
-                            <div
-                                class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-4">
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-fixed text-primary text-sm font-semibold">
-                                        ME</div>
-                                    <div>
-                                        <div class="font-display text-h4 text-on-surface">You</div>
-                                        <span
-                                            class="inline-flex items-center rounded-full bg-primary-fixed px-2 py-0.5 mt-1 text-[10px] font-bold uppercase text-primary">👑
-                                            Leader</span>
-                                    </div>
-                                </div>
+                            <a href="/itinerary/members/<?= htmlspecialchars($data['trip']['itineraryId']) ?>" class="text-body-sm font-semibold text-primary hover:underline">Manage</a>                        
+                        </div> 
+                        
+                        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-4">
+                            <div class="divide-y divide-outline-variant">
+                                <?php if (!empty($data['members'])): ?>
+                                    <?php foreach ($data['members'] as $member): ?>
+                                        <div class="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+                                            <div class="flex items-center gap-3">
+                                                <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-fixed text-primary text-sm font-semibold">
+                                                    <?= strtoupper(substr($member['firstName'], 0, 1) . substr($member['lastName'], 0, 1)) ?>
+                                                </div>
+                                                <div>
+                                                    <div class="font-display text-h4 text-on-surface"><?= htmlspecialchars($member['firstName'] . ' ' . $member['lastName']) ?></div>
+                                                    <div class="text-body-xs text-outline"><?= htmlspecialchars($member['email']) ?></div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <?php if ($member['role'] === 'Organizer'): ?>
+                                                    <span class="inline-flex items-center rounded-full bg-primary-fixed px-2 py-0.5 text-[10px] font-bold uppercase text-primary">👑 Organizer</span>
+                                                <?php elseif ($member['role'] === 'Editor'): ?>
+                                                    <span class="inline-flex items-center rounded-full bg-secondary-fixed px-2 py-0.5 text-[10px] font-bold uppercase text-secondary">✏️ Editor</span>
+                                                <?php else: ?>
+                                                    <span class="inline-flex items-center rounded-full bg-surface-container-highest px-2 py-0.5 text-[10px] font-bold uppercase text-outline">👤 Member</span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <div class="py-2 text-center text-on-surface-variant text-body-sm">No members found.</div>
+                                <?php endif; ?>
                             </div>
                         </div>
-                    </div>
+                        </div>
+                </div>
 
                 </div>
             </div>

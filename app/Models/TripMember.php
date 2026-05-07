@@ -137,26 +137,63 @@ class TripMember
 
     public function delete()
     {
+        if (empty($this->itineraryId)) {
+            $this->read($this->id);
+        }
+
+        // 1. Clean up participation records (These are safe to delete)
+        $this->db->prepare("DELETE FROM AttendanceMember WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+        $this->db->prepare("DELETE FROM Vote WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+        $this->db->prepare("DELETE FROM ExpenseShare WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+        $this->db->prepare("DELETE FROM FundContribution WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+        $this->db->prepare("DELETE FROM HistoryLogEntry WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+        $this->db->prepare("DELETE FROM InventoryItem WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+
+        $stmt = $this->db->prepare("SELECT id FROM TripMember WHERE itineraryId = :itinId AND role IN ('Leader', 'Organizer') AND id != :myId LIMIT 1");
+        $stmt->execute([
+            ':itinId' => $this->itineraryId, 
+            ':myId'   => $this->id
+        ]);
+        $organizer = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if ($organizer) {
+            $newOwnerId = $organizer['id'];
+            
+            $this->db->prepare("UPDATE Activity SET tripMemberId = :newId WHERE tripMemberId = :oldId")->execute([':newId' => $newOwnerId, ':oldId' => $this->id]);
+            $this->db->prepare("UPDATE Subtrip SET tripMemberId = :newId WHERE tripMemberId = :oldId")->execute([':newId' => $newOwnerId, ':oldId' => $this->id]);
+            $this->db->prepare("UPDATE Expense SET tripMemberId = :newId WHERE tripMemberId = :oldId")->execute([':newId' => $newOwnerId, ':oldId' => $this->id]);
+        } else {
+            $this->db->prepare("DELETE FROM Activity WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+            $this->db->prepare("DELETE FROM Subtrip WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+            $this->db->prepare("DELETE FROM Expense WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+        }
         $sql  = "DELETE FROM TripMember WHERE id = :id";
         $stmt = $this->db->prepare($sql);
+        
         return $stmt->execute([':id' => $this->id]);
     }
 
     public function getAllByItineraryId($itineraryId)
     {
-
-        // TEMPORARY FIX: We removed the JOIN to the users table so it doesn't crash.
-        // We are injecting fake names/emails just so the UI has data to display!
-        $sql = "SELECT m.id, m.role, m.joinedAt,
-                       'Test' as firstName, 'User' as lastName, 'test@email.com' as email
+        // REAL FIX: Joining the TripMember table with the User table
+        $sql = "SELECT m.id as memberId, m.role, m.joinedAt, m.itineraryId,
+                       u.id as userId, u.firstName, u.lastName, u.email
                 FROM TripMember m
+                JOIN User u ON m.userId = u.id
                 WHERE m.itineraryId = :itineraryId
-                ORDER BY m.role DESC";
+                ORDER BY 
+                    CASE m.role 
+                        WHEN 'Organizer' THEN 1 
+                        WHEN 'Editor' THEN 2 
+                        WHEN 'Member' THEN 3 
+                        ELSE 4 
+                    END, 
+                    m.joinedAt ASC";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':itineraryId' => $itineraryId]);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public static function getByUserAndItinerary($userId, $itineraryId)
