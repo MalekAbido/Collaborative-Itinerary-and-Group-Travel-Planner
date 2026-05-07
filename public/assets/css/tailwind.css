@@ -1290,6 +1290,9 @@
   .border-on-primary {
     border-color: var(--color-on-primary);
   }
+  .border-on-surface-variant {
+    border-color: var(--color-on-surface-variant);
+  }
   .border-on-surface-variant\/10 {
     border-color: color-mix(in srgb, #414754 10%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
@@ -1472,6 +1475,9 @@
   }
   .bg-on-secondary-fixed-variant {
     background-color: var(--color-on-secondary-fixed-variant);
+  }
+  .bg-on-surface-variant {
+    background-color: var(--color-on-surface-variant);
   }
   .bg-on-surface-variant\/5 {
     background-color: color-mix(in srgb, #414754 5%, transparent);

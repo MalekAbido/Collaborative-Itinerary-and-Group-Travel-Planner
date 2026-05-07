@@ -140,10 +140,13 @@ class ExpenseController extends Controller
         }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         if($expense->delete($tripMember->getId())){
         HistoryLogger::log($itineraryId, TransactionType::EXPENSE_DELETED, $expense, $tripMember);
         }
 =======
+=======
+>>>>>>> eb6cda9c09b11472cf8643e8074d274673886aaa
         $financeModel = new \App\Models\TripFinance();
         $financeModel->read($expense->getTripFinanceId());
 
@@ -255,6 +258,33 @@ class ExpenseController extends Controller
         return true;
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    public function authorizeTripMember($itineraryId) 
+    {
+
+        // login check
+        if (session_status() === PHP_SESSION_NONE) 
+        {
+            session_start();
+        }
+
+        $loggedInUser = $_SESSION['userId'] ?? null;
+        if(!$loggedInUser)
+        {
+            die("You must login to perform this action");
+        }
+
+        $tripMemberModel = new \App\Models\TripMember();
+        $member = $tripMemberModel->getByUserAndItinerary($loggedInUser, $itineraryId);
+
+        if(!$member)  
+        {
+            die("Error: You are not an authorized member of this trip.");
+        }
+        return $member;
+    }
+>>>>>>> eb6cda9c09b11472cf8643e8074d274673886aaa
 }
 =======
     public function authorizeTripMember($itineraryId) 
