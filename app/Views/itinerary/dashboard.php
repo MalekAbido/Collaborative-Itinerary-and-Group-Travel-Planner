@@ -253,7 +253,7 @@
                                 <span class="material-symbols-outlined text-primary">group</span>
                                 <h2 class="font-display text-h3 text-on-surface m-0">Members</h2>
                             </div>
-                            <a href="/itinerary/members/<?= htmlspecialchars($data['trip']['itineraryId']) ?>" class="text-body-sm font-semibold text-primary hover:underline">Manage</a>                        
+                            <a href="/itinerary/members/<?= htmlspecialchars($data['trip']['id']) ?>" class="text-body-sm font-semibold text-primary hover:underline">Manage</a>                        
                         </div> 
                         
                         <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-4">
