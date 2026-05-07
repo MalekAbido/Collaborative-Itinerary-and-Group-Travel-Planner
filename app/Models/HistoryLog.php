@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Core\Database;
@@ -18,28 +19,44 @@ class HistoryLog
     }
 
     public function getId()
-    {return $this->id;}
+    {
+        return $this->id;
+    }
 
     public function setId($id)
-    {$this->id = $id;}
+    {
+        $this->id = $id;
+    }
 
     public function getLogId()
-    {return $this->logId;}
+    {
+        return $this->logId;
+    }
 
     public function setLogId($logId)
-    {$this->logId = $logId;}
+    {
+        $this->logId = $logId;
+    }
 
     public function getItineraryId()
-    {return $this->itineraryId;}
+    {
+        return $this->itineraryId;
+    }
 
     public function setItineraryId($itineraryId)
-    {$this->itineraryId = $itineraryId;}
+    {
+        $this->itineraryId = $itineraryId;
+    }
 
     public function getCreatedAt()
-    {return $this->createdAt;}
+    {
+        return $this->createdAt;
+    }
 
     public function setCreatedAt($createdAt)
-    {$this->createdAt = $createdAt;}
+    {
+        $this->createdAt = $createdAt;
+    }
 
     public static function findByItineraryId($itineraryId)
     {

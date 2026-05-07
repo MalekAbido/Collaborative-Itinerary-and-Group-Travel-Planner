@@ -69,13 +69,13 @@ use App\Models\HistoryLogEntry;
             </div>
 
             <?php if ($flash = \App\Helpers\Session::getFlash(\App\Helpers\Session::FLASH_SUCCESS)): ?>
-            <div class="mb-6 p-4 bg-primary-container text-on-primary rounded-xl border border-primary/20 flex items-center gap-3">
+            <div class="mb-6 p-4 bg-primary-container text-on-primary rounded-xl border border-primary/20 flex items-center gap-3 hidden">
                 <span class="material-symbols-outlined">check_circle</span>
                 <span class="font-medium"><?php echo htmlspecialchars($flash); ?></span>
             </div>
             <?php endif; ?>
             <?php if ($flash = \App\Helpers\Session::getFlash(\App\Helpers\Session::FLASH_ERROR)): ?>
-            <div class="mb-6 p-4 bg-error-container text-on-error-container rounded-xl border border-error/20 flex items-center gap-3">
+            <div class="mb-6 p-4 bg-error-container text-on-error-container rounded-xl border border-error/20 flex items-center gap-3 hidden">
                 <span class="material-symbols-outlined">error</span>
                 <span class="font-medium"><?php echo htmlspecialchars($flash); ?></span>
             </div>
@@ -212,7 +212,11 @@ use App\Models\HistoryLogEntry;
                             <?php if ($entry->isUndoable): ?>
                             <div class="mt-4 flex justify-end">
                                 <form action="/itinerary/<?php echo $itineraryId; ?>/history/revert/<?php echo $entry->getId(); ?>" method="POST">
-                                    <button type="submit" class="inline-flex items-center gap-2 rounded-lg border-2 border-primary text-primary font-bold text-body-sm px-6 py-2 hover:bg-primary hover:text-on-primary transition-all shadow-sm">
+                                    <button type="submit" 
+                                        class="cursor-pointer inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-bold text-sm px-6 py-2.5 rounded-lg 
+                                            transition-transform duration-200 ease-out 
+                                            hover:scale-103 active:scale-98
+                                            transform-gpu antialiased shadow-sm">
                                         <span class="material-symbols-outlined text-[18px]">history</span>
                                         Undo this change
                                     </button>

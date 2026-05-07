@@ -190,26 +190,6 @@ ALTER TABLE HistoryLogEntry
 ALTER TABLE HistoryLogEntry
   ADD CONSTRAINT UQ_entryId UNIQUE (entryId);
 
-CREATE TABLE InventoryItem
-(
-  id           INT          NOT NULL AUTO_INCREMENT,
-  itemId       VARCHAR(55)  NOT NULL,
-  name         VARCHAR(150) NULL    ,
-  quantity     INT          NULL    ,
-  category     VARCHAR(50)  NULL    ,
-  isPacked     BOOLEAN      NULL    ,
-  activityId   INT          NOT NULL,
-  tripMemberId INT          NULL    ,
-  deletedAt       DATETIME      NULL DEFAULT NULL,
-  PRIMARY KEY (id)
-);
-
-ALTER TABLE InventoryItem
-  ADD CONSTRAINT UQ_id UNIQUE (id);
-
-ALTER TABLE InventoryItem
-  ADD CONSTRAINT UQ_itemId UNIQUE (itemId);
-
 CREATE TABLE Invitation
 (
   id           INT          NOT NULL AUTO_INCREMENT,
@@ -278,21 +258,6 @@ ALTER TABLE Poll
 
 ALTER TABLE Poll
   ADD CONSTRAINT UQ_pollId UNIQUE (pollId);
-
-CREATE TABLE RatingChoice
-(
-  id       INT          NOT NULL AUTO_INCREMENT,
-  choiceId VARCHAR(55)  NOT NULL,
-  label    VARCHAR(50)  NULL    ,
-  weight   DECIMAL(5,2) NULL    ,
-  PRIMARY KEY (id)
-);
-
-ALTER TABLE RatingChoice
-  ADD CONSTRAINT UQ_id UNIQUE (id);
-
-ALTER TABLE RatingChoice
-  ADD CONSTRAINT UQ_choiceId UNIQUE (choiceId);
 
 CREATE TABLE Subtrip
 (
@@ -414,7 +379,6 @@ CREATE TABLE Vote
   timestamp      DATETIME      NULL    ,
   pollId         INT           NOT NULL,
   tripMemberId   INT           NOT NULL,
-  ratingChoiceId INT           NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -564,16 +528,6 @@ ALTER TABLE TransportDetail
     FOREIGN KEY (toActivityId)
     REFERENCES Activity (id);
 
-ALTER TABLE InventoryItem
-  ADD CONSTRAINT FK_Activity_TO_InventoryItem
-    FOREIGN KEY (activityId)
-    REFERENCES Activity (id);
-
-ALTER TABLE InventoryItem
-  ADD CONSTRAINT FK_TripMember_TO_InventoryItem
-    FOREIGN KEY (tripMemberId)
-    REFERENCES TripMember (id);
-
 ALTER TABLE Poll
   ADD CONSTRAINT FK_Activity_TO_Poll
     FOREIGN KEY (activityId)
@@ -588,11 +542,6 @@ ALTER TABLE Vote
   ADD CONSTRAINT FK_TripMember_TO_Vote
     FOREIGN KEY (tripMemberId)
     REFERENCES TripMember (id);
-
-ALTER TABLE Vote
-  ADD CONSTRAINT FK_RatingChoice_TO_Vote
-    FOREIGN KEY (ratingChoiceId)
-    REFERENCES RatingChoice (id);
 
 ALTER TABLE TransportDetail
   ADD CONSTRAINT FK_TransportMode_TO_TransportDetail
@@ -620,12 +569,6 @@ INSERT INTO TransportMode (modeId, name) VALUES
 ('mode_001', 'Flight'),
 ('mode_002', 'Bullet Train (Shinkansen)'),
 ('mode_003', 'Bus');
-
-INSERT INTO RatingChoice (choiceId, label, weight) VALUES
-('rate_001', 'Must Do', 5.00),
-('rate_002', 'Interested', 3.00),
-('rate_003', 'Neutral', 1.00),
-('rate_004', 'Skip', 0.00);
 
 -- 2. Level 1 Dependencies (Depend on Independent Tables)
 INSERT INTO EmergencyContact (contactId, name, phone, email, relationship, userId) VALUES
@@ -696,10 +639,6 @@ INSERT INTO AttendanceList (totalAttendeeCount, activityId) VALUES
 INSERT INTO TransportDetail (transportId, distance, duration, fromActivityId, toActivityId, transportModeId) VALUES
 ('trans_001', 500.00, 150, 2, 3, 2); -- Akihabara to Kyoto via Bullet Train
 
-INSERT INTO InventoryItem (itemId, name, quantity, category, isPacked, activityId, tripMemberId) VALUES
-('inv_001', 'Camera', 1, 'Electronics', TRUE, 2, 1),
-('inv_002', 'Travel Guide', 1, 'Misc', FALSE, 3, 2);
-
 INSERT INTO Poll (pollId, deadline, status, isAnonymous, weightedTotal, activityId) VALUES
 ('poll_001', '2026-04-01 23:59:59', 'Closed', FALSE, 13.00, 2);
 
@@ -711,7 +650,7 @@ INSERT INTO AttendanceMember (status, note, attendanceListId, tripMemberId) VALU
 ('Attending', NULL, 2, 1),
 ('Not Attending', 'Feeling sick', 2, 3);
 
-INSERT INTO Vote (voteId, voteWeight, timestamp, pollId, tripMemberId, ratingChoiceId) VALUES
-('vote_001', 1.00, '2026-03-15 10:00:00', 1, 1, 1), 
-('vote_002', 1.00, '2026-03-16 11:00:00', 1, 2, 1), 
-('vote_003', 1.00, '2026-03-17 12:00:00', 1, 3, 2);
+INSERT INTO Vote (voteId, voteWeight, timestamp, pollId, tripMemberId) VALUES
+('vote_001', 1.00, '2026-03-15 10:00:00', 1, 1), 
+('vote_002', 1.00, '2026-03-16 11:00:00', 1, 2), 
+('vote_003', 1.00, '2026-03-17 12:00:00', 1, 3);

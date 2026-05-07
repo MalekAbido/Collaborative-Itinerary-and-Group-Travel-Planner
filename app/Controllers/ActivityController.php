@@ -74,7 +74,6 @@ class ActivityController extends Controller
 
         $locationId = 1;
 
-// Fallback
         if (! empty($locationName) || ! empty($locationAddress)) {
             $location = new Location();
             $location->setName($locationName);
@@ -145,9 +144,9 @@ class ActivityController extends Controller
         $this->view('activity/show', [
             'itineraryId'         => $itineraryId,
             'activity'            => $activity,
-            'userRole'            => $tripMember->getRole(), // 'Leader', 'Editor', or 'Member'
-            'currentMemberId'     => $tripMember->getId(),   // Useful for highlighting the current user in the list
-            'currentMemberStatus' => $currentMemberStatus,   // Useful for highlighting the current user in the list
+            'userRole'            => $tripMember->getRole(), 
+            'currentMemberId'     => $tripMember->getId(),   
+            'currentMemberStatus' => $currentMemberStatus,   
             'attendanceList'      => $attendanceList,
             'totalGoing'          => $totalGoing,
             'goingMembers'        => $goingMembers,

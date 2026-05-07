@@ -35,7 +35,6 @@ class HistoryController extends Controller
         $processedEntities = [];
 
         foreach ($entries as $entry) {
-            // 1. Top of Stack check
             $key = $entry->getChangedEntityType() . '_' . $entry->getChangedEntityId();
 
             if (! isset($processedEntities[$key])) {
@@ -46,11 +45,9 @@ class HistoryController extends Controller
                 }
             }
 
-            // 2. Grouping
             $date                    = date('Y-m-d', strtotime($entry->getTimestamp()));
             $groupedEntries[$date][] = $entry;
 
-            // 3. Counting
             $type = $entry->getTransactionType();
 
             if (str_contains($type, 'ADDED') || str_contains($type, 'CREATED')) {
@@ -83,7 +80,6 @@ class HistoryController extends Controller
             exit;
         }
 
-        // Validation 1: Top of Stack
         $latest = HistoryLogEntry::findLatestForEntity($entry->getChangedEntityId(), $entry->getChangedEntityType());
 
         if ($latest->getId() !== $entry->getId()) {
@@ -100,8 +96,6 @@ class HistoryController extends Controller
                 $activity = Activity::getByActivityId($entry->getChangedEntityId());
 
                 if ($activity) {
-// Validation 2: Business Logic conflicts (Overlap)
-
 // if ($activity->hasOverlap($itineraryId, $activity->getStartTime(), $activity->getEndTime())) {
                     if (false) {
                         Session::setFlash(Session::FLASH_ERROR, 'Cannot restore activity: It overlaps with another existing activity.');

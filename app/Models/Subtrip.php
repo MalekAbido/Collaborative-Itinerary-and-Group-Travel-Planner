@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\ItineraryItem;
@@ -10,8 +11,14 @@ class Subtrip extends ItineraryItem
 {
     private $deletedAt;
 
-    public function getDeletedAt() { return $this->deletedAt; }
-    public function setDeletedAt($deletedAt) { $this->deletedAt = $deletedAt; }
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
+    public function setDeletedAt($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
+    }
 
     public function fill(array $row)
     {
@@ -46,7 +53,7 @@ class Subtrip extends ItineraryItem
         $sql = "UPDATE Subtrip SET deletedAt = NOW() WHERE id = :id";
         $stmt = $db->prepare($sql);
         $success = $stmt->execute([':id' => $this->id]);
-        
+
         if ($success) {
             HistoryLogger::log($this->itineraryId, \App\Models\TransactionType::SUBTRIP_DELETED, $this, $deletedByTripMemberId);
         }
@@ -81,7 +88,7 @@ class Subtrip extends ItineraryItem
         $stmt = $db->prepare($sql);
         $stmt->execute([':itineraryId' => $itineraryId]);
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         $subtrips = [];
         foreach ($data as $row) {
             $subtrip = new self();

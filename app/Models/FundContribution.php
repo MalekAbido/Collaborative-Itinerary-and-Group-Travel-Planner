@@ -1,10 +1,9 @@
 <?php
-
 namespace App\Models;
 
+use App\Helpers\HistoryLogger;
 use Core\Database;
 use PDO;
-use App\Helpers\HistoryLogger;
 
 class FundContribution
 {
@@ -22,62 +21,114 @@ class FundContribution
         $this->db = Database::getInstance()->getConnection();
     }
 
-    public function getId() { return $this->id; }
-    public function setId($id) { $this->id = $id; }
+    public function getId()
+    {
+        return $this->id;
+    }
 
-    public function getContributionId() { return $this->contributionId; }
-    public function setContributionId($contributionId) { $this->contributionId = $contributionId; }
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
-    public function getAmount() { return $this->amount; }
-    public function setAmount($amount) { $this->amount = $amount; }
+    public function getContributionId()
+    {
+        return $this->contributionId;
+    }
 
-    public function getTimestamp() { return $this->timestamp; }
-    public function setTimestamp($timestamp) { $this->timestamp = $timestamp; }
+    public function setContributionId($contributionId)
+    {
+        $this->contributionId = $contributionId;
+    }
 
-    public function getGroupFundId() { return $this->groupFundId; }
-    public function setGroupFundId($groupFundId) { $this->groupFundId = $groupFundId; }
+    public function getAmount()
+    {
+        return $this->amount;
+    }
 
-    public function getTripMemberId() { return $this->tripMemberId; }
-    public function setTripMemberId($tripMemberId) { $this->tripMemberId = $tripMemberId; }
+    public function setAmount($amount)
+    {
+        $this->amount = $amount;
+    }
 
-    public function getDeletedAt() { return $this->deletedAt; }
-    public function setDeletedAt($deletedAt) { $this->deletedAt = $deletedAt; }
+    public function getTimestamp()
+    {
+        return $this->timestamp;
+    }
+
+    public function setTimestamp($timestamp)
+    {
+        $this->timestamp = $timestamp;
+    }
+
+    public function getGroupFundId()
+    {
+        return $this->groupFundId;
+    }
+
+    public function setGroupFundId($groupFundId)
+    {
+        $this->groupFundId = $groupFundId;
+    }
+
+    public function getTripMemberId()
+    {
+        return $this->tripMemberId;
+    }
+
+    public function setTripMemberId($tripMemberId)
+    {
+        $this->tripMemberId = $tripMemberId;
+    }
+
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
+    }
 
     public function fill(array $data)
     {
-        $this->id = $data['id'];
+        $this->id             = $data['id'];
         $this->contributionId = $data['contributionId'];
-        $this->amount = $data['amount'];
-        $this->timestamp = $data['timestamp'];
-        $this->groupFundId = $data['groupFundId'];
-        $this->tripMemberId = $data['tripMemberId'];
-        $this->deletedAt = $data['deletedAt'] ?? null;
+        $this->amount         = $data['amount'];
+        $this->timestamp      = $data['timestamp'];
+        $this->groupFundId    = $data['groupFundId'];
+        $this->tripMemberId   = $data['tripMemberId'];
+        $this->deletedAt      = $data['deletedAt'] ?? null;
     }
 
     public function read($id)
     {
-        $sql = "SELECT * FROM FundContribution WHERE id = :id LIMIT 1";
+        $sql  = "SELECT * FROM FundContribution WHERE id = :id LIMIT 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
         if ($data) {
             $this->fill($data);
             return true;
         }
+
         return false;
     }
 
     public function delete($deletedByTripMemberId)
     {
-        $sql = "UPDATE FundContribution SET deletedAt = NOW() WHERE id = :id";
-        $stmt = $this->db->prepare($sql);
+        $sql     = "UPDATE FundContribution SET deletedAt = NOW() WHERE id = :id";
+        $stmt    = $this->db->prepare($sql);
         $success = $stmt->execute([':id' => $this->id]);
-        
+
         if ($success) {
             $itineraryId = $this->getItineraryId();
             // move this to fund contribution controller
             HistoryLogger::log($itineraryId, \App\Models\TransactionType::FUND_CONTRIBUTION_DELETED, $this, $deletedByTripMemberId);
         }
+
         return $success;
     }
 
@@ -93,11 +144,11 @@ class FundContribution
 
     public function update()
     {
-        $sql = "UPDATE FundContribution SET deletedAt = :deletedAt WHERE id = :id";
+        $sql  = "UPDATE FundContribution SET deletedAt = :deletedAt WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             ':deletedAt' => $this->deletedAt,
-            ':id' => $this->id
+            ':id'        => $this->id,
         ]);
     }
 }

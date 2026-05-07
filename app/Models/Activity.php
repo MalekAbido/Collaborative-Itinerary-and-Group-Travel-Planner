@@ -14,7 +14,6 @@ class Activity extends ItineraryItem
     private $subtripId;
     private $locationId;
     private $isAnonymous          = false;
-    private $inventoryItemsList   = null;
     private $attendanceListObject = null;
     private $locationObject       = null;
 
@@ -199,17 +198,6 @@ class Activity extends ItineraryItem
         $stmt = $db->prepare($sql);
         $success = $stmt->execute([':id' => ($this->id)]);
         return $success;
-    }
-
-    public function getInventoryItems()
-    {
-
-// if ($this->inventoryItemsList === null) {
-
-//     $this->inventoryItemsList = InventoryItem::getAllByActivityId($this->id);
-        // }
-
-        return $this->inventoryItemsList;
     }
 
     public static function getAllByItineraryId($itineraryId)

@@ -31,60 +31,95 @@ class HistoryLogEntry
         $this->db = Database::getInstance()->getConnection();
     }
 
-    // Getters and Setters
     public function getId()
-    {return $this->id;}
+    {
+        return $this->id;
+    }
 
     public function setId($id)
-    {$this->id = $id;}
+    {
+        $this->id = $id;
+    }
 
     public function getEntryId()
-    {return $this->entryId;}
+    {
+        return $this->entryId;
+    }
 
     public function setEntryId($entryId)
-    {$this->entryId = $entryId;}
+    {
+        $this->entryId = $entryId;
+    }
 
     public function getTransactionType()
-    {return $this->transactionType;}
+    {
+        return $this->transactionType;
+    }
 
     public function setTransactionType($transactionType)
-    {$this->transactionType = $transactionType;}
+    {
+        $this->transactionType = $transactionType;
+    }
 
     public function getTimestamp()
-    {return $this->timestamp;}
+    {
+        return $this->timestamp;
+    }
 
     public function setTimestamp($timestamp)
-    {$this->timestamp = $timestamp;}
+    {
+        $this->timestamp = $timestamp;
+    }
 
     public function getChangedEntityId()
-    {return $this->changedEntityId;}
+    {
+        return $this->changedEntityId;
+    }
 
     public function setChangedEntityId($changedEntityId)
-    {$this->changedEntityId = $changedEntityId;}
+    {
+        $this->changedEntityId = $changedEntityId;
+    }
 
     public function getChangedEntityType()
-    {return $this->changedEntityType;}
+    {
+        return $this->changedEntityType;
+    }
 
     public function setChangedEntityType($changedEntityType)
-    {$this->changedEntityType = $changedEntityType;}
+    {
+        $this->changedEntityType = $changedEntityType;
+    }
 
     public function getHistoryLogId()
-    {return $this->historyLogId;}
+    {
+        return $this->historyLogId;
+    }
 
     public function setHistoryLogId($historyLogId)
-    {$this->historyLogId = $historyLogId;}
+    {
+        $this->historyLogId = $historyLogId;
+    }
 
     public function getTripMemberId()
-    {return $this->tripMemberId;}
+    {
+        return $this->tripMemberId;
+    }
 
     public function setTripMemberId($tripMemberId)
-    {$this->tripMemberId = $tripMemberId;}
+    {
+        $this->tripMemberId = $tripMemberId;
+    }
 
     public function getPreviousSnapshotId()
-    {return $this->previousSnapshotId;}
+    {
+        return $this->previousSnapshotId;
+    }
 
     public function setPreviousSnapshotId($previousSnapshotId)
-    {$this->previousSnapshotId = $previousSnapshotId;}
+    {
+        $this->previousSnapshotId = $previousSnapshotId;
+    }
 
     /**
      * Lazy Loading for TripMember
@@ -110,14 +145,11 @@ class HistoryLogEntry
             case 'Activity':
                 $activity = new Activity();
 
-// Assuming your read() method populates the object and returns true/false
                 if ($activity->read($this->changedEntityId)) {
                     return $activity;
                 }
 
                 return null;
-
-            // You can add cases for Expense, Subtrip, etc., later when you want to customize them!
 
             default:
                 return null;

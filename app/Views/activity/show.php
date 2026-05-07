@@ -279,12 +279,7 @@
             <span class="material-symbols-outlined mb-1" data-icon="rule">rule</span>
             Manage
         </a>
-        <a class="flex flex-col items-center justify-center text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30 rounded-xl px-4 py-1 Active: scale-90 transition-transform duration-100"
-            href="#">
-            <span class="material-symbols-outlined mb-1" data-icon="inventory_2" data-weight="fill"
-                style="font-variation-settings: 'FILL' 1;">inventory_2</span>
-            Inventory
-        </a>
+
         <a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 active:bg-zinc-100 dark:active:bg-zinc-800 rounded-xl px-4 py-1"
             href="#">
             <span class="material-symbols-outlined mb-1" data-icon="person">person</span>

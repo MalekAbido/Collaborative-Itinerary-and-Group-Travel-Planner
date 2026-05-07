@@ -266,7 +266,6 @@ class Expense
 
     public function updateRefundedAmount($newRefundInput)
     {
-        // 1. Safety check
         if ($newRefundInput <= 0 || $newRefundInput > $this->amount) {
             return false; 
         }

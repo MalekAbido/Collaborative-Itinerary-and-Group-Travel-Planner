@@ -38,7 +38,6 @@ class FinanceController extends Controller
         $actualSpending = $finance->getActualSpending();
         $budgetAlert = $finance->checkBudgetAlert();
 
-        // --- FETCH REAL GROUP FUND DATA ---
         $groupFund = new GroupFund();
         $isFundFound = $groupFund->readByTripFinanceId($finance->getId());
         
