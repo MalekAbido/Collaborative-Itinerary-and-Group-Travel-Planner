@@ -12,9 +12,12 @@
                     <!-- Hero Card -->
                     <div
                         class="bg-surface rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] border-l-4 border-primary overflow-hidden relative">
+                        <?php 
+                            $bannerUrl = $activity->getBannerImage() ? '/' . htmlspecialchars($activity->getBannerImage()) : 'https://lh3.googleusercontent.com/aida-public/AB6AXuAP0GA5BMqfjA9S_J6C8IYH2XP2cYgizm7IlSqBm8LkYC3Li2e4GEPTlgdZP7doWnvRCYr4Qua4WJpmyBzL73w4tVN7itPOZaqG1HsoTedgiOX2M4EzdFloidufze5t_X0YPhXSSv6ix9oadjTtsTZIajspW6FXbEsZLIEQmlfzGz2MvFf1bYwdyyR-8oLlwfFYa6Gh_HMGmhjdju1zQBSZTVunUiBFxSxebwSRXXBnEpEJzaWa88NJoCSYmpCKrleezvRJUkQLJVQ';
+                        ?>
                         <div class="h-48 w-full bg-cover bg-center relative"
-                            data-alt="A breathtaking view of Mount Fuji towering over a serene lake, reflecting perfectly in the still water. The sky is a clear, vibrant blue, characteristic of a crisp autumn morning in Japan. The scene embodies exploration and awe, fitting the 'Structured Exploration' theme of the travel app with high contrast and clean lines."
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAP0GA5BMqfjA9S_J6C8IYH2XP2cYgizm7IlSqBm8LkYC3Li2e4GEPTlgdZP7doWnvRCYr4Qua4WJpmyBzL73w4tVN7itPOZaqG1HsoTedgiOX2M4EzdFloidufze5t_X0YPhXSSv6ix9oadjTtsTZIajspW6FXbEsZLIEQmlfzGz2MvFf1bYwdyyR-8oLlwfFYa6Gh_HMGmhjdju1zQBSZTVunUiBFxSxebwSRXXBnEpEJzaWa88NJoCSYmpCKrleezvRJUkQLJVQ');">
+                            data-alt="Activity banner"
+                            style="background-image: url('<?php echo $bannerUrl; ?>');">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                             <div
                                 class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">

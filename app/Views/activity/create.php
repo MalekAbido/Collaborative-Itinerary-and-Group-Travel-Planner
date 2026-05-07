@@ -53,8 +53,45 @@
         <?php endif; ?>
 
         <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6">
-            <form id="activity-form" action="/itinerary/<?= htmlspecialchars($itineraryId) ?>/activity/store" method="POST" class="space-y-6">
+            <form id="activity-form" action="/itinerary/<?= htmlspecialchars($itineraryId) ?>/activity/store" method="POST" enctype="multipart/form-data" class="space-y-6">
                 <input type="hidden" name="timezone" id="clientTimezoneReopen" value="">
+
+                <!-- Banner Image Upload -->
+                <div class="space-y-4">
+                    <label class="block text-[12px] font-bold uppercase tracking-wider text-on-surface-variant mb-2 text-center">Activity Banner (Optional)</label>
+                    <div class="flex flex-col items-center gap-4">
+                        <div id="banner-preview-container" class="w-full h-48 rounded-xl overflow-hidden border-2 border-dashed border-outline-variant bg-surface-container flex items-center justify-center relative">
+                            <div id="banner-placeholder" class="text-on-surface-variant flex flex-col items-center gap-2">
+                                <span class="material-symbols-outlined text-4xl">image</span>
+                                <span class="text-body-sm">Click below to upload a banner</span>
+                            </div>
+                        </div>
+                        <div class="w-full max-w-xs">
+                            <input type="file" name="bannerImage" id="banner-input" accept="image/*"
+                                class="w-full text-body-sm text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-body-sm file:font-semibold file:bg-primary-fixed file:text-primary hover:file:bg-primary-container transition" />
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                document.getElementById('banner-input').onchange = evt => {
+                    const [file] = evt.target.files
+                    if (file) {
+                        const container = document.getElementById('banner-preview-container');
+                        let preview = document.getElementById('banner-preview');
+
+                        if (!preview) {
+                            preview = document.createElement('img');
+                            preview.id = 'banner-preview';
+                            preview.className = 'w-full h-full object-cover';
+                            container.innerHTML = '';
+                            container.appendChild(preview);
+                        }
+                        preview.src = URL.createObjectURL(file);
+                    }
+                }
+                </script>
+
                 <div>
                     <label class="block text-[12px] font-bold uppercase tracking-wider text-on-surface-variant mb-2">Activity Name</label>
                     <input type="text" name="name" value="<?= htmlspecialchars($pendingActivity['name'] ?? '') ?>" required class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-[14px] focus:border-primary focus:ring-primary focus:outline-none transition" placeholder="e.g. Visit Louvre Museum">

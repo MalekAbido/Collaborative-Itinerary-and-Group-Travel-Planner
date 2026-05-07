@@ -14,6 +14,7 @@ class Activity extends ItineraryItem
     private $subtripId;
     private $locationId;
     private $isAnonymous          = false;
+    private $bannerImage;
     private $attendanceListObject = null;
     private $locationObject       = null;
 
@@ -25,6 +26,16 @@ class Activity extends ItineraryItem
     public function setCategory($category)
     {
         $this->category = $category;
+    }
+
+    public function getBannerImage()
+    {
+        return $this->bannerImage;
+    }
+
+    public function setBannerImage($bannerImage)
+    {
+        $this->bannerImage = $bannerImage;
     }
 
     public function getActivityStatus()
@@ -82,6 +93,7 @@ class Activity extends ItineraryItem
         $this->setSubtripId($row['subtripId']);
         $this->setLocationId($row['locationId']);
         $this->setIsAnonymous($row['isAnonymous'] ?? false);
+        $this->setBannerImage($row['bannerImage'] ?? null);
     }
 
     public static function getByActivityId($activityId)
@@ -105,10 +117,12 @@ class Activity extends ItineraryItem
     {
         $db = Database::getInstance()->getConnection();
 
-        $this->itemId = uniqid('act_');
+        if (empty($this->itemId)) {
+            $this->itemId = uniqid('act_');
+        }
 
-        $sql = "INSERT INTO Activity (itemId, name, description, startTime, endTime, category, status, itineraryId, tripMemberId, subtripId, locationId, isAnonymous)
-                VALUES (:itemId, :name, :description, :startTime, :endTime, :category, :status, :itineraryId, :tripMemberId, :subtripId, :locationId, :isAnonymous)";
+        $sql = "INSERT INTO Activity (itemId, name, description, startTime, endTime, category, status, itineraryId, tripMemberId, subtripId, locationId, isAnonymous, bannerImage)
+                VALUES (:itemId, :name, :description, :startTime, :endTime, :category, :status, :itineraryId, :tripMemberId, :subtripId, :locationId, :isAnonymous, :bannerImage)";
 
         $stmt    = $db->prepare($sql);
         $success = $stmt->execute([
@@ -124,6 +138,7 @@ class Activity extends ItineraryItem
             ':subtripId'    => $this->subtripId,
             ':locationId'   => $this->locationId,
             ':isAnonymous'  => $this->isAnonymous ? 1 : 0,
+            ':bannerImage'  => $this->bannerImage,
         ]);
 
         if ($success) {

@@ -13,6 +13,7 @@ CREATE TABLE Activity
   subtripId    INT          NULL    ,
   locationId   INT          NOT NULL,
   isAnonymous  BOOLEAN      DEFAULT FALSE,
+  bannerImage  VARCHAR(255) NULL    ,
   PRIMARY KEY (id)
 );
 

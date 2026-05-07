@@ -129,6 +129,26 @@ class ActivityController extends Controller
         }
 
         $activity = new Activity();
+        $activity->setItemId(uniqid('act_'));
+
+        $bannerImage = null;
+        if (isset($_FILES['bannerImage']) && $_FILES['bannerImage']['error'] === UPLOAD_ERR_OK) {
+            $fileTmpPath = $_FILES['bannerImage']['tmp_name'];
+            $fileName = $_FILES['bannerImage']['name'];
+            $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+            $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg', 'webp');
+            if (in_array($fileExtension, $allowedfileExtensions)) {
+                $uploadFileDir = dirname(__DIR__, 2) . '/public/uploads/activities/';
+                $newFileName = $activity->getItemId() . '.' . $fileExtension;
+                $dest_path = $uploadFileDir . $newFileName;
+
+                if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                    $bannerImage = 'uploads/activities/' . $newFileName;
+                }
+            }
+        }
+
         $activity->setName($name);
         $activity->setDescription($description);
         $activity->setStartTime($startTime);
@@ -139,6 +159,7 @@ class ActivityController extends Controller
         $activity->setActivityStatus('Draft');
         $activity->setItineraryId($itineraryId);
         $activity->setTripMemberId($tripMember->getId());
+        $activity->setBannerImage($bannerImage);
 
         if ($activity->create()) {
             HistoryLogger::log($itineraryId, TransactionType::ACTIVITY_ADDED, $activity, $tripMember->getId());
