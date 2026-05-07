@@ -32,6 +32,7 @@ $this->get('/styleguide', 'HomeController', 'styleguide');
 //Auth Routes
 $this->get('/login', 'AuthController', 'login');
 $this->post('/login/process', 'AuthController', 'processLogin');
+$this->post('/login/test', 'AuthController', 'testLogin');
 
 $this->get('/register', 'AuthController', 'register');
 $this->post('/register/process', 'AuthController', 'processRegister');

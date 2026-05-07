@@ -152,7 +152,7 @@ class User
             $user->setPasswordHash($data['passwordHash']);
             $user->setNationality($data['nationality'] ?? null);
             $user->setPolicyNumber($data['policyNumber'] ?? null);
-            $user->setProfileImage($data['profileImage'] ?? null); 
+            $user->setProfileImage($data['profileImage'] ?? null);
             return $user;
         }
 
@@ -175,7 +175,7 @@ class User
             $user->setLastName($data['lastName']);
             $user->setEmail($data['email']);
             $user->setPasswordHash($data['passwordHash']);
-            $user->setProfileImage($data['profileImage'] ?? null); 
+            $user->setProfileImage($data['profileImage'] ?? null);
             return $user;
         }
 
@@ -274,14 +274,14 @@ class User
         $stmt->execute([':email' => $email]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // if ($data && password_verify($password, $data['passwordHash'])) {
-        if ($data && password_verify($password, password_hash($password, PASSWORD_DEFAULT))) {
+        if ($data && password_verify($password, $data['passwordHash'])) {
             $this->read($data['id']);
             return $data['id'];
         }
 
         return false;
     }
+
 
     public function updateProfile($data)
     {

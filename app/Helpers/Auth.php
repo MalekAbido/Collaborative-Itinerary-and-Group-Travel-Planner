@@ -4,7 +4,6 @@ namespace App\Helpers;
 use App\Helpers\Session;
 use App\Models\TripMember;
 use App\Models\User;
-use App\Models\TripMember;
 
 
 class Auth

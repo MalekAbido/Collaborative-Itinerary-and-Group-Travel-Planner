@@ -552,8 +552,8 @@ ALTER TABLE TransportDetail
 
 -- 1. Independent Tables
 INSERT INTO User (userId, firstName, lastName, email, passwordHash, nationality, policyNumber, profileImage) VALUES
-('user_00001', 'Ahmed', 'Ali', 'ahmed.ali@example.com', 'hashed_pw_1', 'Egyptian', 'POL1234567890123456', 'uploads/profiles/user1.jpg'),
-('user_00002', 'Yousef', 'Hassan', 'yousef.h@example.com', 'hashed_pw_2', 'Egyptian', 'POL1234567890123457', 'uploads/profiles/user2.jpg'),
+('user_00001', 'Ahmed', 'Ali', 'ahmed.ali@example.com', '$2y$10$jcfUGlVgsAMXB4qwxEbUd.fW..I9Rqiy3ZJnmebMcw8pT4RrRlNNO', 'Egyptian', 'POL1234567890123456', 'uploads/profiles/user1.jpg'),
+('user_00002', 'Yousef', 'Hassan', 'yousef.h@example.com', '$2y$10$WkETwNGL8hMzXkzQehOdAeMaMuN7h6xkjMz8Si/UB.PuuhmIX4ydG', 'Egyptian', 'POL1234567890123457', 'uploads/profiles/user2.jpg'),
 ('user_00003', 'Hagar', 'Mahmoud', 'hagar.m@example.com', 'hashed_pw_3', 'Egyptian', 'POL1234567890123458', 'uploads/profiles/user3.jpg');
 
 INSERT INTO Itinerary (itineraryId, title, description, startDate, endDate) VALUES
@@ -583,10 +583,11 @@ INSERT INTO Allergy (allergenId, allergen, severity, reaction, userId) VALUES
 -- Assuming IDs 1, 2, 3 for Users and 1, 2 for Itineraries based on auto-increment
 INSERT INTO TripMember (membershipId, role, joinedAt, userId, itineraryId) VALUES
 ('mem_001', 'Organizer', '2026-03-01 10:00:00', 1, 1),
-('mem_002', 'Member', '2026-03-02 11:30:00', 2, 1),
+('mem_002', 'Editor', '2026-03-02 11:30:00', 2, 1),
 ('mem_003', 'Member', '2026-03-05 09:15:00', 3, 1),
 ('mem_004', 'Organizer', '2026-04-01 14:00:00', 1, 2),
-('mem_005', 'Member', '2026-04-02 16:45:00', 2, 2);
+('mem_005', 'Editor', '2026-04-02 16:45:00', 2, 2);
+('mem_006', 'Member', '2026-04-02 16:45:00', 3, 2);
 
 INSERT INTO Invitation (invitationId, secureToken, isActive, itineraryId, email, role) VALUES
 ('inv_001', 'token_abc123', TRUE, 1, 'dummy1@example.com', 'Member'),
@@ -616,8 +617,8 @@ INSERT INTO Expense (expenseId, amount, refundedAmount, currencyType, descriptio
 -- Note: Subtrip uses ID 1, Locations use 1, 2, 3
 INSERT INTO Activity (itemId, name, description, startTime, endTime, category, status, itineraryId, tripMemberId, subtripId, locationId) VALUES
 ('act_001', 'Flight Arrival', 'Arrive at Narita', '2026-05-10 14:00:00', '2026-05-10 15:30:00', 'Travel', 'Confirmed', 1, 1, NULL, 1),
-('act_002', 'Akihabara Shopping', 'Buying electronics', '2026-05-11 10:00:00', '2026-05-11 16:00:00', 'Leisure', 'Planned', 1, 1, NULL, 2),
-('act_003', 'Imperial Palace Visit', 'Historical tour', '2026-05-16 09:00:00', '2026-05-16 12:00:00', 'Sightseeing', 'Planned', 1, 2, 1, 3);
+('act_002', 'Akihabara Shopping', 'Buying electronics', '2026-05-11 10:00:00', '2026-05-11 16:00:00', 'Leisure', 'Draft', 1, 1, NULL, 2),
+('act_003', 'Imperial Palace Visit', 'Historical tour', '2026-05-16 09:00:00', '2026-05-16 12:00:00', 'Sightseeing', 'Proposed', 1, 2, 1, 3);
 
 INSERT INTO FundContribution (contributionId, amount, timestamp, groupFundId, tripMemberId) VALUES
 ('cont_001', 25000.00, '2026-04-10 10:00:00', 1, 1),
@@ -634,8 +635,8 @@ INSERT INTO HistoryLogEntry (entryId, transactionType, timestamp, changedEntityI
 
 -- 5. Level 4 Dependencies 
 INSERT INTO AttendanceList (totalAttendeeCount, activityId) VALUES
-(3, 2), -- List for Akihabara Shopping
-(2, 3); -- List for Kyoto Temple
+(3, 1),
+(2, 2);
 
 INSERT INTO TransportDetail (transportId, distance, duration, fromActivityId, toActivityId, transportModeId) VALUES
 ('trans_001', 500.00, 150, 2, 3, 2); -- Akihabara to Kyoto via Bullet Train
@@ -645,11 +646,12 @@ INSERT INTO Poll (pollId, deadline, status, isAnonymous, weightedTotal, activity
 
 -- 6. Level 5 Dependencies 
 INSERT INTO AttendanceMember (status, note, attendanceListId, tripMemberId) VALUES
-('Attending', 'Will be there early', 1, 1),
-('Attending', NULL, 1, 2),
-('Attending', NULL, 1, 3),
-('Attending', NULL, 2, 1),
-('Not Attending', 'Feeling sick', 2, 3);
+('Going', 'Will be there early', 1, 1),
+('Pending', NULL, 1, 2),
+('Not Going', NULL, 1, 3),
+('Going', NULL, 2, 1),
+('Not Going', 'Feeling sick', 2, 2);
+('Not Going', 'Feeling tired', 2, 3);
 
 INSERT INTO Vote (voteId, voteWeight, timestamp, pollId, tripMemberId) VALUES
 ('vote_001', 1.00, '2026-03-15 10:00:00', 1, 1), 

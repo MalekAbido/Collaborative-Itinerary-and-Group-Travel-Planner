@@ -46,7 +46,7 @@
                 <span class="text-xl font-display font-extrabold text-on-surface tracking-tight">Itinerary</span>
             </div>
 
-            <h2 class="font-display text-3xl font-bold text-on-surface mb-2">Welcome back</h2>
+            <h2 class="font-display text-3xl font-bold text-on-surface mb-2">Welcome back <?php echo \App\Helpers\Session::getFlash(\App\Helpers\Session::FLASH_SUCCESS); ?></h2>
             <p class="font-body text-on-surface-variant mb-8">Please enter your details to login.</p>
 
             <form id="login-form" action="/login/process" method="POST" class="flex flex-col gap-5" novalidate>
@@ -85,6 +85,31 @@
                     <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
                 </button>
             </form>
+
+            <div class="mt-8 flex flex-col gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="h-px flex-1 bg-outline-variant"></div>
+                    <span class="text-[11px] font-bold tracking-[0.2em] text-on-surface-variant uppercase">Test Accounts</span>
+                    <div class="h-px flex-1 bg-outline-variant"></div>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <button type="button" onclick="testLogin('Organizer')"
+                        class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-primary/5 hover:bg-primary/10 border border-primary/10 transition-colors group">
+                        <span class="material-symbols-outlined text-primary text-xl group-hover:scale-110 transition-transform">shield_person</span>
+                        <span class="text-[11px] font-bold text-primary">Organizer</span>
+                    </button>
+                    <button type="button" onclick="testLogin('Editor')"
+                        class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-tertiary/5 hover:bg-tertiary/10 border border-tertiary/10 transition-colors group">
+                        <span class="material-symbols-outlined text-tertiary text-xl group-hover:scale-110 transition-transform">edit_square</span>
+                        <span class="text-[11px] font-bold text-tertiary">Editor</span>
+                    </button>
+                    <button type="button" onclick="testLogin('Member')"
+                        class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-on-surface-variant/5 hover:bg-on-surface-variant/10 border border-on-surface-variant/10 transition-colors group">
+                        <span class="material-symbols-outlined text-on-surface-variant text-xl group-hover:scale-110 transition-transform">person</span>
+                        <span class="text-[11px] font-bold text-on-surface-variant">Member</span>
+                    </button>
+                </div>
+            </div>
 
             <p class="text-center text-sm text-on-surface-variant mt-8">
                 Don't have an account?

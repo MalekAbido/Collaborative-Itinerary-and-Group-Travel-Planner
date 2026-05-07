@@ -37,12 +37,13 @@ public function store()
 
             // 3. Create the Itinerary
             $itineraryModel = new Itinerary();
-            $stringTripId = $itineraryModel->create(
+            $itineraryModel->create(
                 $_POST['title'],
                 $_POST['description'],
                 $startDate, 
                 $endDate
             );
+            $stringTripId = $itineraryModel->getItineraryId();
             
             // Grab the numeric ID for database relationships
             $numericTripId = $itineraryModel->getId();
