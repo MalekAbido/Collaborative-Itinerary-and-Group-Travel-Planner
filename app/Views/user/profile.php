@@ -278,6 +278,14 @@
                     </div>
                 </section>
 
+                <div class="flex justify-end mt-8">
+                    <a href="/logout"
+                        class="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-error text-error font-semibold text-body-sm px-6 py-2.5 hover:bg-error-container transition">
+                        <span class="material-symbols-outlined text-[20px]">logout</span>
+                        Logout from Account
+                    </a>
+                </div>
+
                 <footer class="mt-12 pt-8 pb-4 text-center text-body-xs text-outline border-t border-outline-variant">
                     © <?= date('Y') ?> Itinerary. All rights reserved.
                 </footer>
