@@ -17,77 +17,77 @@
         rel="stylesheet" />
 
     <script>
-    tailwind.config = {
-        darkMode: "class",
-        theme: {
-            extend: {
-                colors: {
-                    "primary": "#f65a41",
-                    "primary-container": "#ff8b71",
-                    "primary-fixed": "#ffdad3",
-                    "on-primary": "#ffffff",
-                    "on-primary-fixed-variant": "#7b2a1a",
-                    "secondary": "#825500",
-                    "secondary-container": "#feaa00",
-                    "secondary-fixed": "#ffddb3",
-                    "on-secondary": "#ffffff",
-                    "success": "#16a34a",
-                    "success-container": "#bbf7d0",
-                    "on-success": "#ffffff",
-                    "on-success-container": "#064e2c",
-                    "error": "#ba1a1a",
-                    "error-container": "#ffdad6",
-                    "on-error": "#ffffff",
-                    "on-error-container": "#93000a",
-                    "background": "#fcf8f8",
-                    "on-background": "#191c1d",
-                    "surface": "#fcf8f8",
-                    "surface-container-lowest": "#ffffff",
-                    "surface-container": "#edeeef",
-                    "on-surface": "#191c1d",
-                    "on-surface-variant": "#414754",
-                    "outline": "#727785",
-                    "outline-variant": "#c1c6d6",
-                },
-                fontFamily: {
-                    display: ["'Plus Jakarta Sans'", "sans-serif"],
-                    body: ["'Inter'", "sans-serif"]
-                },
-                fontSize: {
-                    "h2": ["28px", {
-                        lineHeight: "1.3",
-                        fontWeight: "600"
-                    }],
-                    "h4": ["17px", {
-                        lineHeight: "1.4",
-                        fontWeight: "600"
-                    }],
-                    "body-md": ["16px", {
-                        lineHeight: "1.5",
-                        fontWeight: "400"
-                    }],
-                    "body-sm": ["14px", {
-                        lineHeight: "1.5",
-                        fontWeight: "400"
-                    }],
-                    "body-xs": ["13px", {
-                        lineHeight: "1.4",
-                        fontWeight: "400"
-                    }],
-                    "label-caps": ["12px", {
-                        lineHeight: "1",
-                        letterSpacing: "0.05em",
-                        fontWeight: "700"
-                    }],
-                    "label-xs": ["11px", {
-                        lineHeight: "1",
-                        letterSpacing: "0.05em",
-                        fontWeight: "700"
-                    }],
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f65a41",
+                        "primary-container": "#ff8b71",
+                        "primary-fixed": "#ffdad3",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#7b2a1a",
+                        "secondary": "#825500",
+                        "secondary-container": "#feaa00",
+                        "secondary-fixed": "#ffddb3",
+                        "on-secondary": "#ffffff",
+                        "success": "#16a34a",
+                        "success-container": "#bbf7d0",
+                        "on-success": "#ffffff",
+                        "on-success-container": "#064e2c",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "background": "#fcf8f8",
+                        "on-background": "#191c1d",
+                        "surface": "#fcf8f8",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#edeeef",
+                        "on-surface": "#191c1d",
+                        "on-surface-variant": "#414754",
+                        "outline": "#727785",
+                        "outline-variant": "#c1c6d6",
+                    },
+                    fontFamily: {
+                        display: ["'Plus Jakarta Sans'", "sans-serif"],
+                        body: ["'Inter'", "sans-serif"]
+                    },
+                    fontSize: {
+                        "h2": ["28px", {
+                            lineHeight: "1.3",
+                            fontWeight: "600"
+                        }],
+                        "h4": ["17px", {
+                            lineHeight: "1.4",
+                            fontWeight: "600"
+                        }],
+                        "body-md": ["16px", {
+                            lineHeight: "1.5",
+                            fontWeight: "400"
+                        }],
+                        "body-sm": ["14px", {
+                            lineHeight: "1.5",
+                            fontWeight: "400"
+                        }],
+                        "body-xs": ["13px", {
+                            lineHeight: "1.4",
+                            fontWeight: "400"
+                        }],
+                        "label-caps": ["12px", {
+                            lineHeight: "1",
+                            letterSpacing: "0.05em",
+                            fontWeight: "700"
+                        }],
+                        "label-xs": ["11px", {
+                            lineHeight: "1",
+                            letterSpacing: "0.05em",
+                            fontWeight: "700"
+                        }],
+                    }
                 }
             }
-        }
-    };
+        };
     </script>
     <style type="text/tailwindcss">
         @layer base {
@@ -102,7 +102,7 @@
 
     <nav class="fixed inset-x-0 top-0 z-50 h-[64px] bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant shadow-sm flex items-center justify-between px-6">
         <a href="/dashboard" class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
-        <a href="/itinerary/dashboard/<?= htmlspecialchars($data['trip']['itineraryId'] ?? '') ?>" class="inline-flex items-center gap-1 text-body-sm font-semibold text-outline hover:text-primary transition">
+        <a href="/itinerary/dashboard/<?= htmlspecialchars($data['trip']['id'] ?? '') ?>" class="inline-flex items-center gap-1 text-body-sm font-semibold text-outline hover:text-primary transition">
             <span class="material-symbols-outlined text-[18px]">arrow_back</span> Back to Dashboard
         </a>
     </nav>
@@ -121,11 +121,11 @@
             <div class="flex items-center justify-between mb-4">
                 <h3 class="font-display text-h4 text-on-surface m-0">Invite to Trip</h3>
 
-                <?php if (isset($currentUserRole) && $currentUserRole === 'Leader'): ?>
-                <button onclick="copyInviteLink('<?= htmlspecialchars($generalLink) ?>')"
-                    class="inline-flex items-center gap-1.5 rounded-lg border-2 border-outline-variant bg-surface-container-lowest text-on-surface-variant font-semibold text-body-sm px-3 py-1.5 shadow-sm hover:text-primary hover:border-primary transition">
-                    <span class="material-symbols-outlined text-[18px]">link</span> Copy General Link
-                </button>
+                <?php if (isset($currentUserRole) && $currentUserRole === 'Organizer'): ?>
+                    <button onclick="copyInviteLink('<?= htmlspecialchars($generalLink) ?>')"
+                        class="inline-flex items-center gap-1.5 rounded-lg border-2 border-outline-variant bg-surface-container-lowest text-on-surface-variant font-semibold text-body-sm px-3 py-1.5 shadow-sm hover:text-primary hover:border-primary transition">
+                        <span class="material-symbols-outlined text-[18px]">link</span> Copy General Link
+                    </button>
                 <?php endif; ?>
             </div>
 
@@ -170,7 +170,8 @@
                 <?php if (!empty($data['members'])): ?>
                     <?php foreach ($data['members'] as $member): ?>
                         <div class="grid grid-cols-1 sm:grid-cols-[1fr_120px_120px_100px] gap-4 py-4 sm:py-3 items-center">
-                            
+
+                            <!-- 1. Avatar and Info -->
                             <div class="flex items-center gap-3">
                                 <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-fixed text-primary text-sm font-semibold">
                                     <?= strtoupper(substr($member['firstName'], 0, 1) . substr($member['lastName'], 0, 1)) ?>
@@ -181,8 +182,9 @@
                                 </div>
                             </div>
 
+                            <!-- 2. Role Badge -->
                             <div class="text-left sm:text-center">
-                                <?php if ($member['role'] === 'Leader' || $member['role'] === 'Organizer'): ?>
+                                <?php if ($member['role'] === 'Organizer'): ?>
                                     <span class="inline-flex items-center rounded-full bg-primary-fixed px-3 py-1 text-label-xs font-bold uppercase text-primary">👑 <?= htmlspecialchars($member['role']) ?></span>
                                 <?php elseif ($member['role'] === 'Editor'): ?>
                                     <span class="inline-flex items-center rounded-full bg-secondary-fixed px-3 py-1 text-label-xs font-bold uppercase text-secondary">✏️ Editor</span>
@@ -191,22 +193,24 @@
                                 <?php endif; ?>
                             </div>
 
+                            <!-- 3. Join Date -->
                             <span class="text-body-xs text-on-surface-variant hidden sm:block">
                                 <?= !empty($member['joinedAt']) ? date('M j, Y', strtotime($member['joinedAt'])) : 'Just now' ?>
                             </span>
 
+                            <!-- 4. Action Buttons -->
                             <div class="flex justify-start sm:justify-end gap-2">
-                                <?php if ($member['role'] !== 'Leader' && $member['role'] !== 'Organizer'): ?>
-                                    <form action="/itinerary/members/updateRole/<?= htmlspecialchars($data['trip']['itineraryId']) ?>" method="POST" class="inline">
-                                        <input type="hidden" name="memberId" value="<?= htmlspecialchars($member['memberId'] ?? $member['id'] ?? '') ?>">
+                                <?php if ($member['role'] !== 'Organizer'): ?>
+                                    <form action="/itinerary/members/updateRole/<?= htmlspecialchars($data['trip']['id']) ?>" method="POST" class="inline">
+                                        <input type="hidden" name="memberId" value="<?= htmlspecialchars($member['memberId'] ?? '') ?>">
                                         <input type="hidden" name="newRole" value="<?= $member['role'] === 'Member' ? 'Editor' : 'Member' ?>">
                                         <button type="submit" title="Toggle Role" class="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary text-primary hover:bg-primary-fixed transition">
                                             <span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>
                                         </button>
                                     </form>
 
-                                    <form action="/itinerary/members/remove/<?= htmlspecialchars($data['trip']['itineraryId']) ?>" method="POST" class="inline" onsubmit="return confirm('Remove this user from the trip?');">
-                                        <input type="hidden" name="memberId" value="<?= htmlspecialchars($member['memberId'] ?? $member['id'] ?? '') ?>">
+                                    <form action="/itinerary/members/remove/<?= htmlspecialchars($data['trip']['id']) ?>" method="POST" class="inline" onsubmit="return confirm('Remove this user from the trip?');">
+                                        <input type="hidden" name="memberId" value="<?= htmlspecialchars($member['memberId'] ?? '') ?>">
                                         <button type="submit" title="Remove Member" class="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-error text-error hover:bg-error-container transition">
                                             <span class="material-symbols-outlined text-[16px]">person_remove</span>
                                         </button>
@@ -214,133 +218,77 @@
                                 <?php endif; ?>
                             </div>
 
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-fixed text-primary text-sm font-semibold">
-                            <?= strtoupper(substr($member['firstName'], 0, 1) . substr($member['lastName'], 0, 1)) ?>
                         </div>
-                        <div>
-                            <div class="font-display text-h4 text-on-surface">
-                                <?= htmlspecialchars($member['firstName'] . ' ' . $member['lastName']) ?></div>
-                            <div class="text-body-xs text-outline"><?= htmlspecialchars($member['email']) ?></div>
-                        </div>
-                    </div>
-
-                    <div class="text-left sm:text-center">
-                        <?php if ($member['role'] === 'Leader'): ?>
-                        <span
-                            class="inline-flex items-center rounded-full bg-primary-fixed px-3 py-1 text-label-xs font-bold uppercase text-primary">👑
-                            Leader</span>
-                        <?php elseif ($member['role'] === 'Editor'): ?>
-                        <span
-                            class="inline-flex items-center rounded-full bg-secondary-fixed px-3 py-1 text-label-xs font-bold uppercase text-secondary">✏️
-                            Editor</span>
-                        <?php else: ?>
-                        <span
-                            class="inline-flex items-center rounded-full bg-surface-container-highest px-3 py-1 text-label-xs font-bold uppercase text-outline">👤
-                            Member</span>
-                        <?php endif; ?>
-                    </div>
-
-                    <span class="text-body-xs text-on-surface-variant hidden sm:block">
-                        <?= date('M j, Y', strtotime($member['joinedAt'])) ?>
-                    </span>
-
-                    <div class="flex justify-start sm:justify-end gap-2">
-                        <?php if ($member['role'] !== 'Leader'): ?>
-                        <form action="/itinerary/members/updateRole/<?= htmlspecialchars($trip['id']) ?>" method="POST"
-                            class="inline">
-                            <input type="hidden" name="memberId" value="<?= $member['id'] ?>">
-                            <input type="hidden" name="newRole"
-                                value="<?= $member['role'] === 'Member' ? 'Editor' : 'Member' ?>">
-                            <button type="submit" title="Toggle Role"
-                                class="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary text-primary hover:bg-primary-fixed transition">
-                                <span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>
-                            </button>
-                        </form>
-
-                        <form action="/itinerary/members/remove/<?= htmlspecialchars($trip['id']) ?>" method="POST"
-                            class="inline" onsubmit="return confirm('Remove this user from the trip?');">
-                            <input type="hidden" name="memberId" value="<?= $member['id'] ?>">
-                            <button type="submit" title="Remove Member"
-                                class="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-error text-error hover:bg-error-container transition">
-                                <span class="material-symbols-outlined text-[16px]">person_remove</span>
-                            </button>
-                        </form>
-                        <?php endif; ?>
-                    </div>
-
-                </div>
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
                 <?php else: ?>
-                <div class="py-8 text-center text-on-surface-variant text-body-sm">
-                    No members have been added yet. Invite someone above!
-                </div>
+                    <div class="py-8 text-center text-on-surface-variant text-body-sm">
+                        No members have been added yet. Invite someone above!
+                    </div>
                 <?php endif; ?>
 
             </div>
         </div>
 
         <?php if (!empty($pendingInvites)): ?>
-        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 mt-8">
-            <h3 class="font-display text-h4 text-on-surface mb-4">Pending Invitations</h3>
+            <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 mt-8">
+                <h3 class="font-display text-h4 text-on-surface mb-4">Pending Invitations</h3>
 
-            <div class="divide-y divide-outline-variant">
-                <div
-                    class="hidden sm:grid grid-cols-[1fr_120px_140px] gap-4 py-3 text-label-caps uppercase text-outline">
-                    <span>Invited Email</span><span class="text-center">Role</span><span class="text-right">Share
-                        Link</span>
-                </div>
+                <div class="divide-y divide-outline-variant">
+                    <div
+                        class="hidden sm:grid grid-cols-[1fr_120px_140px] gap-4 py-3 text-label-caps uppercase text-outline">
+                        <span>Invited Email</span><span class="text-center">Role</span><span class="text-right">Share
+                            Link</span>
+                    </div>
 
-                <?php foreach ($pendingInvites as $invite): ?>
-                <?php $joinLink = $appUrl . "/join/" . $invite['secureToken']; ?>
-                <div class="grid grid-cols-1 sm:grid-cols-[1fr_120px_140px] gap-4 py-4 sm:py-3 items-center">
+                    <?php foreach ($pendingInvites as $invite): ?>
+                        <?php $joinLink = $appUrl . "/join/" . $invite['secureToken']; ?>
+                        <div class="grid grid-cols-1 sm:grid-cols-[1fr_120px_140px] gap-4 py-4 sm:py-3 items-center">
 
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-highest text-outline text-sm font-semibold">
-                            <span class="material-symbols-outlined text-[18px]">schedule</span>
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-highest text-outline text-sm font-semibold">
+                                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                                </div>
+                                <div>
+                                    <div class="font-display text-h4 text-on-surface">
+                                        <?= htmlspecialchars($invite['email'] ?? 'Unknown') ?></div>
+                                    <div class="text-body-xs text-outline">Awaiting response...</div>
+                                </div>
+                            </div>
+
+                            <div class="text-left sm:text-center">
+                                <?php if ($invite['role'] === 'Editor'): ?>
+                                    <span
+                                        class="inline-flex items-center rounded-full bg-secondary-fixed px-3 py-1 text-label-xs font-bold uppercase text-secondary">
+                                        Editor</span>
+                                <?php else: ?>
+                                    <span
+                                        class="inline-flex items-center rounded-full bg-surface-container-highest px-3 py-1 text-label-xs font-bold uppercase text-outline">
+                                        Member</span>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="flex justify-start sm:justify-end gap-2">
+                                <button onclick="copyInviteLink('<?= $joinLink ?>')" title="Copy Join Link"
+                                    class="inline-flex items-center gap-1 h-9 px-3 rounded-lg border-2 border-primary text-primary hover:bg-primary-fixed transition text-body-sm font-semibold">
+                                    <span class="material-symbols-outlined text-[16px]">content_copy</span> Copy Link
+                                </button>
+                            </div>
+
                         </div>
-                        <div>
-                            <div class="font-display text-h4 text-on-surface">
-                                <?= htmlspecialchars($invite['email'] ?? 'Unknown') ?></div>
-                            <div class="text-body-xs text-outline">Awaiting response...</div>
-                        </div>
-                    </div>
-
-                    <div class="text-left sm:text-center">
-                        <?php if ($invite['role'] === 'Editor'): ?>
-                        <span
-                            class="inline-flex items-center rounded-full bg-secondary-fixed px-3 py-1 text-label-xs font-bold uppercase text-secondary">
-                            Editor</span>
-                        <?php else: ?>
-                        <span
-                            class="inline-flex items-center rounded-full bg-surface-container-highest px-3 py-1 text-label-xs font-bold uppercase text-outline">
-                            Member</span>
-                        <?php endif; ?>
-                    </div>
-
-                    <div class="flex justify-start sm:justify-end gap-2">
-                        <button onclick="copyInviteLink('<?= $joinLink ?>')" title="Copy Join Link"
-                            class="inline-flex items-center gap-1 h-9 px-3 rounded-lg border-2 border-primary text-primary hover:bg-primary-fixed transition text-body-sm font-semibold">
-                            <span class="material-symbols-outlined text-[16px]">content_copy</span> Copy Link
-                        </button>
-                    </div>
-
+                    <?php endforeach; ?>
                 </div>
-                <?php endforeach; ?>
             </div>
-        </div>
         <?php endif; ?>
 
         <script>
-        function copyInviteLink(link) {
-            navigator.clipboard.writeText(link).then(function() {
-                alert("Join link copied to your clipboard!");
-            }).catch(function(err) {
-                alert("Failed to copy link. Please select and copy manually: " + link);
-            });
-        }
+            function copyInviteLink(link) {
+                navigator.clipboard.writeText(link).then(function() {
+                    alert("Join link copied to your clipboard!");
+                }).catch(function(err) {
+                    alert("Failed to copy link. Please select and copy manually: " + link);
+                });
+            }
         </script>
 
     </main>
