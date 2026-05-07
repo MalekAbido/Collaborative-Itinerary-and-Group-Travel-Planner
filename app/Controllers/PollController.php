@@ -237,7 +237,9 @@ class PollController extends Controller
     {
         $poll->closePoll();
         $activity = Activity::getByIdAndItinerary($poll->getActivityId(), $itineraryId);
-        $activity->updateStatus('CONFIRMED');
+        if ($poll->calculateTotalPoints() > 0)
+            $activity->updateStatus('CONFIRMED');
+        else $activity->updateStatus('REJECTED');
     }
 
     public function openPoll(int $itineraryId, Poll $poll)
