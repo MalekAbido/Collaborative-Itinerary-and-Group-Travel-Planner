@@ -1,22 +1,116 @@
 <?php
 namespace App\Models;
 
-use App\Models\ItineraryItem;
 use Core\Database;
 use PDO;
 use \App\Models\AttendanceList;
 use \App\Models\Location;
 
-class Activity extends ItineraryItem
+class Activity
 {
+    private $db;
+    private $id;
+    private $itemId;
+    private $name;
+    private $description;
+    private $startTime;
+    private $endTime;
+    private $itineraryId;
+    private $tripMemberId;
     private $category;
     private $activityStatus;
-    private $subtripId;
     private $locationId;
-    private $isAnonymous          = false;
+    private $isAnonymous = false;
     private $bannerImage;
     private $attendanceListObject = null;
     private $locationObject       = null;
+    private $itineraryObject      = null;
+    private $creatorObject        = null;
+
+    public function __construct()
+    {
+        $this->db = Database::getInstance()->getConnection();
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    protected function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    public function getItemId()
+    {
+        return $this->itemId;
+    }
+
+    public function setItemId($activityId)
+    {
+        $this->itemId = $activityId;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    public function getStartTime()
+    {
+        return $this->startTime;
+    }
+
+    public function setStartTime($startTime)
+    {
+        $this->startTime = $startTime;
+    }
+
+    public function getEndTime()
+    {
+        return $this->endTime;
+    }
+
+    public function setEndTime($endTime)
+    {
+        $this->endTime = $endTime;
+    }
+
+    public function getItineraryId()
+    {
+        return $this->itineraryId;
+    }
+
+    public function setItineraryId($itineraryId)
+    {
+        $this->itineraryId = $itineraryId;
+    }
+
+    public function getTripMemberId()
+    {
+        return $this->tripMemberId;
+    }
+
+    public function setTripMemberId($tripMemberId)
+    {
+        $this->tripMemberId = $tripMemberId;
+    }
 
     public function getCategory()
     {
@@ -46,16 +140,6 @@ class Activity extends ItineraryItem
     public function setActivityStatus($activityStatus)
     {
         $this->activityStatus = $activityStatus;
-    }
-
-    public function getSubtripId()
-    {
-        return $this->subtripId;
-    }
-
-    public function setSubtripId($subtripId)
-    {
-        $this->subtripId = $subtripId;
     }
 
     public function getLocationId()
@@ -90,7 +174,6 @@ class Activity extends ItineraryItem
         $this->setActivityStatus($row['status']);
         $this->setItineraryId($row['itineraryId']);
         $this->setTripMemberId($row['tripMemberId']);
-        $this->setSubtripId($row['subtripId']);
         $this->setLocationId($row['locationId']);
         $this->setIsAnonymous($row['isAnonymous'] ?? false);
         $this->setBannerImage($row['bannerImage'] ?? null);
@@ -121,8 +204,8 @@ class Activity extends ItineraryItem
             $this->itemId = uniqid('act_');
         }
 
-        $sql = "INSERT INTO Activity (itemId, name, description, startTime, endTime, category, status, itineraryId, tripMemberId, subtripId, locationId, isAnonymous, bannerImage)
-                VALUES (:itemId, :name, :description, :startTime, :endTime, :category, :status, :itineraryId, :tripMemberId, :subtripId, :locationId, :isAnonymous, :bannerImage)";
+        $sql = "INSERT INTO Activity (itemId, name, description, startTime, endTime, category, status, itineraryId, tripMemberId, locationId, isAnonymous, bannerImage)
+                VALUES (:itemId, :name, :description, :startTime, :endTime, :category, :status, :itineraryId, :tripMemberId, :locationId, :isAnonymous, :bannerImage)";
 
         $stmt    = $db->prepare($sql);
         $success = $stmt->execute([
@@ -135,7 +218,6 @@ class Activity extends ItineraryItem
             ':status'       => $this->activityStatus,
             ':itineraryId'  => $this->itineraryId,
             ':tripMemberId' => $this->tripMemberId,
-            ':subtripId'    => $this->subtripId,
             ':locationId'   => $this->locationId,
             ':isAnonymous'  => $this->isAnonymous ? 1 : 0,
             ':bannerImage'  => $this->bannerImage,
@@ -163,22 +245,22 @@ class Activity extends ItineraryItem
         ];
 
         if ($this->id) {
-            $sql .= " AND id != :id";
-            $params[':id'] = $this->id;
+            $sql           .= " AND id != :id";
+            $params[':id']  = $this->id;
         }
 
         $stmt = $db->prepare($sql);
         $stmt->execute($params);
 
-        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $data       = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $activities = [];
-        
+
         foreach ($data as $row) {
             $activity = new self();
             $activity->fill($row);
             $activities[] = $activity;
         }
-        
+
         return $activities;
     }
 
@@ -224,9 +306,9 @@ class Activity extends ItineraryItem
 
     public function delete()
     {
-        $db   = Database::getInstance()->getConnection();
-        $sql  = "UPDATE Activity SET status = 'Removed' WHERE id = :id";
-        $stmt = $db->prepare($sql);
+        $db      = Database::getInstance()->getConnection();
+        $sql     = "UPDATE Activity SET status = 'Removed' WHERE id = :id";
+        $stmt    = $db->prepare($sql);
         $success = $stmt->execute([':id' => ($this->id)]);
         return $success;
     }
@@ -280,6 +362,30 @@ class Activity extends ItineraryItem
             ':status' => $status,
             ':id'     => $this->id,
         ]);
+    }
+
+    public function getItinerary()
+    {
+
+        if ($this->itineraryObject === null) {
+            $this->itineraryObject = (new Itinerary())->read($this->itineraryId);
+        }
+
+        return $this->itineraryObject;
+    }
+
+    public function getTripMember()
+    {
+
+        if ($this->creatorObject === null && $this->getTripMemberId()) {
+            $member = new TripMember();
+
+            if ($member->read($this->getTripMemberId())) {
+                $this->creatorObject = $member;
+            }
+        }
+
+        return $this->creatorObject;
     }
 
     public function getAttendanceList()

@@ -76,13 +76,33 @@ class AttendanceMember
 
     public static function getAllByListId($listId)
     {
-        $db   = Database::getInstance()->getConnection();
-        $sql  = "SELECT * FROM AttendanceMember WHERE attendanceListId = :listId ORDER BY FIELD(status, 'Going', 'Not Going', 'Pending')";
+        $db = Database::getInstance()->getConnection();
+
+        $sql = "SELECT a.itineraryId FROM AttendanceList al 
+                JOIN Activity a ON al.activityId = a.id 
+                WHERE al.id = :listId LIMIT 1";
         $stmt = $db->prepare($sql);
         $stmt->execute([':listId' => $listId]);
-        $data    = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $members = [];
+        $itineraryId = $stmt->fetchColumn();
 
+        if ($itineraryId) {
+            $syncSql = "INSERT INTO AttendanceMember (status, attendanceListId, tripMemberId)
+                        SELECT 'Pending', :listId, tm.id
+                        FROM TripMember tm
+                        WHERE tm.itineraryId = :itineraryId
+                        AND tm.id NOT IN (
+                            SELECT tripMemberId FROM AttendanceMember WHERE attendanceListId = :listId
+                        )";
+            $syncStmt = $db->prepare($syncSql);
+            $syncStmt->execute([':listId' => $listId, ':itineraryId' => $itineraryId]);
+        }
+
+        $sql = "SELECT * FROM AttendanceMember WHERE attendanceListId = :listId ORDER BY FIELD(status, 'Going', 'Not Going', 'Pending')";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':listId' => $listId]);
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $members = [];
         foreach ($data as $row) {
             $member = new self();
             $member->fill($row);

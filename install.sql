@@ -10,7 +10,6 @@ CREATE TABLE Activity
   status       VARCHAR(30)  NULL    ,
   itineraryId  INT          NOT NULL,
   tripMemberId INT          NOT NULL,
-  subtripId    INT          NULL    ,
   locationId   INT          NOT NULL,
   isAnonymous  BOOLEAN      DEFAULT FALSE,
   bannerImage  VARCHAR(255) NULL    ,
@@ -261,27 +260,6 @@ ALTER TABLE Poll
 ALTER TABLE Poll
   ADD CONSTRAINT UQ_pollId UNIQUE (pollId);
 
-CREATE TABLE Subtrip
-(
-  id           INT          NOT NULL AUTO_INCREMENT,
-  subtripId    VARCHAR(55)  NOT NULL,
-  name         VARCHAR(150) NULL    ,
-  description  TEXT         NULL    ,
-  startTime    DATETIME     NULL    ,
-  endTime      DATETIME     NULL    ,
-  itineraryId  INT          NOT NULL,
-  tripMemberId INT          NOT NULL,
-  deletedAt       DATETIME      NULL DEFAULT NULL,
-  PRIMARY KEY (id)
-);
-
-ALTER TABLE Subtrip
-  ADD CONSTRAINT UQ_id UNIQUE (id);
-
-ALTER TABLE Subtrip
-  ADD CONSTRAINT UQ_subtripId UNIQUE (subtripId);
-
-
 CREATE TABLE TripFinance
 (
   id           INT           NOT NULL AUTO_INCREMENT,
@@ -325,7 +303,7 @@ CREATE TABLE User
   passwordHash VARCHAR(255) NULL    ,
   nationality  VARCHAR(50)  NULL    ,
   policyNumber CHAR(19)     NULL    ,
-  sessionToken VarCHAR(255) NULL    ,
+  sessionToken VARCHAR(255) NULL    ,
   profileImage VARCHAR(255) NULL    ,
   PRIMARY KEY (id)
 );
@@ -459,11 +437,6 @@ ALTER TABLE HistoryLogEntry
     FOREIGN KEY (tripMemberId)
     REFERENCES TripMember (id);
 
-ALTER TABLE Subtrip
-  ADD CONSTRAINT FK_Itinerary_TO_Subtrip
-    FOREIGN KEY (itineraryId)
-    REFERENCES Itinerary (id);
-
 ALTER TABLE Activity
   ADD CONSTRAINT FK_Itinerary_TO_Activity
     FOREIGN KEY (itineraryId)
@@ -471,16 +444,6 @@ ALTER TABLE Activity
 
 ALTER TABLE Activity
   ADD CONSTRAINT FK_TripMember_TO_Activity
-    FOREIGN KEY (tripMemberId)
-    REFERENCES TripMember (id);
-
-ALTER TABLE Activity
-  ADD CONSTRAINT FK_Subtrip_TO_Activity
-    FOREIGN KEY (subtripId)
-    REFERENCES Subtrip (id);
-
-ALTER TABLE Subtrip
-  ADD CONSTRAINT FK_TripMember_TO_Subtrip
     FOREIGN KEY (tripMemberId)
     REFERENCES TripMember (id);
 
@@ -586,23 +549,22 @@ INSERT INTO HistoryLog (logId, itineraryId) VALUES
 ('log_002', 2);
 
 -- 3. Level 2 Dependencies 
-INSERT INTO Subtrip (subtripId, name, description, startTime, endTime, itineraryId, tripMemberId) VALUES
-('sub_001', 'Kyoto Excursion', 'Visiting traditional temples', '2026-05-15 08:00:00', '2026-05-17 20:00:00', 1, 1);
-
 INSERT INTO GroupFund (fundId, targetBalance, currentBalance, tripFinanceId) VALUES
 ('fund_001', 150000.00, 50000.00, 1),
 ('fund_002', 5000.00, 2000.00, 2);
 
 -- 4. Level 3 Dependencies 
--- Note: Subtrip uses ID 1, Locations use 1, 2, 3
-INSERT INTO Activity (itemId, name, description, startTime, endTime, category, status, itineraryId, tripMemberId, subtripId, locationId) VALUES
-('act_001', 'Flight Arrival', 'Arrive at Narita', '2026-05-10 14:00:00', '2026-05-10 15:30:00', 'Travel', 'Confirmed', 1, 1, NULL, 1),
-('act_002', 'Akihabara Shopping', 'Buying electronics', '2026-05-11 10:00:00', '2026-05-11 16:00:00', 'Leisure', 'Draft', 1, 1, NULL, 2),
-('act_003', 'Imperial Palace Visit', 'Historical tour', '2026-05-16 09:00:00', '2026-05-16 12:00:00', 'Sightseeing', 'Proposed', 1, 2, 1, 3);
+INSERT INTO Activity (itemId, name, description, startTime, endTime, category, status, itineraryId, tripMemberId, locationId) VALUES
+('act_001', 'Flight Arrival', 'Arrive at Narita', '2026-05-10 14:00:00', '2026-05-10 15:30:00', 'Travel', 'Confirmed', 1, 1, 1),
+('act_002', 'Akihabara Shopping', 'Buying electronics', '2026-05-11 10:00:00', '2026-05-11 16:00:00', 'Leisure', 'Draft', 1, 1, 2),
+('act_003', 'Imperial Palace Visit', 'Historical tour', '2026-05-16 09:00:00', '2026-05-16 12:00:00', 'Sightseeing', 'Proposed', 1, 2, 3);
 
 INSERT INTO FundContribution (contributionId, amount, timestamp, groupFundId, tripMemberId) VALUES
 ('cont_001', 25000.00, '2026-04-10 10:00:00', 1, 1),
 ('cont_002', 25000.00, '2026-04-11 11:00:00', 1, 2);
+
+INSERT INTO Expense (expenseId, amount, refundedAmount, currencyType, description, category, isNonCash, paidByKitty, tripFinanceId, tripMemberId) VALUES
+('exp_001', 30000.00, 0.00, 'JPY', 'Accommodation Booking', 'Housing', FALSE, FALSE, 1, 1);
 
 INSERT INTO ExpenseShare (shareId, amount, isPayer, expenseId, tripMemberId) VALUES
 ('shr_001', 10000.00, TRUE, 1, 1),

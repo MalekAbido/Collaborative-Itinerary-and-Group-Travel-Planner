@@ -43,7 +43,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <?php if ($activity->getActivityStatus() == 'CONFIRMED'): ?>
+                                <?php if (strtolower($activity->getActivityStatus()) == 'confirmed'): ?>
                                 <div class="relative">
                                     <form
                                         action="/itinerary/<?php echo $itineraryId ?>/activity/<?php echo $activity->getId() ?>/updateAttendance"
@@ -80,7 +80,7 @@
                             </div>
                         </div>
                     </div>
-                    <?php if ($activity->getActivityStatus() == 'CONFIRMED'): ?>
+                    <?php if (strtolower($activity->getActivityStatus()) == 'confirmed'): ?>
                     <div class="bg-surface rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)]  border border-surface-variant p-6">
                         <div class="flex items-center justify-between mb-4">
                             <h2 class="font-h3 text-h3 text-on-surface flex items-center gap-2">
@@ -170,7 +170,7 @@
                         </div>
                     </div>
                     <?php endif; ?>
-                    <?php if (Auth::hasRole("Editor", $userRole) && $activity->getActivityStatus() == 'CONFIRMED'): ?>
+                    <?php if (Auth::hasRole("Editor", $userRole) && strtolower($activity->getActivityStatus()) == 'confirmed'): ?>
                         <div class="mt-auto pt-6 flex justify-end border-surface-variant">
                             <form
                                 action="/itinerary/<?php echo $itineraryId ?>/activity/<?php echo $activity->getId() ?>/delete"
