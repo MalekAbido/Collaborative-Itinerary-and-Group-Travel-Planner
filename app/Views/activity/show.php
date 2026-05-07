@@ -2,19 +2,20 @@
 
     use App\Helpers\Auth;
     require __DIR__ . '/../layouts/header.php';
-    $totalMembers        = count($attendanceList->getMembers());
+    
+    // FIX 1: Safely count members only if the attendance list exists
+    $totalMembers = $attendanceList ? count($attendanceList->getMembers()) : 0;
 ?>
 
-        <!-- Main Content -->
-        <!-- <main class="flex-1 mt-navbar h-[calc(100vh-theme(spacing.navbar))] overflow-y-auto bg-surface p-6 lg:p-8 scroll-thin"> -->
-                <!-- Activity Header & Detail Column -->
-                <div class="col-span-12 lg:col-span-8 flex flex-col gap-6">
-                    <!-- Hero Card -->
+        <div class="col-span-12 lg:col-span-8 flex flex-col gap-6">
                     <div
                         class="bg-surface rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] border-l-4 border-primary overflow-hidden relative">
+                        <?php 
+                            $bannerUrl = $activity->getBannerImage() ? '/' . htmlspecialchars($activity->getBannerImage()) : 'https://lh3.googleusercontent.com/aida-public/AB6AXuAP0GA5BMqfjA9S_J6C8IYH2XP2cYgizm7IlSqBm8LkYC3Li2e4GEPTlgdZP7doWnvRCYr4Qua4WJpmyBzL73w4tVN7itPOZaqG1HsoTedgiOX2M4EzdFloidufze5t_X0YPhXSSv6ix9oadjTtsTZIajspW6FXbEsZLIEQmlfzGz2MvFf1bYwdyyR-8oLlwfFYa6Gh_HMGmhjdju1zQBSZTVunUiBFxSxebwSRXXBnEpEJzaWa88NJoCSYmpCKrleezvRJUkQLJVQ';
+                        ?>
                         <div class="h-48 w-full bg-cover bg-center relative"
-                            data-alt="A breathtaking view of Mount Fuji towering over a serene lake, reflecting perfectly in the still water. The sky is a clear, vibrant blue, characteristic of a crisp autumn morning in Japan. The scene embodies exploration and awe, fitting the 'Structured Exploration' theme of the travel app with high contrast and clean lines."
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAP0GA5BMqfjA9S_J6C8IYH2XP2cYgizm7IlSqBm8LkYC3Li2e4GEPTlgdZP7doWnvRCYr4Qua4WJpmyBzL73w4tVN7itPOZaqG1HsoTedgiOX2M4EzdFloidufze5t_X0YPhXSSv6ix9oadjTtsTZIajspW6FXbEsZLIEQmlfzGz2MvFf1bYwdyyR-8oLlwfFYa6Gh_HMGmhjdju1zQBSZTVunUiBFxSxebwSRXXBnEpEJzaWa88NJoCSYmpCKrleezvRJUkQLJVQ');">
+                            data-alt="Activity banner"
+                            style="background-image: url('<?php echo $bannerUrl; ?>');">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                             <div
                                 class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
@@ -42,7 +43,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- RSVP Dropdown -->
                                 <?php if ($activity->getActivityStatus() == 'CONFIRMED'): ?>
                                 <div class="relative">
                                     <form
@@ -53,16 +53,16 @@
 
                                             <option value="PENDING"
                                                 <?php
-                                                echo $currentMemberStatus->getStatus() === 'PENDING' ? 'selected' : '' ?>>
+                                                echo ($currentMemberStatus && $currentMemberStatus->getStatus() === 'PENDING') ? 'selected' : '' ?>>
                                                 Pending
                                             </option>
                                             <option value="GOING"
                                                 <?php
-                                                echo $currentMemberStatus->getStatus() === 'GOING' ? 'selected' : '' ?>>Going
+                                                echo ($currentMemberStatus && $currentMemberStatus->getStatus() === 'GOING') ? 'selected' : '' ?>>Going
                                             </option>
                                             <option value="NOT_GOING"
                                                 <?php
-                                                echo $currentMemberStatus->getStatus() === 'NOT_GOING' ? 'selected' : '' ?>>
+                                                echo ($currentMemberStatus && $currentMemberStatus->getStatus() === 'NOT_GOING') ? 'selected' : '' ?>>
                                                 Not
                                                 Going
                                             </option>
@@ -80,7 +80,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Attendees Bento -->
                     <?php if ($activity->getActivityStatus() == 'CONFIRMED'): ?>
                     <div class="bg-surface rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)]  border border-surface-variant p-6">
                         <div class="flex items-center justify-between mb-4">
@@ -117,11 +116,9 @@
                                     <tr
                                         class="border-b border-surface-variant/50 hover:bg-surface-bright transition-colors">
 
-                                        <!-- 1. The User's Profile Info -->
                                         <td class="py-3 px-4 flex items-center gap-3">
                                             <div
                                                 class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center font-bold text-primary">
-                                                <!-- Use their initial as a fallback avatar -->
                                                 <?php echo substr($person->getFirstName(), 0, 1) ?>
                                             </div>
                                             <span class="font-semibold text-on-surface">
@@ -165,7 +162,7 @@
                                     <?php endforeach; ?>
                                     <?php else: ?>
                                     <tr>
-                                        <td colspan="2" class="p-4 text-center">There are no attendants yet.</td>
+                                        <td colspan="2" class="p-4 text-center">No attendance tracking set up yet.</td>
                                     </tr>
                                     <?php endif; ?>
                                 </tbody>
@@ -186,9 +183,7 @@
                         </div>
                     <?php endif; ?>
                 </div>
-        </main>
-    </div>
-    <!-- BottomNavBar (Mobile Only) -->
+        </div>
     <nav
         class="bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md font-['Plus_Jakarta_Sans'] text-[10px] font-semibold fixed bottom-0 w-full rounded-t-2xl border-t border-zinc-100 dark:border-zinc-800 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2">
         <a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 active:bg-zinc-100 dark:active:bg-zinc-800 rounded-xl px-4 py-1"

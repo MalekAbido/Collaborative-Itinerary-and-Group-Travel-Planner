@@ -198,8 +198,9 @@ class TripMember
 
     public static function getByUserAndItinerary($userId, $itineraryId)
     {
-        $db = Database::getInstance()->getConnection();
+        $db = \Core\Database::getInstance()->getConnection();
 
+        // Added the \PDO:: namespace slash to prevent any namespace crashing
         $sql  = "SELECT * FROM TripMember WHERE userId = :userId AND itineraryId = :itineraryId LIMIT 1";
         $stmt = $db->prepare($sql);
         $stmt->execute([
@@ -207,7 +208,7 @@ class TripMember
             ':itineraryId' => $itineraryId,
         ]);
 
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if ($row) {
             $member = new self();
