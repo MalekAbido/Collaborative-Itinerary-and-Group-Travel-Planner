@@ -47,7 +47,10 @@
                             </div>
                             <div class="flex items-center gap-2 text-on-surface-variant text-sm">
                                 <span class="material-symbols-outlined text-[16px]">calendar_today</span>
-                                <span><?php echo date('M d, h:i A', strtotime($activity->getStartTime())); ?> - <?php echo date('h:i A', strtotime($activity->getEndTime())); ?></span>
+                                <span>
+                                    <span class="local-time" data-utc="<?= date('c', strtotime($activity->getStartTime())) ?>" data-format="datetime"></span> - 
+                                    <span class="local-time" data-utc="<?= date('c', strtotime($activity->getEndTime())) ?>" data-format="datetime"></span>
+                                </span>
                             </div>
                         </div>
                         <!-- Proposer & Flags -->
@@ -82,11 +85,13 @@
                         <form id="approve_form_<?php echo $activity->getId(); ?>" action="/itinerary/<?php echo $itineraryId; ?>/proposals/<?php echo $activity->getId(); ?>/approve" method="POST" class="flex flex-col gap-4 flex-1">
                             <!-- Poll Deadline -->
                             <div class="mb-2 flex flex-col gap-2">
+                                <input type="hidden" name="timezone" class="clientTimezone" value="">
                                 <label class="text-[12px] font-bold text-on-surface-variant uppercase tracking-wider">Poll Deadline</label>
                                 <input
                                     class="w-full bg-surface border border-outline-variant rounded-md px-4 py-2 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary cursor-pointer"
                                     type="datetime-local" 
                                     name="poll_deadline" 
+                                    min="<?= date('Y-m-d\TH:i') ?>"
                                     required />
                                 <!-- <span class="text-[10px] text-on-surface-variant italic">Select the date and time for the poll to close.</span> -->
                             </div>
@@ -156,7 +161,10 @@
                                 </div>
                                 <div class="flex items-center gap-1.5 text-on-surface-variant/80 text-xs">
                                     <span class="material-symbols-outlined text-[14px]">calendar_today</span>
-                                    <span><?php echo date('M d, h:i A', strtotime($activity->getStartTime())); ?> - <?php echo date('h:i A', strtotime($activity->getEndTime())); ?></span>
+                                    <span>
+                                        <span class="local-time" data-utc="<?= date('c', strtotime($activity->getStartTime())) ?>" data-format="datetime"></span> - 
+                                        <span class="local-time" data-utc="<?= date('c', strtotime($activity->getEndTime())) ?>" data-format="datetime"></span>
+                                    </span>
                                 </div>
                             </div>
                             <div class="mt-1 flex items-center gap-1.5">
@@ -196,5 +204,27 @@
             <span>Profile</span>
         </a>
     </nav>
+    <script src="/assets/js/timezone.js"></script>
+    <script>
+        // Set all hidden timezone inputs
+        document.addEventListener('DOMContentLoaded', () => {
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            document.querySelectorAll('.clientTimezone').forEach(el => {
+                el.value = tz;
+            });
+
+            // Update min attribute to local time every minute to stay accurate
+            const updateMinTime = () => {
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                const minStr = now.toISOString().slice(0, 16);
+                document.querySelectorAll('input[type="datetime-local"][name="poll_deadline"]').forEach(input => {
+                    input.min = minStr;
+                });
+            };
+            updateMinTime();
+            setInterval(updateMinTime, 60000);
+        });
+    </script>
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>

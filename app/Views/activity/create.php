@@ -54,7 +54,7 @@
 
         <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6">
             <form id="activity-form" action="/itinerary/<?= htmlspecialchars($itineraryId) ?>/activity/store" method="POST" class="space-y-6">
-                
+                <input type="hidden" name="timezone" id="clientTimezoneReopen" value="">
                 <div>
                     <label class="block text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-2">Activity Name</label>
                     <input type="text" name="name" value="<?= htmlspecialchars($pendingActivity['name'] ?? '') ?>" required class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition" placeholder="e.g. Visit Louvre Museum">
@@ -113,5 +113,6 @@
             </form>
         </div>
     </div>
+    <script src="/assets/js/timezone.js"></script>
 </body>
 </html>
