@@ -17,6 +17,7 @@ class Itinerary
     private $description;
     private $startDate;
     private $endDate;
+    private $coverImage;
     private $tripMembers = [];
     private $invitations = [];
     private $historyLog;
@@ -139,21 +140,22 @@ class Itinerary
         $this->itineraryItems = $itineraryItems;
     }
 
-    public function create($title, $description, $startDate, $endDate)
+    public function create($title, $description, $startDate, $endDate, $coverImage = null)
     {
         $this->itineraryId = uniqid('trip_');
 
-        $sql = "INSERT INTO Itinerary (itineraryId, title, description, startDate, endDate)
-                VALUES (:id, :title, :desc, :start, :end)";
+        $sql = "INSERT INTO Itinerary (itineraryId, title, description, startDate, endDate, coverImage)
+                VALUES (:id, :title, :desc, :start, :end, :coverImage)";
 
         $stmt = $this->db->prepare($sql);
         
         $success = $stmt->execute([
-            ':id'    => $this->itineraryId,
-            ':title' => $title,
-            ':desc'  => $description,
-            ':start' => $startDate,
-            ':end'   => $endDate,
+            ':id'         => $this->itineraryId,
+            ':title'      => $title,
+            ':desc'       => $description,
+            ':start'      => $startDate,
+            ':end'        => $endDate,
+            ':coverImage' => $coverImage
         ]);
 
         if ($success) {
@@ -178,6 +180,7 @@ class Itinerary
             $this->description = $data['description'];
             $this->startDate   = $data['startDate'];
             $this->endDate     = $data['endDate'];
+            $this->coverImage  = $data['coverImage'];
             return true;
         }
 
@@ -189,7 +192,6 @@ class Itinerary
         $sql  = "SELECT * FROM Itinerary WHERE itineraryId = :id LIMIT 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
-
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
@@ -198,25 +200,37 @@ class Itinerary
         $sql  = "SELECT * FROM Itinerary WHERE id = :id LIMIT 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
-
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function update($id, $title, $description, $startDate, $endDate)
+    public function update($id, $title, $description, $startDate, $endDate, $coverImage = null)
     {
-        $sql = "UPDATE Itinerary
-                SET title = :title, description = :desc, startDate = :start, endDate = :end
-                WHERE itineraryId = :id";
-
-        $stmt = $this->db->prepare($sql);
-        
-        return $stmt->execute([
-            ':title' => $title,
-            ':desc'  => $description,
-            ':start' => $startDate,
-            ':end'   => $endDate,
-            ':id'    => $id,
-        ]);
+        if ($coverImage === null) {
+            $sql = "UPDATE Itinerary
+                    SET title = :title, description = :desc, startDate = :start, endDate = :end
+                    WHERE itineraryId = :id";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([
+                ':title' => $title,
+                ':desc'  => $description,
+                ':start' => $startDate,
+                ':end'   => $endDate,
+                ':id'    => $id,
+            ]);
+        } else {
+            $sql = "UPDATE Itinerary
+                    SET title = :title, description = :desc, startDate = :start, endDate = :end, coverImage = :coverImage
+                    WHERE itineraryId = :id";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([
+                ':title'      => $title,
+                ':desc'       => $description,
+                ':start'      => $startDate,
+                ':end'        => $endDate,
+                ':coverImage' => $coverImage,
+                ':id'         => $id,
+            ]);
+        }
     }
 
     public function delete($id)

@@ -18,7 +18,7 @@ class ItineraryController extends Controller {
         ]);
     }
 
-public function store()
+    public function store()
     {
         // 1. Require user to be logged in
         Auth::requireLogin();
@@ -38,13 +38,36 @@ public function store()
                 exit;
             }
 
-            // 3. Create the Itinerary
+            // --- NEW: HANDLE IMAGE UPLOAD ---
+            $coverImagePath = null;
+            if (isset($_FILES['coverImage']) && $_FILES['coverImage']['error'] === UPLOAD_ERR_OK) {
+                
+                // Define where the image should be saved (e.g., public/uploads/itineraries)
+                $uploadDir = __DIR__ . '/../../public/uploads/itineraries/';
+                
+                // Create the directory if it doesn't exist yet
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+
+                // Generate a unique file name so images don't overwrite each other
+                $fileName = uniqid('trip_img_') . '_' . basename($_FILES['coverImage']['name']);
+                $targetPath = $uploadDir . $fileName;
+
+                // Move the file from the temp folder to your public uploads folder
+                if (move_uploaded_file($_FILES['coverImage']['tmp_name'], $targetPath)) {
+                    $coverImagePath = 'uploads/itineraries/' . $fileName; // Path saved in DB
+                }
+            }
+
+            // 3. Create the Itinerary (Now passing the image path!)
             $itineraryModel = new Itinerary();
             $itineraryModel->create(
                 $_POST['title'],
                 $_POST['description'],
                 $startDate, 
-                $endDate
+                $endDate,
+                $coverImagePath
             );
             $stringTripId = $itineraryModel->getItineraryId();
             
@@ -74,7 +97,6 @@ public function store()
                     $email = trim($rawEmail);
                     
                     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                        // NOTE: Using $numericTripId here because your DB schema requires an INT
                         $token = $invitationModel->createToken($numericTripId, $email, 'Member');
                         
                         if ($token) {
@@ -91,7 +113,7 @@ public function store()
                 }
             }
 
-            // 7. Redirect to the new dashboard using the String ID
+            // 7. Redirect to the new dashboard
             header("Location: /itinerary/dashboard/" . $stringTripId);
             exit;
         }
@@ -116,36 +138,61 @@ public function store()
     public function update($id){
         Auth::requireLogin();    
         $itineraryModel = new Itinerary();
+        
+        // Find the trip using the string ID from the URL
         $tripData = $itineraryModel->findById($id);
 
         if (!$tripData) {
-            header("Location: /itinerary/dashboard/" . $id);
+            header("Location: /dashboard");
             exit;
         }
-        $startDate = $_POST['startDate'];
-        $endDate = $_POST['endDate'];
+        
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $startDate = $_POST['startDate'];
+            $endDate = $_POST['endDate'];
+            
             if (strtotime($endDate) < strtotime($startDate)) {
                 \App\Helpers\Session::setFlash('date_error', 'The end date cannot be before the start date.');
-                \App\Helpers\Session::setFlash('old_title', $_POST['title']);
-                \App\Helpers\Session::setFlash('old_description', $_POST['description']);
                 header("Location: " . $_SERVER['HTTP_REFERER']);
                 exit;
             }
-        $member = Auth::requireMembership($tripData['id']);
-        $role = $member->getRole();
-        Auth::requireRole('Organizer', $role);
-
-        if($_SERVER['REQUEST_METHOD'] === 'POST'){
             
+            // Require Organizer permissions
+            $member = Auth::requireMembership($tripData['id']); // uses numeric ID
+            $role = $member->getRole();
+            Auth::requireRole('Organizer', $role);
+
+            // --- NEW: HANDLE IMAGE UPLOAD ON UPDATE ---
+            $coverImagePath = null; // Stays null unless they actually uploaded a new file
+            
+            if (isset($_FILES['coverImage']) && $_FILES['coverImage']['error'] === UPLOAD_ERR_OK) {
+                
+                $uploadDir = __DIR__ . '/../../public/uploads/itineraries/';
+                
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+
+                $fileName = uniqid('trip_img_') . '_' . basename($_FILES['coverImage']['name']);
+                $targetPath = $uploadDir . $fileName;
+
+                if (move_uploaded_file($_FILES['coverImage']['tmp_name'], $targetPath)) {
+                    $coverImagePath = 'uploads/itineraries/' . $fileName; 
+                }
+            }
+
+            // Update the database
             $itineraryModel->update(
                 $id,
                 $_POST['title'],
                 $_POST['description'],
-                $_POST['startDate'],
-                $_POST['endDate']
+                $startDate,
+                $endDate,
+                $coverImagePath // This will be null if no new image, or the new path if uploaded!
             );
 
-            header("Location: " . $_SERVER['HTTP_REFERER']);
+            // Redirect back to settings with the success flag
+            header("Location: /itinerary/settings/" . $id . "?status=updated");
             exit;
         }
     }

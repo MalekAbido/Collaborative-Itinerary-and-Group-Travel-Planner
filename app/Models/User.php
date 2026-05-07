@@ -347,9 +347,9 @@ class User
         }
     }
 
-    public function getUserItineraries()
+public function getUserItineraries()
     {
-        $sql = "SELECT i.id, i.itineraryId, i.title, i.description, i.startDate, i.endDate, tm.role, tm.joinedAt
+        $sql = "SELECT i.id, i.itineraryId, i.title, i.description, i.startDate, i.endDate, i.coverImage, tm.role, tm.joinedAt
                 FROM Itinerary i
                 JOIN TripMember tm ON i.id = tm.itineraryId
                 WHERE tm.userId = :userId

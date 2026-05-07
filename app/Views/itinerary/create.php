@@ -1,13 +1,11 @@
 <?php require __DIR__ . '/../layouts/header.php'; ?>
 
-    <!-- <main class="max-w-[800px] mx-auto mt-[100px] px-6"> -->
-
-        <div class="flex items-center gap-2 pb-3 mb-6 border-b border-outline-variant">
+    <div class="flex items-center gap-2 pb-3 mb-6 border-b border-outline-variant">
             <span class="material-symbols-outlined text-primary text-[28px]">flight_takeoff</span>
             <h2 class="font-display text-h2 text-on-surface m-0">Plan a New Trip</h2>
         </div>
 
-        <form action="/itinerary/store" method="POST" class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 lg:p-8">
+        <form action="/itinerary/store" method="POST" enctype="multipart/form-data" class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 lg:p-8">
             
             <div class="mb-6">
                 <label class="block text-label-caps uppercase text-on-surface-variant mb-2" for="title">Trip Title</label>
@@ -19,6 +17,14 @@
                 <label class="block text-label-caps uppercase text-on-surface-variant mb-2" for="description">Trip Notes / Description</label>
                 <textarea id="description" name="description" rows="3" placeholder="What is the vibe of this trip?"
                     class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-body-sm text-on-surface placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/30 focus:outline-none transition resize-y"></textarea>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-label-caps uppercase text-on-surface-variant mb-2" for="coverImage">
+                    Cover Image <span class="normal-case text-outline font-normal ml-1">(Optional)</span>
+                </label>
+                <input id="coverImage" name="coverImage" type="file" accept="image/*"
+                    class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2 text-body-sm text-on-surface file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-body-sm file:font-semibold file:bg-primary-fixed file:text-primary hover:file:bg-primary-fixed-variant transition cursor-pointer" />
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -61,6 +67,4 @@
                 </button>
             </div>
         </form>
-    </main>
-    
-<?php require __DIR__ . '/../layouts/footer.php'; ?>
+    <?php require __DIR__ . '/../layouts/footer.php'; ?>
