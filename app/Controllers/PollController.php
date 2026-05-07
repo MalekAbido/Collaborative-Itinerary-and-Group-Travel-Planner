@@ -231,10 +231,9 @@ class PollController extends Controller
                 $conflicts = $activity->getConflictingConfirmedActivities();
                 foreach ($conflicts as $conflict) {
                     $conflictPolls = Poll::getByActivityId($conflict->getId());
-                    $cpPoints = 0;
-                    foreach ($conflictPolls as $cp) {
-                        $cpPoints += (float)$cp['weightedTotal'];
-                    }
+                    // Use the first poll (assuming 1:1 ratio)
+                    $cpPoints = !empty($conflictPolls) ? (float)$conflictPolls[0]['weightedTotal'] : 0;
+                    
                     $pollData['conflicts'][] = [
                         'name' => $conflict->getName(),
                         'points' => $cpPoints
@@ -271,27 +270,25 @@ class PollController extends Controller
 
         $conflicts = $activity->getConflictingConfirmedActivities();
         
-        $canConfirm = true;
+        $canConfirm = ($currentPoints > 0);
         foreach ($conflicts as $conflict) {
             $conflictPolls = Poll::getByActivityId($conflict->getId());
-            $cpPoints = 0;
-            foreach ($conflictPolls as $cp) {
-                $cpPoints += (float)$cp['weightedTotal'];
-            }
-            // If current poll doesn't beat each conflict independently, it can't be confirmed
+            $cpPoints = !empty($conflictPolls) ? (float)$conflictPolls[0]['weightedTotal'] : 0;
+            
+            // If current poll doesn't beat each independent conflict (or match it), it cannot be confirmed
             if ($currentPoints < $cpPoints) {
                 $canConfirm = false;
                 break;
             }
         }
 
-        if ($canConfirm && $currentPoints > 0) {
+        if ($canConfirm) {
             $activity->updateStatus('Confirmed');
             foreach ($conflicts as $conflict) {
                 $conflict->updateStatus('DECLINED');
             }
         } else {
-            $activity->updateStatus('REJECTED');
+            $activity->updateStatus('DECLINED');
         }
     }
 
