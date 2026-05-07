@@ -91,7 +91,7 @@
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <?php foreach ($members as $member): ?>
                         <label class="flex items-center gap-2 p-3 border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container transition">
-                            <input type="radio" name="payerId" value="<?= $member['id'] ?>" required class="text-primary focus:ring-primary">
+                            <input type="radio" name="payerId" value="<?= $member['memberId'] ?>" required class="text-primary focus:ring-primary">
                             <span class="text-body-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis">
                                 <?= htmlspecialchars($member['firstName'] . ' ' . $member['lastName']) ?>
                             </span>
@@ -118,7 +118,7 @@
                             <label class="text-body-sm font-medium text-on-surface truncate pr-4">
                                 <?= htmlspecialchars($member['firstName'] . ' ' . $member['lastName']) ?>
                             </label>
-                            <input type="number" step="0.01" name="shares[<?= $member['id'] ?>]" class="share-input w-32 rounded-md border border-outline-variant bg-surface-container-lowest px-2 py-1 text-body-sm text-right focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition" value="0.00">
+                            <input type="number" step="0.01" name="shares[<?= $member['memberId'] ?>]" class="share-input w-32 rounded-md border border-outline-variant bg-surface-container-lowest px-2 py-1 text-body-sm text-right focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition" value="0.00">
                         </div>
                     <?php endforeach; ?>
                 </div>

@@ -198,9 +198,10 @@
                             <span class="material-symbols-outlined text-[18px]">settings</span> Settings
                         </a>
                         <?php endif;?>
-                        <button class="inline-flex items-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition">
+                        <a href="/itinerary/<?= htmlspecialchars($data['trip']['id']) ?>/activity/create"
+                            class="inline-flex items-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition">
                             <span class="material-symbols-outlined text-[18px]">add</span> Add Activity
-                        </button>
+                        </a>
                     </div>
                 </header>
 

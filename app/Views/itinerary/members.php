@@ -198,7 +198,7 @@
                             <div class="flex justify-start sm:justify-end gap-2">
                                 <?php if ($member['role'] !== 'Leader' && $member['role'] !== 'Organizer'): ?>
                                     <form action="/itinerary/members/updateRole/<?= htmlspecialchars($data['trip']['itineraryId']) ?>" method="POST" class="inline">
-                                        <input type="hidden" name="memberId" value="<?= htmlspecialchars($member['memberId'] ?? $member['id'] ?? '') ?>">
+                                        <input type="hidden" name="memberId" value="<?= htmlspecialchars($member['memberId'] ?? $member['memberId'] ?? '') ?>">
                                         <input type="hidden" name="newRole" value="<?= $member['role'] === 'Member' ? 'Editor' : 'Member' ?>">
                                         <button type="submit" title="Toggle Role" class="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary text-primary hover:bg-primary-fixed transition">
                                             <span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>
@@ -206,7 +206,7 @@
                                     </form>
 
                                     <form action="/itinerary/members/remove/<?= htmlspecialchars($data['trip']['itineraryId']) ?>" method="POST" class="inline" onsubmit="return confirm('Remove this user from the trip?');">
-                                        <input type="hidden" name="memberId" value="<?= htmlspecialchars($member['memberId'] ?? $member['id'] ?? '') ?>">
+                                        <input type="hidden" name="memberId" value="<?= htmlspecialchars($member['memberId'] ?? $member['memberId'] ?? '') ?>">
                                         <button type="submit" title="Remove Member" class="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-error text-error hover:bg-error-container transition">
                                             <span class="material-symbols-outlined text-[16px]">person_remove</span>
                                         </button>
@@ -250,7 +250,7 @@
                         <?php if ($member['role'] !== 'Leader'): ?>
                         <form action="/itinerary/members/updateRole/<?= htmlspecialchars($trip['id']) ?>" method="POST"
                             class="inline">
-                            <input type="hidden" name="memberId" value="<?= $member['id'] ?>">
+                            <input type="hidden" name="memberId" value="<?= $member['memberId'] ?>">
                             <input type="hidden" name="newRole"
                                 value="<?= $member['role'] === 'Member' ? 'Editor' : 'Member' ?>">
                             <button type="submit" title="Toggle Role"
@@ -261,7 +261,7 @@
 
                         <form action="/itinerary/members/remove/<?= htmlspecialchars($trip['id']) ?>" method="POST"
                             class="inline" onsubmit="return confirm('Remove this user from the trip?');">
-                            <input type="hidden" name="memberId" value="<?= $member['id'] ?>">
+                            <input type="hidden" name="memberId" value="<?= $member['memberId'] ?>">
                             <button type="submit" title="Remove Member"
                                 class="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-error text-error hover:bg-error-container transition">
                                 <span class="material-symbols-outlined text-[16px]">person_remove</span>
