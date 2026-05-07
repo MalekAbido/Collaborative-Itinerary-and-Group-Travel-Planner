@@ -43,6 +43,7 @@ class ActivityController extends Controller
             'itineraryId'           => $itineraryId,
             'pendingActivity'       => $pendingActivity,
             'conflictingActivities' => $conflictingActivities,
+            'activeTab' => 'createActivity'
         ]);
     }
 
@@ -195,6 +196,7 @@ class ActivityController extends Controller
             'goingMembers'        => $goingMembers,
             'pendingMembers'      => $pendingMembers,
             'notGoingMembers'     => $notGoingMembers,
+            'activeTab' => 'activity'
         ]);
     }
 
