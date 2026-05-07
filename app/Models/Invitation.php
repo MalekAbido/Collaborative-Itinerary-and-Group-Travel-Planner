@@ -13,75 +13,88 @@ class Invitation
         $this->db = Database::getInstance()->getConnection();
     }
 
-    public function createToken($itineraryId, $email, $role)
+    public function createToken($itineraryId, $email, $role = 'Member')
     {
-        $secureToken = bin2hex(random_bytes(32));
-        $invitationId = uniqid('inv_');
+        $token = bin2hex(random_bytes(16));
 
-        $sql = "INSERT INTO Invitation (invitationId, secureToken, isActive, itineraryId, email, role) 
-                VALUES (:invitationId, :secureToken, 1, :itineraryId, :email, :role)";
-        $stmt = $this->db->prepare($sql);
+        $sql = "INSERT INTO Invitation (itineraryId, email, token, role, createdAt, expiresAt, used) 
+                VALUES (:itineraryId, :email, :token, :role, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY), 0)";
         
+        $stmt = $this->db->prepare($sql);
         $success = $stmt->execute([
-            ':invitationId' => $invitationId,
-            ':secureToken'  => $secureToken,
-            ':itineraryId'  => $itineraryId,
-            ':email'        => $email,
-            ':role'         => $role
+            ':itineraryId' => $itineraryId,
+            ':email'       => $email,
+            ':token'       => $token,
+            ':role'        => $role
         ]);
 
-        return $success ? $secureToken : false;
+        return $success ? $token : false;
     }
 
-    public function findByToken($secureToken)
+    public function findByToken($token)
     {
-        $sql = "SELECT * FROM Invitation WHERE secureToken = :token AND isActive = 1 LIMIT 1";
+        $sql = "SELECT * FROM Invitation 
+                WHERE token = :token 
+                AND used = 0 
+                AND expiresAt > NOW() 
+                LIMIT 1";
+                
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([':token' => $secureToken]);
+        $stmt->execute([':token' => $token]);
         
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function getPendingByItinerary($itineraryId)
     {
-        $sql = "SELECT * FROM Invitation WHERE itineraryId = :itineraryId AND isActive = 1 AND email IS NOT NULL";
+        $sql = "SELECT * FROM Invitation 
+                WHERE itineraryId = :itineraryId 
+                AND used = 0 
+                AND expiresAt > NOW() 
+                ORDER BY createdAt DESC";
+                
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':itineraryId' => $itineraryId]);
         
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function markUsed($secureToken)
+    public function markUsed($token)
     {
-        $sql = "UPDATE Invitation SET isActive = 0 WHERE secureToken = :token";
+        $sql = "UPDATE Invitation SET used = 1 WHERE token = :token";
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute([':token' => $secureToken]);
+        return $stmt->execute([':token' => $token]);
     }
 
     public function getOrCreateGeneralToken($itineraryId)
     {
-        $sql = "SELECT secureToken FROM Invitation WHERE itineraryId = :itineraryId AND email IS NULL AND isActive = 1 LIMIT 1";
+        $sql = "SELECT token FROM Invitation 
+                WHERE itineraryId = :itineraryId 
+                AND email = 'general_link@voyagesync.com' 
+                AND used = 0 
+                AND expiresAt > NOW() 
+                LIMIT 1";
+                
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':itineraryId' => $itineraryId]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            return $result['secureToken'];
+            return $result['token'];
         }
 
-        $secureToken = bin2hex(random_bytes(32));
-        $invitationId = uniqid('inv_');
+        $token = bin2hex(random_bytes(16));
 
-        $sqlInsert = "INSERT INTO Invitation (invitationId, secureToken, isActive, itineraryId, email, role) 
-                      VALUES (:invitationId, :secureToken, 1, :itineraryId, NULL, 'Member')";
+        $sqlInsert = "INSERT INTO Invitation (itineraryId, email, token, role, createdAt, expiresAt, used) 
+                      VALUES (:itineraryId, :email, :token, 'Member', NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY), 0)";
         
         $stmtInsert = $this->db->prepare($sqlInsert);
         $stmtInsert->execute([
-            ':invitationId' => $invitationId,
-            ':secureToken'  => $secureToken,
-            ':itineraryId'  => $itineraryId
+            ':itineraryId' => $itineraryId,
+            ':email'       => 'general_link@voyagesync.com',
+            ':token'       => $token
         ]);
 
-        return $secureToken;
+        return $token;
     }
 }

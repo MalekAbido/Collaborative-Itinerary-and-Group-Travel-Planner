@@ -72,7 +72,7 @@ $this->post('/itinerary/destroy/{id}', 'ItineraryController', 'destroy');
 
 // Dashboard & Members (From your UML diagram, for later!)
 $this->get('/itinerary/dashboard/{id}', 'ItineraryController', 'getDashboard');
-$this->get('/itinerary/members/{id}', 'ItineraryController', 'getMembersList');
+// $this->get('/itinerary/members/{id}', 'ItineraryController', 'getMembersList');
 
 // Poll Routes
 $this->get('/itinerary/polls/{id}', 'PollController', 'index');
