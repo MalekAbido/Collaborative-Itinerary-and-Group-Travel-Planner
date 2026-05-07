@@ -7,6 +7,7 @@ use App\Helpers\HistoryLogger;
 use App\Models\Expense;
 use App\Models\ExpenseShare;
 use App\Models\TransactionType;
+use App\Models\TripFinance;
 use App\Models\TripMember;
 use Core\Controller;
 
@@ -34,6 +35,7 @@ class ExpenseController extends Controller
             'financeId' => $financeId,
             'itineraryId' => $id,
             'groupFundBalance' => $groupFundBalance
+            'activeTab' => 'addExpense'
         ]);
     }
 
@@ -201,11 +203,15 @@ class ExpenseController extends Controller
                 $debtors[] = $share;
             }
         }
-
+        $financeId = $expense->getTripFinanceId();
+        $finance = new TripFinance();
+        $finance->read($financeId);
         $this->view('expenses/details', [
             'expense' => $expense,
             'payer'   => $payer,
-            'debtors' => $debtors
+            'debtors' => $debtors,
+            'itineraryId' => $finance->getItineraryId(),
+            'activeTab' => 'expense'
         ]);
     }
 

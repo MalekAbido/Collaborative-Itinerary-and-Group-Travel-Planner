@@ -56,7 +56,8 @@ class FinanceController extends Controller
             'kittyBalance' => $kittyBalance,
             'contributions' => $contributions,
             'expenses' => $finance->getExpenses(),
-            'userRole' => $member->getRole()
+            'userRole' => $member->getRole(),
+            'activeTab' => 'finance'
         ]);
     }
 

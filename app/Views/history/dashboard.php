@@ -1,62 +1,9 @@
 <?php
-use App\Helpers\Auth;
+require __DIR__ . '/../layouts/header.php';
 use App\Models\HistoryLogEntry;
 ?>
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>VoyageSync - Trip History Log</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/assets/css/tailwind.css">
 
-    <style type="text/tailwindcss">
-        @layer base {
-            html, body { height: 100%; }
-            body { @apply font-body text-body-md bg-background text-on-background m-0; }
-            .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; user-select: none; line-height: 1; }
-        }
-    </style>
-</head>
-
-<body class="pt-navbar">
-    <div class="flex-1 flex flex-col h-full w-full relative">
-
-        <nav class="fixed inset-x-0 top-0 z-50 h-navbar bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant shadow-sm">
-            <div class="mx-auto flex h-full max-w-[1280px] items-center justify-between px-6 lg:px-8">
-                <div class="flex items-center gap-8">
-                    <a href="/dashboard" class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
-                    <div class="hidden md:flex items-center gap-1">
-                        <a href="/dashboard" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Dashboard</a>
-                        <a href="/itinerary/dashboard/<?php echo htmlspecialchars($itineraryId ?? '') ?>" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Itinerary</a>
-                        <a href="/itinerary/polls/<?php echo htmlspecialchars($itineraryId ?? '') ?>" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Polls</a>
-                        <a href="/finance/dashboard/<?php echo htmlspecialchars($itineraryId ?? '') ?>" class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Finances</a>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button class="inline-flex items-center gap-1 rounded-lg border-2 border-error px-3 py-1.5 text-body-xs font-bold tracking-wide text-error hover:bg-error-container transition">
-                        <span class="material-symbols-outlined text-base">warning</span>SOS
-                    </button>
-                    <a href="/profile" class="flex items-center gap-2 cursor-pointer">
-                        <?php $currentUser = Auth::user(); ?>
-                        <?php if ($currentUser && $currentUser->getProfileImage()): ?>
-                        <img src="/<?php echo htmlspecialchars($currentUser->getProfileImage() ?? '') ?>" alt="Profile" class="h-8 w-8 rounded-full border-2 border-outline-variant object-cover">
-                        <?php elseif ($currentUser): ?>
-                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
-                            <?php echo strtoupper(substr($currentUser->getFirstName() ?? '', 0, 1) . substr($currentUser->getLastName() ?? '', 0, 1)) ?>
-                        </div>
-                        <?php endif; ?>
-                    </a>
-                </div>
-            </div>
-        </nav>
-
-        <main class="max-w-[1280px] mx-auto px-6 lg:px-8 py-8 w-full">
+        <!-- <main class="max-w-[1280px] mx-auto px-6 lg:px-8 py-8 w-full"> -->
             <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
                     <h1 class="font-display text-display text-on-surface">
@@ -261,5 +208,4 @@ use App\Models\HistoryLogEntry;
             </div>
         </main>
     </div>
-</body>
-</html>
+<?php require __DIR__ . '/../layouts/footer.php'; ?>

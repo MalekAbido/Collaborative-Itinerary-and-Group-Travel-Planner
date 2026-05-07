@@ -28,6 +28,7 @@ class UserController extends Controller
                 'user'              => $user,
                 'allergies'         => $user->getAllergies(),
                 'emergencyContacts' => $user->getEmergencyContacts(),
+                'activeTab' => 'userSettings'
             ]);
         }
         die('User profile not found.');
@@ -42,6 +43,7 @@ class UserController extends Controller
 
             return $this->view('user/dashboard', [
                 'myTrips' => $myTrips,
+                'activeTab' => 'dashboard'
             ]);
         }
         die('User profile not found.');

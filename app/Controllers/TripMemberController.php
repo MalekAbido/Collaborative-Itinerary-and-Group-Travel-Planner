@@ -45,7 +45,9 @@ class TripMemberController extends Controller
             'pendingInvites' => $pendingInvites,
             'appUrl' => $appUrl,
             'generalLink' => $generalLink,
-            'currentUserRole' => $currentUserRole
+            'currentUserRole' => $currentUserRole,
+            'itineraryId' => $tripData['id'],
+            'activeTab' => 'members'
         ]);
     }
 

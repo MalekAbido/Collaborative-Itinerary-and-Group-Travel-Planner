@@ -43,6 +43,7 @@ class ActivityController extends Controller
             'itineraryId'           => $itineraryId,
             'pendingActivity'       => $pendingActivity,
             'conflictingActivities' => $conflictingActivities,
+            'activeTab' => 'createActivity'
         ]);
     }
 
@@ -135,7 +136,7 @@ class ActivityController extends Controller
                 $allMembers = $tripMember->getAllByItineraryId($itineraryId);
 
                 foreach ($allMembers as $memberData) {
-                    $attendanceList->updateStatus($memberData['id'], 'PENDING');
+                    $attendanceList->updateStatus($memberData['memberId'], 'PENDING');
                 }
             }
 
@@ -195,6 +196,7 @@ class ActivityController extends Controller
             'goingMembers'        => $goingMembers,
             'pendingMembers'      => $pendingMembers,
             'notGoingMembers'     => $notGoingMembers,
+            'activeTab' => 'activity'
         ]);
     }
 

@@ -1,86 +1,12 @@
 <?php
 
     use App\Helpers\Auth;
-    // $itineraryId         = $data['itineraryId'];
-    // $activity            = $data['activity'];
-    // $userRole            = $data['userRole'];
-    // $currentMemberId     = $data['currentMemberId'];
-    // $currentMemberStatus = $data['currentMemberStatus'];
-    // $attendanceList      = $data['attendanceList'];
-    // $goingMembers        = $data['goingMembers'];
-    // $pendingMembers      = $data['pendingMembers'];
-    // $notGoingMembers     = $data['notGoingMembers'];
-    // $totalGoing          = $data['totalGoing'];
+    require __DIR__ . '/../layouts/header.php';
     $totalMembers        = count($attendanceList->getMembers());
 ?>
-<!DOCTYPE html>
-
-<html class="light" lang="en">
-
-<head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>VoyageSync - Activity Detail</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;900&amp;family=Inter:wght@400;600;700&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <link rel="stylesheet" href="/assets/css/tailwind.css">
-</head>
-
-<body class="bg-background text-on-background font-body text-body-md m-0 overflow-hidden">
-    <!-- TopNavBar -->
-
-    <div class="flex h-screen overflow-hidden">
-        <nav
-            class="fixed inset-x-0 top-0 z-50 h-navbar bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant shadow-sm">
-            <div class="mx-auto flex h-full max-w-[1280px] items-center justify-between px-6 lg:px-8">
-                <div class="flex items-center gap-8">
-                    <a href="/dashboard"
-                        class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
-                    <div class="hidden md:flex items-center gap-1">
-                        <a href="/dashboard"
-                            class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Dashboard</a>
-                        <a href="#"
-                            class="px-3 py-2 rounded-md text-body-sm font-medium text-primary border-b-2 border-primary">Itinerary</a>
-                        <a href="/itinerary/polls/<?= htmlspecialchars($itineraryId) ?>"
-                            class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Polls</a>
-                        <a href="/finance/dashboard/<?= htmlspecialchars($itineraryId) ?>"
-                            class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Finances</a>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button
-                        class="inline-flex items-center gap-1 rounded-lg border-2 border-error px-3 py-1.5 text-body-xs font-bold tracking-wide text-error hover:bg-error-container transition">
-                        <span class="material-symbols-outlined text-base">warning</span>SOS
-                    </button>
-                    <a href="/profile" class="flex items-center gap-2 cursor-pointer">
-                        <?php $currentUser = \App\Helpers\Auth::user(); ?>
-                        <?php if ($currentUser->getProfileImage()): ?>
-                        <img src="/<?= htmlspecialchars($currentUser->getProfileImage()) ?>" alt="Profile"
-                            class="h-8 w-8 rounded-full border-2 border-outline-variant object-cover">
-                        <?php else: ?>
-                        <div
-                            class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
-                            <?= strtoupper(substr($currentUser->getFirstName(), 0, 1) . substr($currentUser->getLastName(), 0, 1)) ?>
-                        </div>
-                        <?php endif; ?>
-                    </a>
-                </div>
-            </div>
-        </nav>
 
         <!-- Main Content -->
-        <main
-            class="flex-1 mt-navbar h-[calc(100vh-theme(spacing.navbar))] overflow-y-auto bg-surface p-6 lg:p-8 scroll-thin">
-            <div class="max-w-[1280px] mx-auto grid grid-cols-12 gap-6">
+        <!-- <main class="flex-1 mt-navbar h-[calc(100vh-theme(spacing.navbar))] overflow-y-auto bg-surface p-6 lg:p-8 scroll-thin"> -->
                 <!-- Activity Header & Detail Column -->
                 <div class="col-span-12 lg:col-span-8 flex flex-col gap-6">
                     <!-- Hero Card -->
@@ -111,7 +37,7 @@
                                         </div>
                                         <div class="flex items-center gap-1">
                                             <span class="material-symbols-outlined text-base">location_on</span>
-                                            <?php echo $activity->getLocationId() ?>
+                                            <?php echo $activity->getLocation()->getName(); ?>
 
                                         </div>
                                     </div>
@@ -247,24 +173,19 @@
                         </div>
                     </div>
                     <?php endif; ?>
-                </div>
-                <!-- Right Sidebar Column -->
-                <div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
-                    <!-- Danger Zone -->
                     <?php if (Auth::hasRole("Editor", $userRole) && $activity->getActivityStatus() == 'CONFIRMED'): ?>
-                    <div class="mt-auto pt-6 flex justify-end border-surface-variant">
-                        <form
-                            action="/itinerary/<?php echo $itineraryId ?>/activity/<?php echo $activity->getId() ?>/delete"
-                            method="POST" onsubmit="return confirm('Are you sure you want to delete this activity?');">
-                            <button type="submit"
-                                class="text-error font-button text-button flex items-center gap-1 hover:bg-error-container/50 px-3 py-2 rounded-md transition-colors opacity-70 hover:opacity-100">
-                                <span class="material-symbols-outlined text-[16px]">delete</span> Delete Activity
-                            </button>
-                        </form>
-                    </div>
+                        <div class="mt-auto pt-6 flex justify-end border-surface-variant">
+                            <form
+                                action="/itinerary/<?php echo $itineraryId ?>/activity/<?php echo $activity->getId() ?>/delete"
+                                method="POST" onsubmit="return confirm('Are you sure you want to delete this activity?');">
+                                <button type="submit"
+                                    class="text-error font-button text-button flex items-center gap-1 hover:bg-error-container/50 px-3 py-2 rounded-md transition-colors opacity-70 hover:opacity-100">
+                                    <span class="material-symbols-outlined text-[16px]">delete</span> Delete Activity
+                                </button>
+                            </form>
+                        </div>
                     <?php endif; ?>
                 </div>
-            </div>
         </main>
     </div>
     <!-- BottomNavBar (Mobile Only) -->
@@ -287,6 +208,5 @@
             Profile
         </a>
     </nav>
-</body>
 
-</html>
+<?php require __DIR__ . '/../layouts/footer.php'; ?>

@@ -1,83 +1,6 @@
-<!DOCTYPE html>
-<html class="light" lang="en">
-
-<head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Activity Status Management - VoyageSync</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800;900&amp;display=swap"
-        rel="stylesheet" />
-    <link rel="stylesheet" href="/assets/css/tailwind.css">
-    <style>
-    .material-symbols-outlined {
-        font-family: 'Material Symbols Outlined';
-        font-weight: normal;
-        font-style: normal;
-        font-size: 24px;
-        line-height: 1;
-        letter-spacing: normal;
-        text-transform: none;
-        display: inline-block;
-        white-space: nowrap;
-        word-wrap: normal;
-        direction: ltr;
-        -webkit-font-feature-settings: 'liga';
-        -webkit-font-smoothing: antialiased;
-    }
-    </style>
-</head>
-
-<body class="bg-background text-on-background antialiased flex h-screen overflow-hidden font-body-md text-body-md">
-    <!-- Main Content Area -->
-    <div class="flex-1 flex flex-col h-full w-full relative">
-        <!-- TopNavBar -->
-        <nav
-            class="fixed inset-x-0 top-0 z-50 h-16 bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant shadow-sm">
-            <div class="mx-auto flex h-full max-w-[1280px] items-center justify-between px-6 lg:px-8">
-                <div class="flex items-center gap-8">
-                    <a href="/dashboard"
-                        class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
-                    <div class="hidden md:flex items-center gap-1">
-                        <a href="/dashboard"
-                            class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Dashboard</a>
-                        <a href="/itinerary/dashboard/<?php echo htmlspecialchars($itineraryId ?? '') ?>"
-                            class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Itinerary</a>
-                        <a href="/itinerary/polls/<?php echo htmlspecialchars($itineraryId ?? '') ?>"
-                            class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Polls</a>
-                        <a href="/finance/dashboard/<?php echo htmlspecialchars($itineraryId ?? '') ?>"
-                            class="px-3 py-2 rounded-md text-body-sm font-medium text-on-surface-variant hover:text-primary transition">Finances</a>
-                        <?php if (\App\Helpers\Auth::hasRole("Editor", $memberRole)): ?>
-                        <a href="/itinerary/<?php echo htmlspecialchars($itineraryId ?? '') ?>/proposals"
-                            class="px-3 py-2 rounded-md text-body-sm font-medium text-primary border-b-2 border-primary">Proposals</a>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button
-                        class="inline-flex items-center gap-1 rounded-lg border-2 border-error px-3 py-1.5 text-body-xs font-bold tracking-wide text-error hover:bg-error-container transition">
-                        <span class="material-symbols-outlined text-base">warning</span>SOS
-                    </button>
-                    <a href="/profile" class="flex items-center gap-2 cursor-pointer">
-                        <?php $currentUser = \App\Helpers\Auth::user(); ?>
-                        <?php if ($currentUser && $currentUser->getProfileImage()): ?>
-                        <img src="/<?php echo htmlspecialchars($currentUser->getProfileImage() ?? '') ?>" alt="Profile"
-                            class="h-8 w-8 rounded-full border-2 border-outline-variant object-cover">
-                        <?php elseif ($currentUser): ?>
-                        <div
-                            class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-fixed text-primary text-xs font-bold border-2 border-outline-variant">
-                            <?php echo strtoupper(substr($currentUser->getFirstName() ?? '', 0, 1) . substr($currentUser->getLastName() ?? '', 0, 1)) ?>
-                        </div>
-                        <?php endif; ?>
-                    </a>
-                </div>
-            </div>
-        </nav>
+<?php require __DIR__ . '/../layouts/header.php'; ?>
         <!-- Main Scrollable Canvas -->
-        <main class="flex-1 overflow-y-auto bg-surface pb-16 pt-20">
+        <!-- <main class="flex-1 overflow-y-auto bg-surface pb-16 pt-20"> -->
             <div class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
                 <!-- Page Header -->
                 <div class="mb-10">
@@ -273,6 +196,5 @@
             <span>Profile</span>
         </a>
     </nav>
-</body>
 
-</html>
+<?php require __DIR__ . '/../layouts/footer.php'; ?>

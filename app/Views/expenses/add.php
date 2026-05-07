@@ -36,9 +36,12 @@
         </div>
     <?php endif; ?>
     <main class="max-w-2xl mx-auto">
+<?php require __DIR__ . '/../layouts/header.php'; ?>
+
+    <!-- <main class="max-w-2xl mx-auto"> -->
         <div class="mb-6 flex items-center justify-between">
             <h1 class="font-display text-h2 text-on-surface m-0">Log a New Expense</h1>
-            <a href="/finance/dashboard/<?= htmlspecialchars($financeId ?? '') ?>" class="text-body-sm font-semibold text-outline hover:text-primary transition">Cancel</a>        </div>
+            <a href="/finance/dashboard/<?= htmlspecialchars($itineraryId ?? '') ?>" class="text-body-sm font-semibold text-outline hover:text-primary transition">Cancel</a>        </div>
 
         <form action="/finance/expense/create" method="POST" class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 md:p-8">
             
@@ -97,7 +100,11 @@
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <?php foreach ($members as $member): ?>
                         <label class="flex items-center gap-2 p-3 border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container transition">
+<<<<<<< HEAD
                             <input type="radio" name="payerId" value="<?= htmlspecialchars($member['memberId']) ?>" required class="text-primary focus:ring-primary">
+=======
+                            <input type="radio" name="payerId" value="<?= $member['memberId'] ?>" required class="text-primary focus:ring-primary">
+>>>>>>> 83e9a80e42500280a083c7b0d63969d442a4e0b9
                             <span class="text-body-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis">
                                 <?= htmlspecialchars($member['firstName'] . ' ' . $member['lastName']) ?>
                             </span>
@@ -124,7 +131,11 @@
                             <label class="text-body-sm font-medium text-on-surface truncate pr-4">
                                 <?= htmlspecialchars($member['firstName'] . ' ' . $member['lastName']) ?>
                             </label>
+<<<<<<< HEAD
                             <input type="number" step="0.01" name="shares[<?= htmlspecialchars($member['memberId']) ?>]" class="share-input w-32 rounded-md border border-outline-variant bg-surface-container-lowest px-2 py-1 text-body-sm text-right focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition" value="0.00">
+=======
+                            <input type="number" step="0.01" name="shares[<?= $member['memberId'] ?>]" class="share-input w-32 rounded-md border border-outline-variant bg-surface-container-lowest px-2 py-1 text-body-sm text-right focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition" value="0.00">
+>>>>>>> 83e9a80e42500280a083c7b0d63969d442a4e0b9
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -219,5 +230,4 @@
         updateExpenseSections();
         splitMethodDropdown.dispatchEvent(new Event('change'));
     </script>
-</body>
-</html>
+<?php require __DIR__ . '/../layouts/footer.php'; ?>

@@ -1,46 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Expense Breakdown - VoyageSync</title>
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#f65a41", "error": "#ba1a1a", "on-error": "#ffffff",
-                        "surface": "#fcf8f8", "surface-container-lowest": "#ffffff", 
-                        "surface-container": "#edeeef", "on-surface": "#191c1d", 
-                        "on-surface-variant": "#414754", "outline": "#727785", 
-                        "outline-variant": "#c1c6d6", "success-container": "#bbf7d0", "on-success-container": "#064e2c"
-                    },
-                    fontFamily: { display: ["'Plus Jakarta Sans'", "sans-serif"], body: ["'Inter'", "sans-serif"] },
-                    fontSize: {
-                        "h2": ["28px", { lineHeight: "1.3", fontWeight: "600" }],
-                        "h3": ["20px", { lineHeight: "1.4", fontWeight: "600" }],
-                        "body-lg": ["18px", { lineHeight: "1.6", fontWeight: "400" }],
-                        "body-md": ["16px", { lineHeight: "1.5", fontWeight: "400" }],
-                        "body-sm": ["14px", { lineHeight: "1.5", fontWeight: "400" }],
-                        "label-caps": ["12px", { lineHeight: "1", letterSpacing: "0.05em", fontWeight: "700" }],
-                    }
-                }
-            }
-        };
-    </script>
-</head>
-<body class="bg-surface font-body text-on-surface min-h-screen p-6 lg:p-8">
+<?php require __DIR__ . '/../layouts/header.php'; ?>
 
-    <main class="max-w-2xl mx-auto">
+    <!-- <main class="max-w-2xl mx-auto"> -->
         
         <div class="mb-6 flex items-center justify-between">
             <h1 class="font-display text-h2 text-on-surface m-0">Expense Receipt</h1>
-            <!-- Added your dynamic Dashboard link here! -->
-            <a href="/finance/dashboard/<?= $expense->getTripFinanceId() ?>" class="text-body-sm font-semibold text-outline hover:text-primary flex items-center gap-1 transition">
-                <span class="material-symbols-outlined text-[18px]">arrow_back</span> Dashboard
-            </a>
+
         </div>
 
         <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden mb-6">
@@ -136,5 +100,4 @@
         
     </main>
 
-</body>
-</html>
+<?php require __DIR__ . '/../layouts/footer.php'; ?>
