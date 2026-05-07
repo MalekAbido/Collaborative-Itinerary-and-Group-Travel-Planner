@@ -11,33 +11,30 @@ use App\Helpers\Mailer;
 
 class TripMemberController extends Controller
 {
-public function index($id)
+    public function index($id)
     {
         $itineraryModel = new Itinerary();
-        
-        $tripData = $itineraryModel->findById($id);
+        $tripData = $itineraryModel->findByIdNumeric($id);
 
         if (!$tripData) {
             header("Location: /dashboard");
             exit;
         }
 
-        $numericId = $tripData['id'];
-
         $memberModel = new TripMember();
-        $members = $memberModel->getAllByItineraryId($numericId); 
+        $members = $memberModel->getAllByItineraryId($tripData['id']); 
 
         $invitationModel = new Invitation();
-        $pendingInvites = $invitationModel->getPendingByItinerary($numericId);
-        
+        $pendingInvites = $invitationModel->getPendingByItinerary($id);
         $appUrl = $_ENV['APP_URL'] ?? 'http://localhost:8080';
-        $generalToken = $invitationModel->getOrCreateGeneralToken($numericId);
+
+        $generalToken = $invitationModel->getOrCreateGeneralToken($id);
         $generalLink = $appUrl . "/join/" . $generalToken;
 
         $currentUserId = Auth::id();
-        $currentMember = TripMember::getByUserAndItinerary($currentUserId, $numericId);
+        $currentMember = TripMember::getByUserAndItinerary($currentUserId, $id);
         
-        $currentUserRole = 'Member';
+        $currentUserRole = 'Member'; // Default
         if ($currentMember) {
             $currentUserRole = is_array($currentMember) ? $currentMember['role'] : $currentMember->getRole();
         }
@@ -60,25 +57,18 @@ public function index($id)
             $email = trim($_POST['email']);
             $role = $_POST['role'];
             
-            $itineraryModel = new Itinerary();
-            $tripData = $itineraryModel->findById($id);
-
-            if (!$tripData) {
-                header("Location: /dashboard");
-                exit;
-            }
-
-            $numericId = $tripData['id'];
-
             $invitationModel = new Invitation();
-            $token = $invitationModel->createToken($numericId, $email, $role);
+            $token = $invitationModel->createToken($id, $email, $role);
+
+            
+            $userId = rand(100, 999);
 
             if (!$token) { die("Failed to generate invitation token."); }
 
             $baseUrl = $_ENV['APP_URL'] ?? 'http://localhost:8080';
             $joinLink = $baseUrl . "/join/" . $token;
 
-            $subject = "You've been invited to a trip on VoyageSync!";
+            $subject = "You've been invited to a trip on Itinerary!";
             
             $body = "<h2>You have a new trip invitation!</h2>
                      <p>Click the link below to join the itinerary:</p>
@@ -113,7 +103,7 @@ public function index($id)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $memberId = $_POST['memberId'];
-            $member = new TripMember();
+            $member = new \App\Models\TripMember();
             $member->setId($memberId);
             $member->delete();
 
