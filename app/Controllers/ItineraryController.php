@@ -12,7 +12,9 @@ class ItineraryController extends Controller {
 
     public function create(){
         Auth::requireLogin();
-        $this->view("itinerary/create");
+        $this->view("itinerary/create",[
+            'activeTab' => 'createItinerary'
+        ]);
     }
 
 public function store()
@@ -103,7 +105,11 @@ public function store()
         $itineraryModel = new Itinerary();
         $tripData = $itineraryModel->findByIdNumeric($id);
         
-        $this->view("itinerary/settings", ['trip' => $tripData]);
+        $this->view("itinerary/settings", [
+            'trip' => $tripData,
+            'itineraryId' => $tripData['id'],
+            'activeTab' => 'settings'
+        ]);
     }
 
     public function update($id){
@@ -181,6 +187,8 @@ public function store()
             'trip' => $tripData, 
             'members' => $members,
             'userRole' => $member->getRole(),
+            'itineraryId' => $tripData['id'],
+            'activeTab' => 'itinerary'
         ]);
     }
 }
