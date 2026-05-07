@@ -32,8 +32,8 @@
                                         class="flex items-center gap-4 text-on-surface-variant font-body-sm text-body-sm">
                                         <div class="flex items-center gap-1">
                                             <span class="material-symbols-outlined text-base">calendar_month</span>
-                                            <?php echo date('M j, g:i A', strtotime($activity->getStartTime())) ?> -
-                                            <?php echo date('g:i A', strtotime($activity->getEndTime())) ?>
+                                            <span class="local-time" data-utc="<?= date('c', strtotime($activity->getStartTime())) ?>" data-format="datetime"></span> - 
+                                            <span class="local-time" data-utc="<?= date('c', strtotime($activity->getEndTime())) ?>" data-format="time"></span>
                                         </div>
                                         <div class="flex items-center gap-1">
                                             <span class="material-symbols-outlined text-base">location_on</span>
@@ -208,5 +208,5 @@
             Profile
         </a>
     </nav>
-
+<script src="/assets/js/timezone.js"></script>
 <?php require __DIR__ . '/../layouts/footer.php'; ?>

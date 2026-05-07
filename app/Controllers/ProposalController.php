@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Helpers\Auth;
 use App\Helpers\Session;
+use App\Helpers\TimeHelper;
 use App\Models\Activity;
 use App\Models\Poll;
 use App\Models\TripMember;
@@ -62,23 +63,22 @@ class ProposalController extends Controller
             exit;
         }
 
-        // $date = $_POST['deadline_date'] ?? '';
-        // $time = $_POST['deadline_time'] ?? '';
+        $pollDeadlineRaw   = $_POST['poll_deadline'] ?? '';
+        $clientTimezoneStr = $_POST['timezone'] ?? 'UTC';
 
-        // if (empty($date) || empty($time)) {
-        //     Session::setFlash(Session::FLASH_ERROR, 'Both date and time are required for the poll deadline.');
-        //     header("Location: /itinerary/{$itineraryId}/proposals");
-        //     exit;
-        // }
-
-        // $pollDeadline = $date . ' ' . $time;
-        $pollDeadline = $_POST['poll_deadline'] ?? '';
-        if (empty($pollDeadline)) {
+        if (empty($pollDeadlineRaw)) {
             Session::setFlash(Session::FLASH_ERROR, 'Both date and time are required for the poll deadline.');
             header("Location: /itinerary/{$itineraryId}/proposals");
             exit;
         }
 
+        $pollDeadline = TimeHelper::convertToUTC($pollDeadlineRaw, $clientTimezoneStr);
+
+        if (!$pollDeadline) {
+            Session::setFlash(Session::FLASH_ERROR, 'Invalid datetime or timezone provided.');
+            header("Location: /itinerary/{$itineraryId}/proposals");
+            exit;
+        }
 
         if ($activity->updateStatus('Proposed')) {
             $poll = new Poll();

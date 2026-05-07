@@ -4,6 +4,7 @@ namespace App\Controllers;
 use App\Helpers\Auth;
 use App\Helpers\HistoryLogger;
 use App\Helpers\Session;
+use App\Helpers\TimeHelper;
 use App\Models\Activity;
 use App\Models\AttendanceList;
 use App\Models\AttendanceMember;
@@ -58,17 +59,23 @@ class ActivityController extends Controller
             exit;
         }
 
-        $name            = trim($_POST['name'] ?? '');
-        $description     = trim($_POST['description'] ?? '');
-        $startTime       = date('Y-m-d H:i:s', strtotime($_POST['start_time'] ?? ''));
-        $endTime         = date('Y-m-d H:i:s', strtotime($_POST['end_time'] ?? ''));
-        $category        = $_POST['category'] ?? 'General';
-        $isAnonymous     = isset($_POST['is_anonymous']) ? true : false;
-        $locationName    = trim($_POST['location_name'] ?? '');
-        $locationAddress = trim($_POST['location_address'] ?? '');
+        $name              = trim($_POST['name'] ?? '');
+        $description       = trim($_POST['description'] ?? '');
+        $startTimeRaw      = $_POST['start_time'] ?? '';
+        $endTimeRaw        = $_POST['end_time'] ?? '';
+        $clientTimezoneStr = $_POST['timezone'] ?? 'UTC';
 
-        if (empty($name) || empty($_POST['start_time']) || empty($_POST['end_time'])) {
+        if (empty($name) || empty($startTimeRaw) || empty($endTimeRaw)) {
             Session::setFlash(Session::FLASH_ERROR, 'Name, start time, and end time are required.');
+            header("Location: /itinerary/{$itineraryId}/activity/create");
+            exit;
+        }
+
+        $startTime = TimeHelper::convertToUTC($startTimeRaw, $clientTimezoneStr);
+        $endTime   = TimeHelper::convertToUTC($endTimeRaw, $clientTimezoneStr);
+
+        if (!$startTime || !$endTime) {
+            Session::setFlash(Session::FLASH_ERROR, 'Invalid datetime or timezone provided.');
             header("Location: /itinerary/{$itineraryId}/activity/create");
             exit;
         }
@@ -78,6 +85,11 @@ class ActivityController extends Controller
             header("Location: /itinerary/{$itineraryId}/activity/create");
             exit;
         }
+
+        $category        = $_POST['category'] ?? 'General';
+        $isAnonymous     = isset($_POST['is_anonymous']) ? true : false;
+        $locationName    = trim($_POST['location_name'] ?? '');
+        $locationAddress = trim($_POST['location_address'] ?? '');
 
         if (! isset($_POST['confirm_override'])) {
             $checkActivity = new Activity();

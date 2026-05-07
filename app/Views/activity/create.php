@@ -20,7 +20,7 @@
                         <?php foreach ($conflictingActivities as $conflict): ?>
                             <li>
                                 <strong><?= htmlspecialchars($conflict['name']) ?></strong> 
-                                (<?= htmlspecialchars(date('M d, H:i', strtotime($conflict['startTime']))) ?> - <?= htmlspecialchars(date('M d, H:i', strtotime($conflict['endTime']))) ?>)
+                                (<span class="local-time" data-utc="<?= date('c', strtotime($conflict['startTime'])) ?>" data-format="datetime"></span> - <span class="local-time" data-utc="<?= date('c', strtotime($conflict['endTime'])) ?>" data-format="datetime"></span>)
                             </li>
                         <?php endforeach; ?>
                     </ul>
@@ -54,33 +54,33 @@
 
         <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6">
             <form id="activity-form" action="/itinerary/<?= htmlspecialchars($itineraryId) ?>/activity/store" method="POST" class="space-y-6">
-                
+                <input type="hidden" name="timezone" id="clientTimezoneReopen" value="">
                 <div>
-                    <label class="block text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-2">Activity Name</label>
-                    <input type="text" name="name" value="<?= htmlspecialchars($pendingActivity['name'] ?? '') ?>" required class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition" placeholder="e.g. Visit Louvre Museum">
+                    <label class="block text-[12px] font-bold uppercase tracking-wider text-on-surface-variant mb-2">Activity Name</label>
+                    <input type="text" name="name" value="<?= htmlspecialchars($pendingActivity['name'] ?? '') ?>" required class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-[14px] focus:border-primary focus:ring-primary focus:outline-none transition" placeholder="e.g. Visit Louvre Museum">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-2">Description</label>
-                    <textarea name="description" rows="3" class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition" placeholder="Activity details..."><?= htmlspecialchars($pendingActivity['description'] ?? '') ?></textarea>
+                    <label class="block text-[12px] font-bold uppercase tracking-wider text-on-surface-variant mb-2">Description</label>
+                    <textarea name="description" rows="3" class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-[14px] focus:border-primary focus:ring-primary focus:outline-none transition" placeholder="Activity details..."><?= htmlspecialchars($pendingActivity['description'] ?? '') ?></textarea>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-2">Start Time</label>
-                        <input type="datetime-local" name="start_time" value="<?= htmlspecialchars($pendingActivity['start_time'] ?? '') ?>" required class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition">
+                        <label class="block text-[12px] font-bold uppercase tracking-wider text-on-surface-variant mb-2">Start Time</label>
+                        <input type="datetime-local" name="start_time" value="<?= htmlspecialchars($pendingActivity['start_time'] ?? '') ?>" required class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-[14px] focus:border-primary focus:ring-primary focus:outline-none transition">
                     </div>
                     <div>
-                        <label class="block text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-2">End Time</label>
-                        <input type="datetime-local" name="end_time" value="<?= htmlspecialchars($pendingActivity['end_time'] ?? '') ?>" required class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition">
+                        <label class="block text-[12px] font-bold uppercase tracking-wider text-on-surface-variant mb-2">End Time</label>
+                        <input type="datetime-local" name="end_time" value="<?= htmlspecialchars($pendingActivity['end_time'] ?? '') ?>" required class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-[14px] focus:border-primary focus:ring-primary focus:outline-none transition">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-2">Category</label>
+                        <label class="block text-[12px] font-bold uppercase tracking-wider text-on-surface-variant mb-2">Category</label>
                         <?php $selectedCategory = $pendingActivity['category'] ?? 'General'; ?>
-                        <select name="category" class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition">
+                        <select name="category" class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-[14px] focus:border-primary focus:ring-primary focus:outline-none transition">
                             <option value="General" <?= $selectedCategory === 'General' ? 'selected' : '' ?>>General</option>
                             <option value="Flight" <?= $selectedCategory === 'Flight' ? 'selected' : '' ?>>Flight</option>
                             <option value="Accommodation" <?= $selectedCategory === 'Accommodation' ? 'selected' : '' ?>>Accommodation</option>
@@ -95,12 +95,12 @@
                     </div>
                     <div class="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-2">Location Name</label>
-                            <input type="text" name="location_name" value="<?= htmlspecialchars($pendingActivity['location_name'] ?? '') ?>" class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition" placeholder="e.g. Louvre Museum">
+                            <label class="block text-[12px] font-bold uppercase tracking-wider text-on-surface-variant mb-2">Location Name</label>
+                            <input type="text" name="location_name" value="<?= htmlspecialchars($pendingActivity['location_name'] ?? '') ?>" class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-[14px] focus:border-primary focus:ring-primary focus:outline-none transition" placeholder="e.g. Louvre Museum">
                         </div>
                         <div>
-                            <label class="block text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-2">Location Address</label>
-                            <input type="text" name="location_address" value="<?= htmlspecialchars($pendingActivity['location_address'] ?? '') ?>" class="w-full rounded-md border border-outline-variant bg-surface px-4 py-2 focus:border-primary focus:ring-primary transition" placeholder="e.g. Paris, France">
+                            <label class="block text-[12px] font-bold uppercase tracking-wider text-on-surface-variant mb-2">Location Address</label>
+                            <input type="text" name="location_address" value="<?= htmlspecialchars($pendingActivity['location_address'] ?? '') ?>" class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-[14px] focus:border-primary focus:ring-primary focus:outline-none transition" placeholder="e.g. Paris, France">
                         </div>
                     </div>
                 </div>
@@ -113,5 +113,6 @@
             </form>
         </div>
     </div>
+    <script src="/assets/js/timezone.js"></script>
 </body>
 </html>
