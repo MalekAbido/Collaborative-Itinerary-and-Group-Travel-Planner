@@ -2,10 +2,10 @@
 <?php 
     $trip      = $data['trip'] ?? null;
     $tripId    = $trip['id'] ?? null;
+    $userRole  = $data['userRole'] ?? $userRole ?? null;
  ?>
 
-        <!-- <main class="flex-1 mt-navbar h-[calc(100vh-theme(spacing.navbar))] overflow-y-auto bg-surface p-6 lg:p-8 scroll-thin"> -->
-            <div class="max-w-[1280px] mx-auto">
+        <div class="max-w-[1280px] mx-auto">
 
                 <header class="mb-10 flex justify-between items-end">
                     <div>
@@ -61,18 +61,89 @@
                             <h2 class="font-display text-h2 text-on-surface m-0">Itinerary Timeline</h2>
                         </div>
 
-                        <article
-                            class="flex bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden hover:shadow-md transition mb-4 opacity-50">
-                            <div
-                                class="flex flex-col items-center justify-center bg-surface-container-highest text-outline px-4 py-5 w-24 shrink-0">
-                                <span class="material-symbols-outlined text-[28px]">event_busy</span>
+                        <?php if (!empty($data['activities'])): ?>
+                            <div class="relative border-l-2 border-outline-variant ml-4 mt-4">
+                                <?php foreach ($data['activities'] as $activity): ?>
+                                    <?php 
+                                        // Smart Date Logic
+                                        $start = strtotime($activity->getStartTime());
+                                        $end = strtotime($activity->getEndTime());
+                                        $isSameDay = date('Y-m-d', $start) === date('Y-m-d', $end);
+                                    ?>
+                                    <div class="mb-8 ml-8 relative group">
+                                        <span class="absolute flex items-center justify-center w-4 h-4 bg-primary rounded-full -left-[41px] top-1 ring-4 ring-surface"></span>
+                                        
+                                        <div class="block bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5 hover:shadow-md transition relative">
+                                            
+                                            <a href="/itinerary/<?= htmlspecialchars($data['trip']['id']) ?>/activity/<?= $activity->getId() ?>" class="absolute inset-0 z-0 rounded-xl focus:outline-none">
+                                                <span class="sr-only">View Activity Details</span>
+                                            </a>
+
+                                            <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
+                                                <div class="min-w-0 flex-1">
+                                                    <h3 class="font-display text-h4 text-on-surface mb-1 group-hover:text-primary transition-colors">
+                                                        <?= htmlspecialchars($activity->getName()) ?>
+                                                    </h3>
+                                                    
+                                                    <div class="flex flex-wrap items-center text-body-sm text-on-surface-variant font-medium gap-x-4 gap-y-2 mt-2">
+                                                        
+                                                        <div class="flex items-center gap-1 whitespace-nowrap">
+                                                            <span class="material-symbols-outlined text-[16px]">schedule</span>
+                                                            <?php if ($isSameDay): ?>
+                                                                <?= date('M d, Y', $start) ?> &bull; <?= date('h:i A', $start) ?> - <?= date('h:i A', $end) ?>
+                                                            <?php else: ?>
+                                                                <?= date('M d, h:i A', $start) ?> - <?= date('M d, h:i A', $end) ?>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                        
+                                                        <?php if ($activity->getLocation() && $activity->getLocation()->getName()): ?>
+                                                        <div class="flex items-center gap-1 min-w-0">
+                                                            <span class="material-symbols-outlined text-[16px] shrink-0">location_on</span>
+                                                            <span class="truncate"><?= htmlspecialchars($activity->getLocation()->getName()) ?></span>
+                                                        </div>
+                                                        <?php endif; ?>
+                                                        
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="flex items-center gap-3 relative z-10 shrink-0">
+                                                    <span class="inline-flex items-center rounded-full bg-primary-fixed px-3 py-1 text-label-xs font-bold uppercase text-primary">
+                                                        <?= htmlspecialchars($activity->getCategory()) ?>
+                                                    </span>
+                                                    
+                                                    <?php if($userRole !== 'Member'): ?>
+                                                        <form action="/itinerary/<?= htmlspecialchars($data['trip']['id']) ?>/activity/<?= $activity->getId() ?>/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this activity?');" class="m-0">
+                                                            <button type="submit" class="text-error hover:bg-error-container/50 p-1.5 rounded-md transition-colors flex items-center justify-center" title="Delete Activity">
+                                                                <span class="material-symbols-outlined text-[20px]">delete</span>
+                                                            </button>
+                                                        </form>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+
+                                            <?php if (!empty($activity->getDescription())): ?>
+                                                <p class="text-body-md text-on-surface mt-4 pt-4 border-t border-outline-variant/50 relative z-10">
+                                                    <?= nl2br(htmlspecialchars($activity->getDescription())) ?>
+                                                </p>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             </div>
-                            <div class="flex-1 p-5 flex flex-col justify-center">
-                                <h4 class="font-display text-h4 text-on-surface mb-1">No activities planned yet.</h4>
-                                <p class="text-body-sm text-on-surface-variant">Click "Add Activity" above to start
-                                    building your timeline.</p>
-                            </div>
-                        </article>
+                        <?php else: ?>
+                            <article
+                                class="flex bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden hover:shadow-md transition mb-4 opacity-50">
+                                <div
+                                    class="flex flex-col items-center justify-center bg-surface-container-highest text-outline px-4 py-5 w-24 shrink-0">
+                                    <span class="material-symbols-outlined text-[28px]">event_busy</span>
+                                </div>
+                                <div class="flex-1 p-5 flex flex-col justify-center">
+                                    <h4 class="font-display text-h4 text-on-surface mb-1">No activities planned yet.</h4>
+                                    <p class="text-body-sm text-on-surface-variant">Click "Add Activity" above to start
+                                        building your timeline.</p>
+                                </div>
+                            </article>
+                        <?php endif; ?>
                     </div>
 
                 <div class="space-y-8">
@@ -120,6 +191,4 @@
 
                 </div>
             </div>
-        </main>
-
-<?php require __DIR__ . '/../layouts/footer.php'; ?>
+        <?php require __DIR__ . '/../layouts/footer.php'; ?>

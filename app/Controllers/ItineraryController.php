@@ -7,6 +7,7 @@ use App\Models\TripFinance;
 use App\Models\TripMember;
 use App\Helpers\Auth;
 use App\Helpers\Session;
+use App\Models\Activity;
 
 class ItineraryController extends Controller {
 
@@ -170,25 +171,31 @@ public function store()
     }
 
     public function getDashboard($id){
-        Auth::requireLogin();
-        
-        $itineraryModel = new Itinerary();
-        $tripData = $itineraryModel->findByIdNumeric($id);
+    Auth::requireLogin();
+    
+    $itineraryModel = new Itinerary();
+    $tripData = $itineraryModel->findByIdNumeric($id);
 
-        if(!$tripData){
-            header("Location: /dashboard");
-            exit;
-        }
-        $member = Auth::requireMembership($tripData['id']);
-        $memberModel = new TripMember();
-        $members = $memberModel->getAllByItineraryId($tripData['id']); 
-        
-        $this->view("itinerary/dashboard", [
-            'trip' => $tripData, 
-            'members' => $members,
-            'userRole' => $member->getRole(),
-            'itineraryId' => $tripData['id'],
-            'activeTab' => 'itinerary'
-        ]);
+    if(!$tripData){
+        header("Location: /dashboard");
+        exit;
+    }
+    
+    $member = Auth::requireMembership($tripData['id']);
+    $memberModel = new TripMember();
+    $members = $memberModel->getAllByItineraryId($tripData['id']); 
+    
+    // --- NEW CODE: Fetch and sort the timeline activities ---
+    // This uses your existing method which already has ORDER BY startTime ASC
+    $timelineActivities = Activity::getAllByStatusAndItinerary('Confirmed', $tripData['id']);
+
+    $this->view("itinerary/dashboard", [
+        'trip' => $tripData, 
+        'members' => $members,
+        'activities' => $timelineActivities, // Pass the sorted array to the view
+        'userRole' => $member->getRole(),
+        'itineraryId' => $tripData['id'],
+        'activeTab' => 'itinerary'
+    ]);
     }
 }
