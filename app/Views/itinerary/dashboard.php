@@ -62,7 +62,6 @@
                             <div class="relative border-l-2 border-outline-variant ml-4 mt-4">
                                 <?php foreach ($data['activities'] as $activity): ?>
                                     <?php 
-                                        // Smart Date Logic
                                         $start = strtotime($activity->getStartTime());
                                         $end = strtotime($activity->getEndTime());
                                         $isSameDay = date('Y-m-d', $start) === date('Y-m-d', $end);
@@ -87,7 +86,7 @@
                                                         <div class="flex items-center gap-1 whitespace-nowrap">
                                                             <span class="material-symbols-outlined text-[16px]">schedule</span>
                                                             <?php if ($isSameDay): ?>
-                                                                <?= date('M d, Y', $start) ?> &bull; <?= date('h:i A', $start) ?> - <?= date('h:i A', $end) ?>
+                                                                <?= date('M d, Y', $start) ?> • <?= date('h:i A', $start) ?> - <?= date('h:i A', $end) ?>
                                                             <?php else: ?>
                                                                 <?= date('M d, h:i A', $start) ?> - <?= date('M d, h:i A', $end) ?>
                                                             <?php endif; ?>

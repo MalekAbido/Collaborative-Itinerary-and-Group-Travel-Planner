@@ -215,6 +215,7 @@ CREATE TABLE Itinerary
   description TEXT         NULL    ,
   startDate   DATE         NULL    ,
   endDate     DATE         NULL    ,
+  coverImage  VARCHAR(255) NULL    ,
   PRIMARY KEY (id)
 );
 

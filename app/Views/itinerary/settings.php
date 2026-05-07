@@ -1,7 +1,5 @@
 <?php require __DIR__ . '/../layouts/header.php'; ?>
 
-<!-- <main class="max-w-[800px] mx-auto mt-[100px] px-6 pb-12"> -->
-
 <div class="flex items-center gap-2 pb-3 mb-6 border-b border-outline-variant">
     <span class="material-symbols-outlined text-primary text-[28px]">settings</span>
     <h2 class="font-display text-h2 text-on-surface m-0">Trip Settings</h2>
@@ -21,7 +19,7 @@ if (isset($_GET['status']) && $_GET['status'] === 'updated'): ?>
 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 lg:p-8 mb-8">
     <h3 class="font-display text-h4 text-on-surface mb-6 border-b border-outline-variant pb-3">Edit Details</h3>
 
-    <form action="/itinerary/update/<?php echo htmlspecialchars($trip['itineraryId']) ?>" method="POST" class="space-y-6">
+    <form action="/itinerary/update/<?php echo htmlspecialchars($trip['itineraryId']) ?>" method="POST" enctype="multipart/form-data" class="space-y-6">
 
         <div>
             <label class="block text-label-caps uppercase text-on-surface-variant mb-2">Trip Title</label>
@@ -33,6 +31,18 @@ if (isset($_GET['status']) && $_GET['status'] === 'updated'): ?>
             <label class="block text-label-caps uppercase text-on-surface-variant mb-2">Description</label>
             <textarea name="description" rows="4"
                 class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-body-sm text-on-surface placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/30 focus:outline-none transition resize-y"><?php echo htmlspecialchars($trip['description']) ?></textarea>
+        </div>
+
+        <div>
+            <label class="block text-label-caps uppercase text-on-surface-variant mb-2">Cover Image</label>
+            <?php if (!empty($trip['coverImage'])): ?>
+                <div class="mb-3">
+                    <img src="/<?php echo htmlspecialchars($trip['coverImage']) ?>" alt="Current Cover" class="h-40 w-full object-cover rounded-lg border border-outline-variant">
+                    <p class="text-body-xs text-outline mt-1">Current cover image. Upload a new file below to replace it.</p>
+                </div>
+            <?php endif; ?>
+            <input type="file" name="coverImage" accept="image/*"
+                class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2 text-body-sm text-on-surface file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-body-sm file:font-semibold file:bg-primary-fixed file:text-primary hover:file:bg-primary-fixed-variant transition cursor-pointer">
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -71,5 +81,4 @@ if (isset($_GET['status']) && $_GET['status'] === 'updated'): ?>
     </form>
 </div>
 
-</main>
 <?php require __DIR__ . '/../layouts/footer.php'; ?>

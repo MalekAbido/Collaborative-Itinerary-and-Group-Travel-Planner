@@ -2,11 +2,8 @@
 use App\Helpers\Session;
 require __DIR__ . '/../layouts/header.php'; ?>
 
-        <!-- MAIN CONTENT (Sidebar margin removed) -->
-        <!-- <main class="flex-1 mt-navbar h-[calc(100vh-theme(spacing.navbar))] overflow-y-auto bg-surface p-6 lg:p-8 scroll-thin"> -->
-            <div class="max-w-content mx-auto">
+        <div class="max-w-content mx-auto">
 
-                <!-- Page Hero -->
                 <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                     <div>
                         <h1 class="font-display text-display text-on-surface mb-3">Dashboard</h1>
@@ -24,18 +21,23 @@ require __DIR__ . '/../layouts/header.php'; ?>
                     </a>
                 </header>
 
-                <!-- Trips Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <?php if (!empty($myTrips)): ?>
                     <?php foreach ($myTrips as $trip): ?>
                     <article
                         class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden hover:shadow-md transition">
-                        <div class="relative h-40 bg-gradient-primary">
-                            <span
-                                class="material-symbols-outlined absolute bottom-3 left-3 text-5xl text-on-primary/30">travel_explore</span>
+                        
+                        <div class="relative h-40 overflow-hidden bg-surface-container-highest">
+                            <?php if (!empty($trip['coverImage'])): ?>
+                                <img src="/<?= htmlspecialchars($trip['coverImage']) ?>" alt="<?= htmlspecialchars($trip['title']) ?> Cover" class="absolute inset-0 h-full w-full object-cover">
+                                <div class="absolute inset-0 bg-black/10"></div>
+                            <?php else: ?>
+                                <div class="absolute inset-0 bg-gradient-primary"></div>
+                            <?php endif; ?>
 
-                            <span
-                                class="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full bg-surface-container-lowest/20 backdrop-blur px-3 py-1 text-label-xs font-bold uppercase text-on-primary">
+                            <span class="material-symbols-outlined absolute bottom-3 left-3 text-5xl text-white/50">travel_explore</span>
+
+                            <span class="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full bg-black/30 backdrop-blur px-3 py-1 text-label-xs font-bold uppercase text-white">
                                 <?= htmlspecialchars($trip['role']) ?>
                             </span>
                         </div>
@@ -62,7 +64,6 @@ require __DIR__ . '/../layouts/header.php'; ?>
                     </article>
                     <?php endforeach; ?>
                     <?php else: ?>
-                    <!-- Empty State -->
                     <div
                         class="col-span-full flex flex-col items-center justify-center py-20 border-2 border-dashed border-outline-variant rounded-xl bg-surface-container-lowest">
                         <div class="flex h-16 w-16 items-center justify-center rounded-full bg-surface-container mb-4">
@@ -75,13 +76,11 @@ require __DIR__ . '/../layouts/header.php'; ?>
                 </div>
 
                 <footer class="mt-12 pt-8 pb-4 text-center text-body-xs text-outline border-t border-outline-variant">
-                    © <?= date('Y') ?> Itinerary. All rights reserved.
+                    © <?= date('Y') ?> VoyageSync. All rights reserved.
                 </footer>
 
             </div>
-        </main>
-
-    </div>
+        </div>
 
     <script src="/assets/js/user.js"></script>
 
