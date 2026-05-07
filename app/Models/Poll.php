@@ -175,7 +175,8 @@ class Poll
         }
 
         $this->weightedTotal = $total;
-        return $this->update();
+        $this->update();
+        return (float)$total;
     }
 
     public function assignLeadingOption()

@@ -23,16 +23,26 @@ class ExpenseController extends Controller
         $financeModel->readByItinerary($itineraryId);
         $financeId = $financeModel->getId();
 
+        // Get group fund balance if it exists
+        $groupFundBalance = 0;
+        $groupFundModel = new \App\Models\GroupFund();
+        if ($groupFundModel->readByTripFinanceId($financeId)) {
+            $groupFundBalance = $groupFundModel->getCurrentBalance();
+        }
+
         $this->view('expenses/add', [
             'members' => $members,
             'financeId' => $financeId,
             'itineraryId' => $id,
+            'groupFundBalance' => $groupFundBalance,
             'activeTab' => 'addExpense'
         ]);
     }
 
     public function createExpense()
     {
+        Auth::requireLogin();
+
         $financeId = $_POST['financeId'] ?? '';
         $payerId = (int)($_POST['payerId'] ?? 0);
         $splitMethod = $_POST['splitMethod'] ?? 'EVEN';
@@ -47,12 +57,16 @@ class ExpenseController extends Controller
             'shares' => $_POST['shares'] ?? []
         ];
 
-        $isValid = $this->validateExpenseData($splitMethod, $totalAmount, $details['shares']);
-        if (!$isValid) {
-            die("Error: Invalid expense data or shares do not equal the total amount.");
+        $financeModel = new \App\Models\TripFinance();
+        if (!$financeModel->read($financeId)) {
+            die("Error: Invalid finance record.");
         }
 
-        if($paidByKitty == 1) {
+        if ($paidByKitty === 1) {
+            $itineraryId = $financeModel->getItineraryId();
+            $tripMemberModel = new \App\Models\TripMember();
+            $currentMember = Auth::requireMembership($itineraryId);
+
             $groupFundModel = new \App\Models\GroupFund();
             $fundExists = $groupFundModel->readByTripFinanceId($financeId);
 
@@ -61,10 +75,28 @@ class ExpenseController extends Controller
             }
             
             if ($groupFundModel->getCurrentBalance() < $totalAmount) {
-                die("Error: Insufficient funds in the group kitty to cover this expense.");
+                $financeModel = new \App\Models\TripFinance();
+                $financeModel->readByItinerary($itineraryId);
+                $financeId = $financeModel->getId();
+
+                $groupFundBalance = $groupFundModel->getCurrentBalance();
+
+                $this->view('expenses/add', [
+                    'members' => $tripMemberModel->getAllByItineraryId($itineraryId),
+                    'financeId' => $financeId,
+                    'itineraryId' => $itineraryId,
+                    'groupFundBalance' => $groupFundBalance,
+                    'error' => 'Insufficient funds in the group kitty to cover this expense. Available: ' . number_format($groupFundBalance, 2)
+                ]);
+                return;
             } else {
                 $groupFundModel->deductExpense($totalAmount);
             }
+        }
+
+        $isValid = $this->validateExpenseData($splitMethod, $totalAmount, $details['shares'], $paidByKitty);
+        if (!$isValid) {
+            die("Error: Invalid expense data or shares do not equal the total amount.");
         }
 
         $expenseModel = new Expense();
@@ -86,23 +118,24 @@ class ExpenseController extends Controller
             HistoryLogger::log($itineraryId, TransactionType::EXPENSE_ADDED, $newExpense, $payerId);
         }
         
-        $shareModel = new ExpenseShare();
+        if ($paidByKitty !== 1) {
+            $shareModel = new ExpenseShare();
 
-        if ($splitMethod === 'EVEN') {
-            $memberCount = count($details['shares']);
-            $evenSplitAmount = $totalAmount / $memberCount;
+            if ($splitMethod === 'EVEN') {
+                $memberCount = count($details['shares']);
+                $evenSplitAmount = $totalAmount / $memberCount;
 
-            foreach ($details['shares'] as $memberId => $dummyValue) {
-                $isPayer = ((int)$memberId === $payerId) ? 1 : 0;
-                $shareModel->create($expenseId, $memberId, $evenSplitAmount, $isPayer);
-            }
-        } elseif ($splitMethod === 'UNEVEN') {
-            foreach ($details['shares'] as $memberId => $amountOwed) {
-                $isPayer = ((int)$memberId === $payerId) ? 1 : 0;
-                $shareModel->create($expenseId, $memberId, $amountOwed, $isPayer);
+                foreach ($details['shares'] as $memberId => $dummyValue) {
+                    $isPayer = ((int)$memberId === $payerId) ? 1 : 0;
+                    $shareModel->create($expenseId, $memberId, $evenSplitAmount, $isPayer);
+                }
+            } elseif ($splitMethod === 'UNEVEN') {
+                foreach ($details['shares'] as $memberId => $amountOwed) {
+                    $isPayer = ((int)$memberId === $payerId) ? 1 : 0;
+                    $shareModel->create($expenseId, $memberId, $amountOwed, $isPayer);
+                }
             }
         }
-
 
         $financeModel = new \App\Models\TripFinance();
         $financeModel->read($financeId);
@@ -218,8 +251,12 @@ class ExpenseController extends Controller
      * @return bool Returns true if valid, false if invalid
      */
 
-    private function validateExpenseData($splitMethod, $totalAmount, $shares)
+    private function validateExpenseData($splitMethod, $totalAmount, $shares, $paidByKitty = 0)
     {
+        if ($paidByKitty === 1) {
+            return true;
+        }
+
         if (empty($shares)) {
             return false;
         }
