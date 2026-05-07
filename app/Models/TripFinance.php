@@ -133,7 +133,7 @@ class TripFinance
     {
         $this->expenses = []; 
         
-        $sql = "SELECT * FROM Expense WHERE tripFinanceId = :id ORDER BY id DESC"; // Added ORDER BY to show newest first!
+        $sql = "SELECT * FROM Expense WHERE tripFinanceId = :id AND deletedAt IS NULL ORDER BY id DESC"; // Added ORDER BY to show newest first!
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $this->id]);
         

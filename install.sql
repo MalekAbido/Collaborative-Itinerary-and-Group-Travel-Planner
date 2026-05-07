@@ -94,6 +94,7 @@ CREATE TABLE Expense
   paidByKitty     BOOLEAN       NULL    ,
   tripFinanceId   INT           NOT NULL,
   tripMemberId    INT           NOT NULL,
+  deletedAt       DATETIME      NULL DEFAULT NULL,
   PRIMARY KEY (id)
 );
 
@@ -128,6 +129,7 @@ CREATE TABLE FundContribution
   timestamp      DATETIME      NULL    ,
   groupFundId    INT           NOT NULL,
   tripMemberId   INT           NOT NULL,
+  deletedAt       DATETIME      NULL DEFAULT NULL,
   PRIMARY KEY (id)
 );
 
@@ -158,6 +160,7 @@ CREATE TABLE HistoryLog
   id          INT         NOT NULL AUTO_INCREMENT,
   logId       VARCHAR(55) NOT NULL,
   itineraryId INT         NOT NULL,
+  createdAt   DATETIME    DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
 );
 
@@ -171,10 +174,10 @@ CREATE TABLE HistoryLogEntry
 (
   id                 INT          NOT NULL AUTO_INCREMENT,
   entryId            VARCHAR(55)  NOT NULL,
-  transactionType    VARCHAR(50)  NULL    ,
-  timestamp          DATETIME     NULL    ,
-  changedEntityId    VARCHAR(55)  NULL    ,
-  changedEntityType  VARCHAR(100) NULL    ,
+  transactionType    VARCHAR(50)  NOT NULL,
+  timestamp          DATETIME     DEFAULT CURRENT_TIMESTAMP,
+  changedEntityId    VARCHAR(55)  NOT NULL,
+  changedEntityType  VARCHAR(100) NOT NULL,
   historyLogId       INT          NOT NULL,
   tripMemberId       INT          NOT NULL,
   previousSnapshotId INT          NULL    ,
@@ -187,37 +190,16 @@ ALTER TABLE HistoryLogEntry
 ALTER TABLE HistoryLogEntry
   ADD CONSTRAINT UQ_entryId UNIQUE (entryId);
 
-CREATE TABLE InventoryItem
-(
-  id           INT          NOT NULL AUTO_INCREMENT,
-  itemId       VARCHAR(55)  NOT NULL,
-  name         VARCHAR(150) NULL    ,
-  quantity     INT          NULL    ,
-  category     VARCHAR(50)  NULL    ,
-  isPacked     BOOLEAN      NULL    ,
-  activityId   INT          NOT NULL,
-  tripMemberId INT          NULL    ,
-  PRIMARY KEY (id)
-);
-
-ALTER TABLE InventoryItem
-  ADD CONSTRAINT UQ_id UNIQUE (id);
-
-ALTER TABLE InventoryItem
-  ADD CONSTRAINT UQ_itemId UNIQUE (itemId);
-
 CREATE TABLE Invitation
 (
   id           INT          NOT NULL AUTO_INCREMENT,
+  invitationId VARCHAR(55)  NOT NULL,
+  secureToken  VARCHAR(255) NULL    ,
+  isActive     BOOLEAN      NULL    ,
   itineraryId  INT          NOT NULL,
-  email        VARCHAR(255) NOT NULL,
-  token        VARCHAR(64)  NOT NULL,
-  role         VARCHAR(30)  DEFAULT 'Member',
-  createdAt    DATETIME     NOT NULL,
-  expiresAt    DATETIME     NOT NULL,
-  used         BOOLEAN      DEFAULT FALSE,
-  PRIMARY KEY (id),
-  UNIQUE KEY (token)
+  email        VARCHAR(255) NULL    ,
+  role         VARCHAR(30)  NULL    ,
+  PRIMARY KEY (id)
 );
 
 ALTER TABLE Invitation
@@ -278,21 +260,6 @@ ALTER TABLE Poll
 ALTER TABLE Poll
   ADD CONSTRAINT UQ_pollId UNIQUE (pollId);
 
-CREATE TABLE RatingChoice
-(
-  id       INT          NOT NULL AUTO_INCREMENT,
-  choiceId VARCHAR(55)  NOT NULL,
-  label    VARCHAR(50)  NULL    ,
-  weight   DECIMAL(5,2) NULL    ,
-  PRIMARY KEY (id)
-);
-
-ALTER TABLE RatingChoice
-  ADD CONSTRAINT UQ_id UNIQUE (id);
-
-ALTER TABLE RatingChoice
-  ADD CONSTRAINT UQ_choiceId UNIQUE (choiceId);
-
 CREATE TABLE Subtrip
 (
   id           INT          NOT NULL AUTO_INCREMENT,
@@ -303,6 +270,7 @@ CREATE TABLE Subtrip
   endTime      DATETIME     NULL    ,
   itineraryId  INT          NOT NULL,
   tripMemberId INT          NOT NULL,
+  deletedAt       DATETIME      NULL DEFAULT NULL,
   PRIMARY KEY (id)
 );
 
@@ -412,7 +380,6 @@ CREATE TABLE Vote
   timestamp      DATETIME      NULL    ,
   pollId         INT           NOT NULL,
   tripMemberId   INT           NOT NULL,
-  ratingChoiceId INT           NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -562,16 +529,6 @@ ALTER TABLE TransportDetail
     FOREIGN KEY (toActivityId)
     REFERENCES Activity (id);
 
-ALTER TABLE InventoryItem
-  ADD CONSTRAINT FK_Activity_TO_InventoryItem
-    FOREIGN KEY (activityId)
-    REFERENCES Activity (id);
-
-ALTER TABLE InventoryItem
-  ADD CONSTRAINT FK_TripMember_TO_InventoryItem
-    FOREIGN KEY (tripMemberId)
-    REFERENCES TripMember (id);
-
 ALTER TABLE Poll
   ADD CONSTRAINT FK_Activity_TO_Poll
     FOREIGN KEY (activityId)
@@ -586,11 +543,6 @@ ALTER TABLE Vote
   ADD CONSTRAINT FK_TripMember_TO_Vote
     FOREIGN KEY (tripMemberId)
     REFERENCES TripMember (id);
-
-ALTER TABLE Vote
-  ADD CONSTRAINT FK_RatingChoice_TO_Vote
-    FOREIGN KEY (ratingChoiceId)
-    REFERENCES RatingChoice (id);
 
 ALTER TABLE TransportDetail
   ADD CONSTRAINT FK_TransportMode_TO_TransportDetail
@@ -618,12 +570,6 @@ INSERT INTO TransportMode (modeId, name) VALUES
 ('mode_001', 'Flight'),
 ('mode_002', 'Bullet Train (Shinkansen)'),
 ('mode_003', 'Bus');
-
-INSERT INTO RatingChoice (choiceId, label, weight) VALUES
-('rate_001', 'Must Do', 5.00),
-('rate_002', 'Interested', 3.00),
-('rate_003', 'Neutral', 1.00),
-('rate_004', 'Skip', 0.00);
 
 -- 2. Level 1 Dependencies (Depend on Independent Tables)
 INSERT INTO EmergencyContact (contactId, name, phone, email, relationship, userId) VALUES
@@ -694,10 +640,6 @@ INSERT INTO AttendanceList (totalAttendeeCount, activityId) VALUES
 INSERT INTO TransportDetail (transportId, distance, duration, fromActivityId, toActivityId, transportModeId) VALUES
 ('trans_001', 500.00, 150, 2, 3, 2); -- Akihabara to Kyoto via Bullet Train
 
-INSERT INTO InventoryItem (itemId, name, quantity, category, isPacked, activityId, tripMemberId) VALUES
-('inv_001', 'Camera', 1, 'Electronics', TRUE, 2, 1),
-('inv_002', 'Travel Guide', 1, 'Misc', FALSE, 3, 2);
-
 INSERT INTO Poll (pollId, deadline, status, isAnonymous, weightedTotal, activityId) VALUES
 ('poll_001', '2026-04-01 23:59:59', 'Closed', FALSE, 13.00, 2);
 
@@ -709,8 +651,7 @@ INSERT INTO AttendanceMember (status, note, attendanceListId, tripMemberId) VALU
 ('Attending', NULL, 2, 1),
 ('Not Attending', 'Feeling sick', 2, 3);
 
-INSERT INTO Vote (voteId, voteWeight, timestamp, pollId, tripMemberId, ratingChoiceId) VALUES
-('vote_001', 1.00, '2026-03-15 10:00:00', 1, 1, 1), 
-('vote_002', 1.00, '2026-03-16 11:00:00', 1, 2, 1), 
-('vote_003', 1.00, '2026-03-17 12:00:00', 1, 3, 2);
-
+INSERT INTO Vote (voteId, voteWeight, timestamp, pollId, tripMemberId) VALUES
+('vote_001', 1.00, '2026-03-15 10:00:00', 1, 1), 
+('vote_002', 1.00, '2026-03-16 11:00:00', 1, 2), 
+('vote_003', 1.00, '2026-03-17 12:00:00', 1, 3);

@@ -2,11 +2,13 @@
 namespace App\Controllers;
 
 use App\Helpers\Auth;
+use App\Helpers\HistoryLogger;
 use App\Helpers\Session;
 use App\Models\Activity;
 use App\Models\AttendanceList;
 use App\Models\AttendanceMember;
 use App\Models\Location;
+use App\Models\TransactionType;
 use App\Models\TripMember;
 use Core\Controller;
 
@@ -31,15 +33,15 @@ class ActivityController extends Controller
             exit;
         }
 
-        $pendingActivity = Session::get('pending_activity');
+        $pendingActivity       = Session::get('pending_activity');
         $conflictingActivities = Session::get('conflicting_activities');
 
         Session::set('pending_activity', null);
         Session::set('conflicting_activities', null);
 
         $this->view('activity/create', [
-            'itineraryId' => $itineraryId,
-            'pendingActivity' => $pendingActivity,
+            'itineraryId'           => $itineraryId,
+            'pendingActivity'       => $pendingActivity,
             'conflictingActivities' => $conflictingActivities,
         ]);
     }
@@ -76,20 +78,21 @@ class ActivityController extends Controller
             exit;
         }
 
-        if (!isset($_POST['confirm_override'])) {
+        if (! isset($_POST['confirm_override'])) {
             $checkActivity = new Activity();
             $checkActivity->setItineraryId($itineraryId);
             $checkActivity->setStartTime($startTime);
             $checkActivity->setEndTime($endTime);
 
             $conflictingConfirmed = $checkActivity->getConflictingConfirmedActivities();
-            if (!empty($conflictingConfirmed)) {
-                $conflictData = array_map(function($activity) {
+
+            if (! empty($conflictingConfirmed)) {
+                $conflictData = array_map(function ($activity) {
                     return [
-                        'id' => $activity->getId(),
-                        'name' => $activity->getName(),
+                        'id'        => $activity->getId(),
+                        'name'      => $activity->getName(),
                         'startTime' => $activity->getStartTime(),
-                        'endTime' => $activity->getEndTime()
+                        'endTime'   => $activity->getEndTime(),
                     ];
                 }, $conflictingConfirmed);
 
@@ -102,11 +105,11 @@ class ActivityController extends Controller
 
         $locationId = 1;
 
-// Fallback
         if (! empty($locationName) || ! empty($locationAddress)) {
             $location = new Location();
             $location->setName($locationName);
             $location->setAddress($locationAddress);
+
             if ($location->create()) {
                 $locationId = $location->getId();
             }
@@ -125,9 +128,12 @@ class ActivityController extends Controller
         $activity->setTripMemberId($tripMember->getId());
 
         if ($activity->create()) {
+            HistoryLogger::log($itineraryId, TransactionType::ACTIVITY_ADDED, $activity, $tripMember->getId());
             $attendanceList = new AttendanceList();
+
             if ($attendanceList->create($activity->getId())) {
                 $allMembers = $tripMember->getAllByItineraryId($itineraryId);
+
                 foreach ($allMembers as $memberData) {
                     $attendanceList->updateStatus($memberData['id'], 'PENDING');
                 }
@@ -181,9 +187,9 @@ class ActivityController extends Controller
         $this->view('activity/show', [
             'itineraryId'         => $itineraryId,
             'activity'            => $activity,
-            'userRole'            => $tripMember->getRole(), // 'Leader', 'Editor', or 'Member'
-            'currentMemberId'     => $tripMember->getId(),   // Useful for highlighting the current user in the list
-            'currentMemberStatus' => $currentMemberStatus,   // Useful for highlighting the current user in the list
+            'userRole'            => $tripMember->getRole(),
+            'currentMemberId'     => $tripMember->getId(),
+            'currentMemberStatus' => $currentMemberStatus,
             'attendanceList'      => $attendanceList,
             'totalGoing'          => $totalGoing,
             'goingMembers'        => $goingMembers,
@@ -248,6 +254,7 @@ class ActivityController extends Controller
         }
 
         if ($activity->delete()) {
+            HistoryLogger::log($itineraryId, TransactionType::ACTIVITY_REMOVED, $activity, $tripMember->getId());
             Session::setFlash(Session::FLASH_SUCCESS, 'Activity removed successfully.');
         } else {
             Session::setFlash(Session::FLASH_ERROR, 'Failed to remove the activity.');

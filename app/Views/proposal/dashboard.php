@@ -175,14 +175,21 @@
 
                         <!-- Actions Buttons -->
                         <div class="flex items-center gap-4 mt-auto pt-4 border-t border-surface-variant">
-                            <button type="submit" form="approve_form_<?php echo $activity->getId(); ?>"
-                                class="flex-1 bg-primary text-on-primary font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors shadow-sm text-sm">
-                                <span class="material-symbols-outlined text-[18px]">check_circle</span>
-                                Confirm to Voting
-                            </button>
+                                <button type="submit" form="approve_form_<?php echo $activity->getId(); ?>"
+                                    class="cursor-pointer flex-1 bg-primary text-on-primary font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 
+                                        transition-transform duration-200 ease-out 
+                                        hover:scale-103 active:scale-98
+                                        transform-gpu antialiased shadow-sm text-sm">
+                                    <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                                    Confirm to Voting
+                                </button>
                             <form action="/itinerary/<?php echo $itineraryId; ?>/proposals/<?php echo $activity->getId(); ?>/reject" method="POST" class="flex-1">
                                 <button type="submit"
-                                    class="w-full bg-transparent border border-outline text-on-surface font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors text-sm">
+                                    class="cursor-pointer w-full bg-transparent border border-outline text-on-surface font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 
+                                        transition-all duration-200 ease-out 
+                                        hover:bg-surface-variant hover:scale-103 
+                                        active:scale-98 
+                                        transform-gpu antialiased text-sm">
                                     <span class="material-symbols-outlined text-[18px]">cancel</span>
                                     Reject
                                 </button>
@@ -259,11 +266,6 @@
             <span class="material-symbols-outlined mb-1 text-[24px]" data-icon="rule"
                 style="font-variation-settings: 'FILL' 1;">rule</span>
             <span>Manage</span>
-        </a>
-        <a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 active:bg-zinc-100 dark:active:bg-zinc-800 w-16 h-14 rounded-xl transition-colors"
-            href="#">
-            <span class="material-symbols-outlined mb-1 text-[24px]" data-icon="inventory_2">inventory_2</span>
-            <span>Inventory</span>
         </a>
         <a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 active:bg-zinc-100 dark:active:bg-zinc-800 w-16 h-14 rounded-xl transition-colors"
             href="/profile">

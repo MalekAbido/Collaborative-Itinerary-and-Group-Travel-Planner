@@ -2,6 +2,7 @@
 namespace App\Helpers;
 
 use App\Helpers\Session;
+use App\Models\TripMember;
 use App\Models\User;
 use App\Models\TripMember;
 
@@ -9,8 +10,8 @@ use App\Models\TripMember;
 class Auth
 {
     private static $roles = [
-        'Member' => 1,
-        'Editor' => 2,
+        'Member'    => 1,
+        'Editor'    => 2,
         'Organizer' => 3,
     ];
 
@@ -50,7 +51,7 @@ class Auth
     public static function user()
     {
         $userId = self::id();
-        
+
         if ($userId) {
             $user = new User();
             if ($user->read($userId)) {

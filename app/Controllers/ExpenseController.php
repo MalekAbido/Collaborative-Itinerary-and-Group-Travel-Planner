@@ -2,9 +2,13 @@
 
 namespace App\Controllers;
 
-use Core\Controller;
+use App\Helpers\Auth;
+use App\Helpers\HistoryLogger;
 use App\Models\Expense;
 use App\Models\ExpenseShare;
+use App\Models\TransactionType;
+use App\Models\TripMember;
+use Core\Controller;
 
 class ExpenseController extends Controller
 {
@@ -72,6 +76,13 @@ class ExpenseController extends Controller
             'description' => $details['description'],
             'category'    => $details['category']
         ]);
+
+        if ($expenseId) {
+            $newExpense = $expenseModel->findById($expenseId);
+            $itineraryData = $newExpense->getItinerary();
+            $itineraryId = $itineraryData['itineraryId'] ?? null;
+            HistoryLogger::log($itineraryId, TransactionType::EXPENSE_ADDED, $newExpense, $payerId);
+        }
         
         $shareModel = new ExpenseShare();
 
@@ -101,6 +112,13 @@ class ExpenseController extends Controller
 
     public function deleteExpense()
     {
+        $itineraryData = $expense->getItinerary();
+        $itineraryId = $itineraryData['itineraryId'] ?? null;
+
+        Auth::requireLogin();
+        $tripMember = Auth::requireMembership($itineraryId);
+        Auth::requireRole('Editor', $tripMember->getRole());
+
         $expenseId = $_POST['expenseId'] ?? null;
 
         if (!$expenseId) {
@@ -108,18 +126,17 @@ class ExpenseController extends Controller
         }
 
         $expenseModel = new Expense();
-        $shareModel = new ExpenseShare();
-
         // Verify expense exists
         $expense = $expenseModel->findById($expenseId);
         if (!$expense) {
             die("Error: Expense not found.");
         }
 
-        $shareModel->deleteByExpenseId($expenseId);
-        $expenseModel->delete($expenseId);
+        if($expense->delete($tripMember->getId())){
+        HistoryLogger::log($itineraryId, TransactionType::EXPENSE_DELETED, $expense, $tripMember);
+        }
 
-        header("Location: /finance/dashboard/" . $expense->getTripFinanceId() . "?success=expense_deleted");
+        header("Location: /finance/dashboard/" . $itineraryId . "?success=expense_deleted");
         exit();
     }
 
@@ -181,9 +198,10 @@ class ExpenseController extends Controller
 
         $expense->updateRefundedAmount($newRefundInput);
 
-        $itinerary = $expense->getItinerary();
+        $itineraryData = $expense->getItinerary();
+        $itineraryId = $itineraryData['itineraryId'] ?? null;
 
-        header("Location: /finance/dashboard/" . $itinerary['itineraryId'] . "?success=refund_applied");
+        header("Location: /finance/dashboard/" . $itineraryId . "?success=refund_applied");
         exit();
     }
 
