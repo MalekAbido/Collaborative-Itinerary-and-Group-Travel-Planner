@@ -555,7 +555,8 @@ ALTER TABLE TransportDetail
 INSERT INTO User (userId, firstName, lastName, email, passwordHash, nationality, policyNumber, profileImage) VALUES
 ('user_00001', 'Ahmed', 'Ali', 'ahmed.ali@example.com', '$2y$10$jcfUGlVgsAMXB4qwxEbUd.fW..I9Rqiy3ZJnmebMcw8pT4RrRlNNO', 'Egyptian', 'POL1234567890123456', 'uploads/profiles/user1.jpg'),
 ('user_00002', 'Yousef', 'Hassan', 'yousef.h@example.com', '$2y$10$WkETwNGL8hMzXkzQehOdAeMaMuN7h6xkjMz8Si/UB.PuuhmIX4ydG', 'Egyptian', 'POL1234567890123457', 'uploads/profiles/user2.jpg'),
-('user_00003', 'Hagar', 'Mahmoud', 'hagar.m@example.com', 'hashed_pw_3', 'Egyptian', 'POL1234567890123458', 'uploads/profiles/user3.jpg');
+('user_00003', 'Hagar', 'Mahmoud', 'hagar.m@example.com', 'hashed_pw_3', 'Egyptian', 'POL1234567890123458', 'uploads/profiles/user3.jpg'),
+('usr_69fcaaa017920',	'Yuki',	'Caboki',	'example@gmail.com',	'$2y$10$vLG/1vZaAW5YB9Lsi/TdaOQYCgilbjf0/n9FetJ824gtZG1hUag7m', '', '', '');
 
 INSERT INTO Itinerary (itineraryId, title, description, startDate, endDate) VALUES
 ('itin_00001', 'Japan Tech & Culture Tour', 'Exploring AI research hubs and cultural sites in Tokyo and Kyoto.', '2026-05-10', '2026-05-20'),
@@ -589,7 +590,8 @@ INSERT INTO TripMember (membershipId, role, joinedAt, userId, itineraryId) VALUE
 ('mem_004', 'Organizer', '2026-04-01 14:00:00', 1, 2),
 ('mem_005', 'Editor', '2026-04-02 16:45:00', 2, 2),
 
-('mem_006', 'Member', '2026-04-02 16:45:00', 3, 2);
+('mem_006', 'Member', '2026-04-02 16:45:00', 3, 2),
+('mem_007', 'Editor', '2026-03-05 09:15:00', 4, 1);
 
 INSERT INTO Invitation (invitationId, secureToken, isActive, itineraryId, email, role) VALUES
 ('inv_001', 'token_abc123', TRUE, 1, 'dummy1@example.com', 'Member'),

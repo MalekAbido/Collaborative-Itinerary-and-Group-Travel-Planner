@@ -229,7 +229,9 @@ class PollController extends Controller
             'activePolls' => $activePolls,
             'closedPolls' => $closedPolls,
             'ratingChoices' => $ratingChoices,
-            'userRole' => $userRole
+            'userRole' => $userRole,
+            'itineraryId' => $itineraryId,
+            'activeTab' => 'polls'
         ]);
     }
 
