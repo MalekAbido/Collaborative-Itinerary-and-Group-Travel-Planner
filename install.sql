@@ -586,7 +586,8 @@ INSERT INTO TripMember (membershipId, role, joinedAt, userId, itineraryId) VALUE
 ('mem_002', 'Editor', '2026-03-02 11:30:00', 2, 1),
 ('mem_003', 'Member', '2026-03-05 09:15:00', 3, 1),
 ('mem_004', 'Organizer', '2026-04-01 14:00:00', 1, 2),
-('mem_005', 'Editor', '2026-04-02 16:45:00', 2, 2);
+('mem_005', 'Editor', '2026-04-02 16:45:00', 2, 2),
+
 ('mem_006', 'Member', '2026-04-02 16:45:00', 3, 2);
 
 INSERT INTO Invitation (invitationId, secureToken, isActive, itineraryId, email, role) VALUES
@@ -650,7 +651,7 @@ INSERT INTO AttendanceMember (status, note, attendanceListId, tripMemberId) VALU
 ('Pending', NULL, 1, 2),
 ('Not Going', NULL, 1, 3),
 ('Going', NULL, 2, 1),
-('Not Going', 'Feeling sick', 2, 2);
+('Not Going', 'Feeling sick', 2, 2),
 ('Not Going', 'Feeling tired', 2, 3);
 
 INSERT INTO Vote (voteId, voteWeight, timestamp, pollId, tripMemberId) VALUES
