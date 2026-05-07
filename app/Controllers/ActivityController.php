@@ -135,7 +135,7 @@ class ActivityController extends Controller
                 $allMembers = $tripMember->getAllByItineraryId($itineraryId);
 
                 foreach ($allMembers as $memberData) {
-                    $attendanceList->updateStatus($memberData['id'], 'PENDING');
+                    $attendanceList->updateStatus($memberData['memberId'], 'PENDING');
                 }
             }
 
