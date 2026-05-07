@@ -199,7 +199,7 @@ class PollController extends Controller
 
         $currentTime = time();
 
-        foreach ($allPolls as $pollData) {
+        foreach ($allPolls as &$pollData) {
             $pollObj = new Poll();
             $pollObj->read($pollData['id']);
 
@@ -215,6 +215,32 @@ class PollController extends Controller
             $pollData['stats'] = $pollObj->getVoteStats();
             $pollData['voters'] = $pollObj->getVoterDetails();
             $pollData['totalVotes'] = array_sum(array_column($pollData['stats'], 'count'));
+
+            $activity = Activity::getByActivityId($pollData['activityId']);
+
+            // Fetch activity details for the modal
+            $pollData['activityDescription'] = $activity ? $activity->getDescription() : '';
+            $pollData['startTime'] = $activity ? $activity->getStartTime() : '';
+            $pollData['endTime'] = $activity ? $activity->getEndTime() : '';
+            $location = $activity ? $activity->getLocation() : null;
+            $pollData['locationName'] = $location ? $location->getName() : '';
+
+            // Fetch conflicting activities and their poll points
+            $pollData['conflicts'] = [];
+            if ($activity) {
+                $conflicts = $activity->getConflictingConfirmedActivities();
+                foreach ($conflicts as $conflict) {
+                    $conflictPolls = Poll::getByActivityId($conflict->getId());
+                    $cpPoints = 0;
+                    foreach ($conflictPolls as $cp) {
+                        $cpPoints += (float)$cp['weightedTotal'];
+                    }
+                    $pollData['conflicts'][] = [
+                        'name' => $conflict->getName(),
+                        'points' => $cpPoints
+                    ];
+                }
+            }
 
             if ($pollData['status'] === 'OPEN') {
                 $activePolls[] = $pollData;
@@ -241,9 +267,32 @@ class PollController extends Controller
     {
         $poll->closePoll();
         $activity = Activity::getByIdAndItinerary($poll->getActivityId(), $itineraryId);
-        if ($poll->calculateTotalPoints() > 0)
-            $activity->updateStatus('CONFIRMED');
-        else $activity->updateStatus('REJECTED');
+        $currentPoints = $poll->calculateTotalPoints();
+
+        $conflicts = $activity->getConflictingConfirmedActivities();
+        
+        $canConfirm = true;
+        foreach ($conflicts as $conflict) {
+            $conflictPolls = Poll::getByActivityId($conflict->getId());
+            $cpPoints = 0;
+            foreach ($conflictPolls as $cp) {
+                $cpPoints += (float)$cp['weightedTotal'];
+            }
+            // If current poll doesn't beat each conflict independently, it can't be confirmed
+            if ($currentPoints < $cpPoints) {
+                $canConfirm = false;
+                break;
+            }
+        }
+
+        if ($canConfirm && $currentPoints > 0) {
+            $activity->updateStatus('Confirmed');
+            foreach ($conflicts as $conflict) {
+                $conflict->updateStatus('DECLINED');
+            }
+        } else {
+            $activity->updateStatus('REJECTED');
+        }
     }
 
     public function openPoll(int $itineraryId, Poll $poll)
