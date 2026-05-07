@@ -60,6 +60,10 @@
                                 class="flex items-center h-full px-4 text-body-sm transition-all <?= (in_array($activeTab ?? '', ['polls', 'poll']))  ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-b-2 border-transparent hover:text-primary' ?>">
                                 Polls
                             </a>
+                            <a href="/itinerary/inventory/<?= htmlspecialchars($itineraryId) ?>"
+                                class="flex items-center h-full px-4 text-body-sm transition-all <?= ($activeTab ?? '') === 'inventory' ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-b-2 border-transparent hover:text-primary' ?>">
+                                Inventory
+                            </a>
                             <?php $currentMember = TripMember::getByUserAndItinerary($currentUser->getId(), $itineraryId); ?>
                             <?php if (Auth::hasRole("Editor", $currentMember->getRole() ?? null)): ?>
                             <a href="/itinerary/<?= htmlspecialchars($itineraryId) ?>/proposals"
