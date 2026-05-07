@@ -1,8 +1,6 @@
 <?php
-
 namespace App\Controllers;
 
-use Core\Controller;
 use App\Helpers\Auth;
 use App\Helpers\TimeHelper;
 use App\Models\Activity;
@@ -10,6 +8,7 @@ use App\Models\Itinerary;
 use App\Models\Poll;
 use App\Models\TripMember;
 use App\Models\Vote;
+use Core\Controller;
 
 class PollController extends Controller
 {
@@ -21,19 +20,19 @@ class PollController extends Controller
 
     public function store()
     {
-        $activityId = $_POST['activityId'] ?? null;
-        $deadlineRaw = $_POST['deadline'] ?? null;
+        $activityId        = $_POST['activityId'] ?? null;
+        $deadlineRaw       = $_POST['deadline'] ?? null;
         $clientTimezoneStr = $_POST['timezone'] ?? 'UTC';
-        $isAnonymous = isset($_POST['isAnonymous']);
+        $isAnonymous       = isset($_POST['isAnonymous']);
 
-        if (!$activityId || !$deadlineRaw) {
+        if (! $activityId || ! $deadlineRaw) {
             header("Location: " . $_SERVER['HTTP_REFERER']);
             exit();
         }
 
         $formattedDeadline = TimeHelper::convertToUTC($deadlineRaw, $clientTimezoneStr);
 
-        if (!$formattedDeadline) {
+        if (! $formattedDeadline) {
             die("Invalid datetime or timezone provided.");
         }
 
@@ -54,18 +53,19 @@ class PollController extends Controller
 
     public function vote()
     {
-        $pollId = $_POST['pollId'] ?? null;
+        $pollId       = $_POST['pollId'] ?? null;
         $ratingChoice = $_POST['ratingChoice'] ?? null;
-        $userId = $_SESSION['user_id'] ?? Auth::id();
-        $itineraryId = $_POST['itineraryId'] ?? null;
+        $userId       = $_SESSION['user_id'] ?? Auth::id();
+        $itineraryId  = $_POST['itineraryId'] ?? null;
 
-        if (!$pollId || !$ratingChoice || !$itineraryId) {
+        if (! $pollId || ! $ratingChoice || ! $itineraryId) {
             header("Location: " . $_SERVER['HTTP_REFERER']);
             exit();
         }
 
         $poll = new Poll();
-        if (!$poll->read($pollId)) {
+
+        if (! $poll->read($pollId)) {
             die("Poll not found.");
         }
 
@@ -73,13 +73,14 @@ class PollController extends Controller
             if ($poll->getStatus() === 'OPEN') {
                 $poll->closePoll();
             }
+
             header("Location: " . $_SERVER['HTTP_REFERER'] . "&error=poll_closed");
             exit();
         }
 
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
-        if (!$member) {
+        if (! $member) {
             die("You are not a member of this trip.");
         }
 
@@ -106,10 +107,10 @@ class PollController extends Controller
 
     public function closeEarly()
     {
-        $pollId = $_POST['pollId'] ?? null;
+        $pollId      = $_POST['pollId'] ?? null;
         $itineraryId = $_POST['itineraryId'] ?? null;
 
-        if (!$pollId || !$itineraryId) {
+        if (! $pollId || ! $itineraryId) {
             header("Location: " . $_SERVER['HTTP_REFERER']);
             exit();
         }
@@ -117,6 +118,7 @@ class PollController extends Controller
         $this->enforceEditorRole($itineraryId);
 
         $poll = new Poll();
+
         if ($poll->read($pollId)) {
             $this->closePoll($itineraryId, $poll);
         }
@@ -127,12 +129,12 @@ class PollController extends Controller
 
     public function reopen()
     {
-        $pollId = $_POST['pollId'] ?? null;
-        $itineraryId = $_POST['itineraryId'] ?? null;
-        $newDeadlineRaw = $_POST['newDeadline'] ?? null;
+        $pollId            = $_POST['pollId'] ?? null;
+        $itineraryId       = $_POST['itineraryId'] ?? null;
+        $newDeadlineRaw    = $_POST['newDeadline'] ?? null;
         $clientTimezoneStr = $_POST['timezone'] ?? 'UTC';
 
-        if (!$pollId || !$itineraryId || !$newDeadlineRaw) {
+        if (! $pollId || ! $itineraryId || ! $newDeadlineRaw) {
             header("Location: " . $_SERVER['HTTP_REFERER']);
             exit();
         }
@@ -140,6 +142,7 @@ class PollController extends Controller
         $this->enforceEditorRole($itineraryId);
 
         $poll = new Poll();
+
         if ($poll->read($pollId)) {
             $formattedDeadline = TimeHelper::convertToUTC($newDeadlineRaw, $clientTimezoneStr);
 
@@ -161,7 +164,7 @@ class PollController extends Controller
 
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
-        // Handle array or object
+// Handle array or object
         if ($member) {
             $role = is_array($member) ? $member['role'] : $member->getRole();
         } else {
@@ -174,9 +177,9 @@ class PollController extends Controller
     public function index(int $itineraryId)
     {
         $itineraryModel = new Itinerary();
-        $itinerary = $itineraryModel->findByIdNumeric($itineraryId);
+        $itinerary      = $itineraryModel->findByIdNumeric($itineraryId);
 
-        if (!$itinerary) {
+        if (! $itinerary) {
             die("Itinerary not found.");
         }
 
@@ -209,11 +212,12 @@ class PollController extends Controller
                 if ($pollObj->read($pollData['id'])) {
                     $this->closePoll($itineraryId, $pollObj);
                 }
+
                 $pollData['status'] = 'CLOSED';
             }
 
-            $pollData['stats'] = $pollObj->getVoteStats();
-            $pollData['voters'] = $pollObj->getVoterDetails();
+            $pollData['stats']      = $pollObj->getVoteStats();
+            $pollData['voters']     = $pollObj->getVoterDetails();
             $pollData['totalVotes'] = array_sum(array_column($pollData['stats'], 'count'));
 
             $activity = Activity::getByActivityId($pollData['activityId']);
@@ -252,14 +256,16 @@ class PollController extends Controller
         $ratingChoices = Vote::getRatingOptions();
 
         $this->view('polls/polls', [
-            'itinerary' => $itinerary,
-            'itineraryId' => $itineraryId,
-            'activeTab' => 'polls',
-            'activePolls' => $activePolls,
-            'closedPolls' => $closedPolls,
-            'ratingChoices' => $ratingChoices,
-            'userRole' => $userRole,
-            'canManagePolls' => $canManagePolls
+            'itinerary'      => $itinerary,
+            'itineraryId'    => $itineraryId,
+            'activeTab'      => 'polls',
+            'activePolls'    => $activePolls,
+            'closedPolls'    => $closedPolls,
+            'ratingChoices'  => $ratingChoices,
+            'userRole'       => $userRole,
+            'itineraryId'    => $itineraryId,
+            'activeTab'      => 'polls',
+            'canManagePolls' => $canManagePolls,
         ]);
     }
 
