@@ -51,8 +51,9 @@
 <body class="bg-surface overflow-y-auto">
 
     <nav class="fixed inset-x-0 top-0 z-50 h-[64px] bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant shadow-sm flex items-center justify-between px-6">
-        <a href="/home" class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
-        <a href="/itinerary/dashboard/<?= htmlspecialchars($trip['itineraryId']) ?>" class="inline-flex items-center gap-1 text-body-sm font-semibold text-outline hover:text-primary transition">
+        <a href="/dashboard" class="font-display text-[22px] font-extrabold tracking-tight text-primary">VoyageSync</a>
+        
+        <a href="/itinerary/dashboard/<?= htmlspecialchars($data['trip']['id'] ?? '') ?>" class="inline-flex items-center gap-1 text-body-sm font-semibold text-outline hover:text-primary transition">
             <span class="material-symbols-outlined text-[18px]">arrow_back</span> Back to Dashboard
         </a>
     </nav>
