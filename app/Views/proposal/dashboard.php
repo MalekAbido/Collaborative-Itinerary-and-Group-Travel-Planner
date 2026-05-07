@@ -1,10 +1,10 @@
 <?php require __DIR__ . '/../layouts/header.php'; ?>
         <!-- Main Scrollable Canvas -->
         <!-- <main class="flex-1 overflow-y-auto bg-surface pb-16 pt-20"> -->
-            <div class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8 py-0">
                 <!-- Page Header -->
                 <div class="mb-10">
-                    <h1 class="text-4xl font-bold text-on-surface mb-2">Proposed Activities Review</h1>
+                    <h1 class="font-display text-display text-on-surface mb-2">Proposed Activities Review</h1>
                     <p class="text-lg text-on-surface-variant max-w-2xl">Review draft submissions from group members. Approving a draft creates an active poll, while rejecting it removes it from consideration.</p>
                 </div>
                 

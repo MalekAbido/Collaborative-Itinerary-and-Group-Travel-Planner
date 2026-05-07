@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Controllers;
 
 use App\Helpers\Auth;
@@ -8,16 +7,15 @@ use App\Models\Expense;
 use App\Models\ExpenseShare;
 use App\Models\TransactionType;
 use App\Models\TripFinance;
-use App\Models\TripMember;
 use Core\Controller;
 
 class ExpenseController extends Controller
 {
     public function showAddForm($id)
     {
-        $itineraryId = $id;
+        $itineraryId     = $id;
         $tripMemberModel = new \App\Models\TripMember();
-        $members = $tripMemberModel->getAllByItineraryId($itineraryId);
+        $members         = $tripMemberModel->getAllByItineraryId($itineraryId);
 
         $financeModel = new \App\Models\TripFinance();
         $financeModel->readByItinerary($itineraryId);
@@ -25,17 +23,18 @@ class ExpenseController extends Controller
 
         // Get group fund balance if it exists
         $groupFundBalance = 0;
-        $groupFundModel = new \App\Models\GroupFund();
+        $groupFundModel   = new \App\Models\GroupFund();
+
         if ($groupFundModel->readByTripFinanceId($financeId)) {
             $groupFundBalance = $groupFundModel->getCurrentBalance();
         }
 
         $this->view('expenses/add', [
-            'members' => $members,
-            'financeId' => $financeId,
-            'itineraryId' => $id,
+            'members'          => $members,
+            'financeId'        => $financeId,
+            'itineraryId'      => $id,
             'groupFundBalance' => $groupFundBalance,
-            'activeTab' => 'addExpense'
+            'activeTab'        => 'addExpense',
         ]);
     }
 
@@ -43,37 +42,38 @@ class ExpenseController extends Controller
     {
         Auth::requireLogin();
 
-        $financeId = $_POST['financeId'] ?? '';
-        $payerId = (int)($_POST['payerId'] ?? 0);
-        $splitMethod = $_POST['splitMethod'] ?? 'EVEN';
-        $totalAmount = (float)($_POST['amount'] ?? 0);
+        $financeId    = $_POST['financeId'] ?? '';
+        $payerId      = (int) ($_POST['payerId'] ?? 0);
+        $splitMethod  = $_POST['splitMethod'] ?? 'EVEN';
+        $totalAmount  = (float) ($_POST['amount'] ?? 0);
         $currencyType = trim($_POST['currencyType'] ?? 'EGP');
-        $isNonCash = isset($_POST['isNonCash']) ? 1 : 0;
-        $paidByKitty = isset($_POST['paidByKitty']) ? 1 : 0;
+        $isNonCash    = isset($_POST['isNonCash']) ? 1 : 0;
+        $paidByKitty  = isset($_POST['paidByKitty']) ? 1 : 0;
 
         $details = [
             'description' => $_POST['description'] ?? '',
-            'category' => $_POST['category'] ?? '',
-            'shares' => $_POST['shares'] ?? []
+            'category'    => $_POST['category'] ?? '',
+            'shares'      => $_POST['shares'] ?? [],
         ];
 
         $financeModel = new \App\Models\TripFinance();
-        if (!$financeModel->read($financeId)) {
+
+        if (! $financeModel->read($financeId)) {
             die("Error: Invalid finance record.");
         }
 
         if ($paidByKitty === 1) {
-            $itineraryId = $financeModel->getItineraryId();
+            $itineraryId     = $financeModel->getItineraryId();
             $tripMemberModel = new \App\Models\TripMember();
-            $currentMember = Auth::requireMembership($itineraryId);
+            $currentMember   = Auth::requireMembership($itineraryId);
 
             $groupFundModel = new \App\Models\GroupFund();
-            $fundExists = $groupFundModel->readByTripFinanceId($financeId);
+            $fundExists     = $groupFundModel->readByTripFinanceId($financeId);
 
-            if (!$fundExists) {
+            if (! $fundExists) {
                 die("Error: There is no Group Fund set up for this trip yet.");
             }
-            
+
             if ($groupFundModel->getCurrentBalance() < $totalAmount) {
                 $financeModel = new \App\Models\TripFinance();
                 $financeModel->readByItinerary($itineraryId);
@@ -82,11 +82,11 @@ class ExpenseController extends Controller
                 $groupFundBalance = $groupFundModel->getCurrentBalance();
 
                 $this->view('expenses/add', [
-                    'members' => $tripMemberModel->getAllByItineraryId($itineraryId),
-                    'financeId' => $financeId,
-                    'itineraryId' => $itineraryId,
+                    'members'          => $tripMemberModel->getAllByItineraryId($itineraryId),
+                    'financeId'        => $financeId,
+                    'itineraryId'      => $itineraryId,
                     'groupFundBalance' => $groupFundBalance,
-                    'error' => 'Insufficient funds in the group kitty to cover this expense. Available: ' . number_format($groupFundBalance, 2)
+                    'error'            => 'Insufficient funds in the group kitty to cover this expense. Available: ' . number_format($groupFundBalance, 2),
                 ]);
                 return;
             } else {
@@ -95,43 +95,45 @@ class ExpenseController extends Controller
         }
 
         $isValid = $this->validateExpenseData($splitMethod, $totalAmount, $details['shares'], $paidByKitty);
-        if (!$isValid) {
+
+        if (! $isValid) {
             die("Error: Invalid expense data or shares do not equal the total amount.");
         }
 
         $expenseModel = new Expense();
-        $expenseId = $expenseModel->create([
-            'financeId'   => $financeId,
-            'payerId'     => $payerId,
-            'amount'      => $totalAmount,
+        $expenseId    = $expenseModel->create([
+            'financeId'    => $financeId,
+            'payerId'      => $payerId,
+            'amount'       => $totalAmount,
             'currencyType' => $currencyType,
-            'isNonCash'   => $isNonCash,
-            'paidByKitty' => $paidByKitty,
-            'description' => $details['description'],
-            'category'    => $details['category']
+            'isNonCash'    => $isNonCash,
+            'paidByKitty'  => $paidByKitty,
+            'description'  => $details['description'],
+            'category'     => $details['category'],
         ]);
 
         if ($expenseId) {
-            $newExpense = $expenseModel->findById($expenseId);
+            $newExpense    = $expenseModel->findById($expenseId);
             $itineraryData = $newExpense->getItinerary();
-            $itineraryId = $itineraryData['itineraryId'] ?? null;
-            HistoryLogger::log($itineraryId, TransactionType::EXPENSE_ADDED, $newExpense, $payerId);
+            $itineraryId   = $itineraryData['itineraryId'] ?? null;
+            HistoryLogger::log($itineraryId, TransactionType::ADDED_EXPENSE, $newExpense, $payerId);
         }
-        
+
         if ($paidByKitty !== 1) {
             $shareModel = new ExpenseShare();
 
             if ($splitMethod === 'EVEN') {
-                $memberCount = count($details['shares']);
+                $memberCount     = count($details['shares']);
                 $evenSplitAmount = $totalAmount / $memberCount;
 
                 foreach ($details['shares'] as $memberId => $dummyValue) {
-                    $isPayer = ((int)$memberId === $payerId) ? 1 : 0;
+                    $isPayer = ((int) $memberId === $payerId) ? 1 : 0;
                     $shareModel->create($expenseId, $memberId, $evenSplitAmount, $isPayer);
                 }
             } elseif ($splitMethod === 'UNEVEN') {
+
                 foreach ($details['shares'] as $memberId => $amountOwed) {
-                    $isPayer = ((int)$memberId === $payerId) ? 1 : 0;
+                    $isPayer = ((int) $memberId === $payerId) ? 1 : 0;
                     $shareModel->create($expenseId, $memberId, $amountOwed, $isPayer);
                 }
             }
@@ -141,14 +143,14 @@ class ExpenseController extends Controller
         $financeModel->read($financeId);
         $itineraryId = $financeModel->getItineraryId();
 
-        header("Location: /finance/dashboard/" . $itineraryId . "?success=expense_added");
+        header("Location: /finance/dashboard/" . $itineraryId . "?success=ADDED_EXPENSE");
         exit();
     }
 
     public function deleteExpense()
     {
         $itineraryData = $expense->getItinerary();
-        $itineraryId = $itineraryData['itineraryId'] ?? null;
+        $itineraryId   = $itineraryData['itineraryId'] ?? null;
 
         Auth::requireLogin();
         $tripMember = Auth::requireMembership($itineraryId);
@@ -156,22 +158,23 @@ class ExpenseController extends Controller
 
         $expenseId = $_POST['expenseId'] ?? null;
 
-        if (!$expenseId) {
+        if (! $expenseId) {
             die("Error: No Expense ID provided.");
         }
 
         $expenseModel = new Expense();
         // Verify expense exists
         $expense = $expenseModel->findById($expenseId);
-        if (!$expense) {
+
+        if (! $expense) {
             die("Error: Expense not found.");
         }
 
-        if($expense->delete($tripMember->getId())){
-        HistoryLogger::log($itineraryId, TransactionType::EXPENSE_DELETED, $expense, $tripMember);
+        if ($expense->delete($tripMember->getId())) {
+            HistoryLogger::log($itineraryId, TransactionType::DELETED_EXPENSE, $expense, $tripMember);
         }
 
-        header("Location: /finance/dashboard/" . $itineraryId . "?success=expense_deleted");
+        header("Location: /finance/dashboard/" . $itineraryId . "?success=DELETED_EXPENSE");
         exit();
     }
 
@@ -179,21 +182,21 @@ class ExpenseController extends Controller
     {
         $expenseId = $_GET['id'] ?? null;
 
-        if (!$expenseId) {
+        if (! $expenseId) {
             die("Expense ID is required to view details.");
         }
 
         $expenseModel = new Expense();
-        $shareModel = new ExpenseShare();
+        $shareModel   = new ExpenseShare();
 
         $expense = $expenseModel->findById($expenseId);
 
-        if (!$expense) {
+        if (! $expense) {
             die("Expense not found.");
         }
 
         $expense->loadShares($expenseId);
-        $payer = null;
+        $payer   = null;
         $debtors = [];
 
         foreach ($expense->expenseShares as $share) {
@@ -203,31 +206,32 @@ class ExpenseController extends Controller
                 $debtors[] = $share;
             }
         }
+
         $financeId = $expense->getTripFinanceId();
-        $finance = new TripFinance();
+        $finance   = new TripFinance();
         $finance->read($financeId);
         $this->view('expenses/details', [
-            'expense' => $expense,
-            'payer'   => $payer,
-            'debtors' => $debtors,
+            'expense'     => $expense,
+            'payer'       => $payer,
+            'debtors'     => $debtors,
             'itineraryId' => $finance->getItineraryId(),
-            'activeTab' => 'expense'
+            'activeTab'   => 'expense',
         ]);
     }
 
     public function refundExpense()
     {
-        $expenseId = $_POST['expenseId'] ?? null;
+        $expenseId      = $_POST['expenseId'] ?? null;
         $newRefundInput = (float) ($_POST['refundAmount'] ?? 0);
 
-        if (!$expenseId) {
+        if (! $expenseId) {
             die("Error: No Expense ID provided.");
         }
 
         $expenseModel = new Expense();
-        $expense = $expenseModel->findById($expenseId);
+        $expense      = $expenseModel->findById($expenseId);
 
-        if (!$expense) {
+        if (! $expense) {
             die("Error: Expense not found.");
         }
 
@@ -238,7 +242,7 @@ class ExpenseController extends Controller
         $expense->updateRefundedAmount($newRefundInput);
 
         $itineraryData = $expense->getItinerary();
-        $itineraryId = $itineraryData['itineraryId'] ?? null;
+        $itineraryId   = $itineraryData['itineraryId'] ?? null;
 
         header("Location: /finance/dashboard/" . $itineraryId . "?success=refund_applied");
         exit();
@@ -253,6 +257,7 @@ class ExpenseController extends Controller
 
     private function validateExpenseData($splitMethod, $totalAmount, $shares, $paidByKitty = 0)
     {
+
         if ($paidByKitty === 1) {
             return true;
         }
@@ -264,7 +269,7 @@ class ExpenseController extends Controller
         if ($splitMethod === 'UNEVEN') {
             $sumOfShares = array_sum($shares);
 
-            // the epsilon method to handle decimal inaccuracy
+// the epsilon method to handle decimal inaccuracy
             if (abs($sumOfShares - $totalAmount) > 0.01) {
                 return false;
             }

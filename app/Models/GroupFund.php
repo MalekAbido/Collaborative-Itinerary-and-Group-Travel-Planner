@@ -79,7 +79,7 @@ class GroupFund
             if ($contribution->read($lastId)) {
                 $itineraryId = $contribution->getItineraryId();
 
-                HistoryLogger::log($itineraryId, TransactionType::FUND_CONTRIBUTION_ADDED, $contribution, $contributorId);
+                HistoryLogger::log($itineraryId, TransactionType::ADDED_FUND_CONTRIBUTION, $contribution, $contributorId);
             }
         }
 
@@ -138,11 +138,11 @@ class GroupFund
             return [];
         }
 
-        $sql = "SELECT fc.amount, fc.timestamp, u.firstName, u.lastName
+        $sql = "SELECT fc.id, fc.tripMemberId, fc.amount, fc.timestamp, u.firstName, u.lastName
                 FROM FundContribution fc
                 JOIN TripMember tm ON fc.tripMemberId = tm.id
                 JOIN User u ON tm.userId = u.id
-                WHERE fc.groupFundId = :groupFundId
+                WHERE fc.groupFundId = :groupFundId AND fc.deletedAt IS NULL
                 ORDER BY fc.timestamp DESC";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':groupFundId' => $this->fundId]);

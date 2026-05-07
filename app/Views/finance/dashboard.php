@@ -171,8 +171,17 @@ if ($percentage >= 100) {
                                                             </p>
                                                         </div>
                                                     </div>
-                                                    <div class="text-body-md font-bold text-on-surface">
-                                                        +<?= number_format($contribution['amount']) ?> <span class="text-body-xs font-normal text-outline"><?= htmlspecialchars($baseCurrency) ?></span>
+                                                    <div class="flex items-center gap-4">
+                                                        <div class="text-body-md font-bold text-on-surface">
+                                                            +<?= number_format($contribution['amount']) ?> <span class="text-body-xs font-normal text-outline"><?= htmlspecialchars($baseCurrency) ?></span>
+                                                        </div>
+                                                        <?php if ($contribution['tripMemberId'] == $currentMemberId || \App\Helpers\Auth::hasRole('Editor', $userRole)): ?>
+                                                            <form action="/fund/contribution/delete/<?= htmlspecialchars($contribution['id']) ?>" method="POST" onsubmit="return confirm('Are you sure you want to delete this contribution? This will also deduct the amount from the kitty balance.')">
+                                                                <button type="submit" class="text-outline hover:text-error transition flex items-center">
+                                                                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                                                                </button>
+                                                            </form>
+                                                        <?php endif; ?>
                                                     </div>
                                                 </li>
                                             <?php endforeach; ?>
@@ -273,7 +282,6 @@ if ($percentage >= 100) {
 
             </div>
         </main>
-    </div>
 
     <!-- Finance Settings Modal -->
     <div id="financeSettingsModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-on-background/50 backdrop-blur-sm transition-opacity">
@@ -375,4 +383,4 @@ if ($percentage >= 100) {
         }
     </script>
 
-<?php require __DIR__ . '/../layouts/header.php';?>
+<?php require __DIR__ . '/../layouts/footer.php'; ?>

@@ -280,37 +280,6 @@ ALTER TABLE Subtrip
 ALTER TABLE Subtrip
   ADD CONSTRAINT UQ_subtripId UNIQUE (subtripId);
 
-CREATE TABLE TransportDetail
-(
-  id              INT           NOT NULL AUTO_INCREMENT,
-  transportId     VARCHAR(55)   NOT NULL,
-  distance        DECIMAL(10,2) NULL    ,
-  duration        INT           NULL    ,
-  fromActivityId  INT           NOT NULL,
-  toActivityId    INT           NOT NULL,
-  transportModeId INT           NOT NULL,
-  PRIMARY KEY (id)
-);
-
-ALTER TABLE TransportDetail
-  ADD CONSTRAINT UQ_id UNIQUE (id);
-
-ALTER TABLE TransportDetail
-  ADD CONSTRAINT UQ_transportId UNIQUE (transportId);
-
-CREATE TABLE TransportMode
-(
-  id     INT         NOT NULL AUTO_INCREMENT,
-  modeId VARCHAR(55) NOT NULL,
-  name   VARCHAR(50) NULL    ,
-  PRIMARY KEY (id)
-);
-
-ALTER TABLE TransportMode
-  ADD CONSTRAINT UQ_id UNIQUE (id);
-
-ALTER TABLE TransportMode
-  ADD CONSTRAINT UQ_modeId UNIQUE (modeId);
 
 CREATE TABLE TripFinance
 (
@@ -539,15 +508,6 @@ ALTER TABLE Activity
     FOREIGN KEY (locationId)
     REFERENCES Location (id);
 
-ALTER TABLE TransportDetail
-  ADD CONSTRAINT FK_Activity_TO_TransportDetail
-    FOREIGN KEY (fromActivityId)
-    REFERENCES Activity (id);
-
-ALTER TABLE TransportDetail
-  ADD CONSTRAINT FK_Activity_TO_TransportDetail1
-    FOREIGN KEY (toActivityId)
-    REFERENCES Activity (id);
 
 ALTER TABLE Poll
   ADD CONSTRAINT FK_Activity_TO_Poll
@@ -563,11 +523,6 @@ ALTER TABLE Vote
   ADD CONSTRAINT FK_TripMember_TO_Vote
     FOREIGN KEY (tripMemberId)
     REFERENCES TripMember (id);
-
-ALTER TABLE TransportDetail
-  ADD CONSTRAINT FK_TransportMode_TO_TransportDetail
-    FOREIGN KEY (transportModeId)
-    REFERENCES TransportMode (id);
 
 
 ALTER TABLE InventoryItem
@@ -596,11 +551,6 @@ INSERT INTO Location (placeId, name, address, latitude, longitude, timeZoneId) V
 ('loc_00002', 'Akihabara Tech District', 'Akihabara, Tokyo, Japan', 35.698353, 139.771020, 'Asia/Tokyo'),
 ('loc_00003', 'Kyoto Imperial Palace', 'Kyoto, Japan', 35.025400, 135.762100, 'Asia/Tokyo'),
 ('loc_00004', 'Bibliotheca Alexandrina', 'Alexandria, Egypt', 31.208900, 29.909200, 'Africa/Cairo');
-
-INSERT INTO TransportMode (modeId, name) VALUES
-('mode_001', 'Flight'),
-('mode_002', 'Bullet Train (Shinkansen)'),
-('mode_003', 'Bus');
 
 -- 2. Level 1 Dependencies (Depend on Independent Tables)
 INSERT INTO EmergencyContact (contactId, name, phone, email, relationship, userId) VALUES
@@ -642,10 +592,6 @@ INSERT INTO GroupFund (fundId, targetBalance, currentBalance, tripFinanceId) VAL
 ('fund_001', 150000.00, 50000.00, 1),
 ('fund_002', 5000.00, 2000.00, 2);
 
-INSERT INTO Expense (expenseId, amount, refundedAmount, currencyType, description, category, isNonCash, paidByKitty, tripFinanceId, tripMemberId) VALUES
-('exp_001', 30000.00, 0.00, 'JPY', 'Flight Booking Deposit', 'Transport', FALSE, FALSE, 1, 1),
-('exp_002', 15000.00, 0.00, 'JPY', 'Hotel Booking', 'Accommodation', FALSE, TRUE, 1, 2);
-
 -- 4. Level 3 Dependencies 
 -- Note: Subtrip uses ID 1, Locations use 1, 2, 3
 INSERT INTO Activity (itemId, name, description, startTime, endTime, category, status, itineraryId, tripMemberId, subtripId, locationId) VALUES
@@ -670,9 +616,6 @@ INSERT INTO HistoryLogEntry (entryId, transactionType, timestamp, changedEntityI
 INSERT INTO AttendanceList (totalAttendeeCount, activityId) VALUES
 (3, 1),
 (2, 2);
-
-INSERT INTO TransportDetail (transportId, distance, duration, fromActivityId, toActivityId, transportModeId) VALUES
-('trans_001', 500.00, 150, 2, 3, 2); -- Akihabara to Kyoto via Bullet Train
 
 INSERT INTO Poll (pollId, deadline, status, isAnonymous, weightedTotal, activityId) VALUES
 ('poll_001', '2026-04-01 23:59:59', 'Closed', FALSE, 13.00, 2);

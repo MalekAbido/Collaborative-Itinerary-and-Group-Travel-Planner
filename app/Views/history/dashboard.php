@@ -91,9 +91,9 @@ use App\Models\HistoryLogEntry;
                                         <p class="font-body text-body-md text-on-surface">
                                             <span class="font-bold text-primary"><?php echo $user ? htmlspecialchars($user->getFirstName() . ' ' . $user->getLastName()) : 'System'; ?></span>
                                             <?php
-                                            $actionMessage = explode('_', $entry->getTransactionType())??['', ''];
-                                            echo strtolower($actionMessage[1] . ' ' . $actionMessage[0]);
-                                            // echo strtolower(str_replace('_', ' ', $entry->getTransactionType())); ?>
+                                            // $actionMessage = explode('_', $entry->getTransactionType())??['', ''];
+                                            // echo strtolower($actionMessage[1] . ' ' . $actionMessage[0]);
+                                            echo strtolower(str_replace('_', ' ', $entry->getTransactionType())); ?>
                                         </p>
                                         <p class="text-label-xs text-on-surface-variant uppercase tracking-wider font-bold">
                                             <?php echo date('h:i A', strtotime($entry->getTimestamp())); ?>

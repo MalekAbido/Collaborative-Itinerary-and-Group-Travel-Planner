@@ -44,7 +44,7 @@ class ActivityController extends Controller
             'itineraryId'           => $itineraryId,
             'pendingActivity'       => $pendingActivity,
             'conflictingActivities' => $conflictingActivities,
-            'activeTab' => 'createActivity'
+            'activeTab'             => 'createActivity',
         ]);
     }
 
@@ -74,7 +74,7 @@ class ActivityController extends Controller
         $startTime = TimeHelper::convertToUTC($startTimeRaw, $clientTimezoneStr);
         $endTime   = TimeHelper::convertToUTC($endTimeRaw, $clientTimezoneStr);
 
-        if (!$startTime || !$endTime) {
+        if (! $startTime || ! $endTime) {
             Session::setFlash(Session::FLASH_ERROR, 'Invalid datetime or timezone provided.');
             header("Location: /itinerary/{$itineraryId}/activity/create");
             exit;
@@ -141,7 +141,7 @@ class ActivityController extends Controller
         $activity->setTripMemberId($tripMember->getId());
 
         if ($activity->create()) {
-            HistoryLogger::log($itineraryId, TransactionType::ACTIVITY_ADDED, $activity, $tripMember->getId());
+            HistoryLogger::log($itineraryId, TransactionType::ADDED_ACTIVITY, $activity, $tripMember->getId());
             $attendanceList = new AttendanceList();
 
             if ($attendanceList->create($activity->getId())) {
@@ -208,7 +208,7 @@ class ActivityController extends Controller
             'goingMembers'        => $goingMembers,
             'pendingMembers'      => $pendingMembers,
             'notGoingMembers'     => $notGoingMembers,
-            'activeTab' => 'activity'
+            'activeTab'           => 'activity',
         ]);
     }
 
@@ -268,7 +268,7 @@ class ActivityController extends Controller
         }
 
         if ($activity->delete()) {
-            HistoryLogger::log($itineraryId, TransactionType::ACTIVITY_REMOVED, $activity, $tripMember->getId());
+            HistoryLogger::log($itineraryId, TransactionType::REMOVED_ACTIVITY, $activity, $tripMember->getId());
             Session::setFlash(Session::FLASH_SUCCESS, 'Activity removed successfully.');
         } else {
             Session::setFlash(Session::FLASH_ERROR, 'Failed to remove the activity.');

@@ -40,7 +40,7 @@ class FinanceController extends Controller
 
         $groupFund = new GroupFund();
         $isFundFound = $groupFund->readByTripFinanceId($finance->getId());
-        
+
         $fundId = $isFundFound ? $groupFund->getFundId() : null;
         $kittyBalance = $isFundFound ? $groupFund->getCurrentBalance() : 0;
         $contributions = $isFundFound ? $groupFund->getContributions() : [];
@@ -57,6 +57,7 @@ class FinanceController extends Controller
             'contributions' => $contributions,
             'expenses' => $finance->getExpenses(),
             'userRole' => $member->getRole(),
+            'currentMemberId' => $member->getId(),
             'activeTab' => 'finance'
         ]);
     }

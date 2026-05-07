@@ -9,9 +9,6 @@
 
                 <header class="mb-10 flex justify-between items-end">
                     <div>
-                        <span
-                            class="inline-flex items-center rounded-full bg-success-container px-3 py-1 text-label-xs font-bold uppercase text-on-success-container mb-3">✓
-                            Active Trip</span>
                         <h1 class="font-display text-display text-on-surface mb-2">
                             <?= htmlspecialchars($data['trip']['title']) ?></h1>
                         <p class="text-body-lg text-on-surface-variant flex items-center gap-2">
@@ -21,7 +18,7 @@
                         </p>
                     </div>
                     <div class="flex gap-3">
-                        <?php if($userRole !== 'Member'):?>
+                        <?php if(App\Helpers\Auth::hasRole('Organizer', $userRole)):?>
                         <a href="/itinerary/settings/<?= htmlspecialchars($data['trip']['id']) ?>" class="inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-body-sm px-6 py-2.5 hover:bg-surface-container transition">
                             <span class="material-symbols-outlined text-[18px]">settings</span> Settings
                         </a>

@@ -1,26 +1,27 @@
-<?php require __DIR__ . '/../layouts/header.php'; ?>
+<?php 
+require __DIR__ . '/../layouts/header.php';
+$canManageMembers = App\Helpers\Auth::hasRole('Organizer', $currentUserRole);
+?>
 
 <!-- <main class="max-w-[900px] mx-auto mt-[100px] px-6 pb-12"> -->
 
 <!-- Reverted this header back to normal -->
 <div class="flex items-center gap-2 pb-3 mb-8 border-b border-outline-variant">
     <span class="material-symbols-outlined text-primary text-[28px]">group</span>
-    <h2 class="font-display text-h2 text-on-surface m-0">Manage Members</h2>
+    <h2 class="font-display text-h2 text-on-surface m-0"><?php echo($canManageMembers)?'Manage':'Itinerary'; ?> Members</h2>
 </div>
 
+<?php if ($canManageMembers): ?>
 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 mb-8">
 
     <!-- NEW: Flex container to hold the title and the Master Link button side-by-side -->
     <div class="flex items-center justify-between mb-4">
         <h3 class="font-display text-h4 text-on-surface m-0">Invite to Trip</h3>
 
-        <?php
-        if (isset($currentUserRole) && $currentUserRole === 'Organizer'): ?>
         <button onclick="copyInviteLink('<?php echo htmlspecialchars($generalLink) ?>')"
             class="inline-flex items-center gap-1.5 rounded-lg border-2 border-outline-variant bg-surface-container-lowest text-on-surface-variant font-semibold text-body-sm px-3 py-1.5 shadow-sm hover:text-primary hover:border-primary transition">
             <span class="material-symbols-outlined text-[18px]">link</span> Copy General Link
         </button>
-        <?php endif; ?>
     </div>
 
     <form action="/itinerary/members/invite/<?php echo htmlspecialchars($trip['id'] ?? '') ?>" method="POST"
@@ -50,21 +51,24 @@
         </button>
     </form>
 </div>
+<?php endif; ?>
 
 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6">
     <h3 class="font-display text-h4 text-on-surface mb-4">Current Members</h3>
     <div class="divide-y divide-outline-variant">
 
-        <div class="hidden sm:grid grid-cols-[1fr_120px_120px_100px] gap-4 py-3 text-label-caps uppercase text-outline">
-            <span>Member</span><span class="text-center">Role</span><span>Joined</span><span
-                class="text-right">Actions</span>
+        <div class="hidden sm:grid grid-cols-<?php echo ($canManageMembers ? '[1fr_120px_120px_100px]' : '[1fr_120px_120px]'); ?> gap-4 py-3 text-label-caps uppercase text-outline">
+            <span>Member</span><span class="text-center">Role</span><span>Joined</span>
+            <?php if ($canManageMembers): ?>
+            <span class="text-right">Actions</span>
+            <?php endif; ?>
         </div>
 
         <?php
         if (! empty($data['members'])): ?>
         <?php
         foreach ($data['members'] as $member): ?>
-        <div class="grid grid-cols-1 sm:grid-cols-[1fr_120px_120px_100px] gap-4 py-4 sm:py-3 items-center">
+        <div class="grid grid-cols-1 sm:grid-cols-<?php echo ($canManageMembers ? '[1fr_120px_120px_100px]' : '[1fr_120px_120px]'); ?> gap-4 py-4 sm:py-3 items-center">
 
             <!-- 1. Avatar and Info -->
             <div class="flex items-center gap-3">
@@ -103,6 +107,7 @@
             </span>
 
             <!-- 4. Action Buttons -->
+            <?php if ($canManageMembers): ?>
             <div class="flex justify-start sm:justify-end gap-2">
                 <?php
                 if ($member['role'] !== 'Organizer'): ?>
@@ -127,6 +132,7 @@
                 </form>
                 <?php endif; ?>
             </div>
+            <?php endif; ?>
 
         </div>
         <?php endforeach; ?>
