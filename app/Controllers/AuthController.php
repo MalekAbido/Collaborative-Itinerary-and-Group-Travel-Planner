@@ -2,6 +2,7 @@
 namespace App\Controllers;
 
 use App\Helpers\Auth;
+use App\Helpers\Session;
 use App\Models\User;
 use Core\Controller;
 
@@ -28,29 +29,56 @@ class AuthController extends Controller
             $user = new User();
 
             if ($user->login($email, $password)) {
-                
-                \App\Helpers\Auth::login($user->getId());
+                Auth::login($user->getId());
 
                 $redirectUrl = '/dashboard';
-                $intended = \App\Helpers\Session::get('intended_url');
-                
+                $intended    = Session::get('intended_url');
+
                 if ($intended) {
                     if (strpos($intended, 'login') === false) {
                         $redirectUrl = $intended;
                     }
-                    \App\Helpers\Session::set('intended_url', null); 
+
+                    Session::set('intended_url', null);
                 }
 
                 echo json_encode(['success' => true, 'redirect' => $redirectUrl]);
                 exit();
-                
             } else {
                 echo json_encode(['success' => false, 'errors' => ["Invalid email or password."]]);
                 exit();
             }
         }
     }
-    
+
+    public function testLogin()
+    {
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $role = $_POST['role'] ?? 'Member';
+            $db  = \Core\Database::getInstance()->getConnection();
+            $sql = "SELECT u.id, u.email
+                    FROM User u
+                    JOIN TripMember tm ON u.id = tm.userId
+                    WHERE tm.role = :role
+                    LIMIT 1";
+
+            $stmt = $db->prepare($sql);
+            $stmt->execute([':role' => $role]);
+            $userData = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if ($userData) {
+                Auth::login($userData['id']);
+                echo json_encode(['success' => true, 'redirect' => '/dashboard']);
+                exit();
+            } else {
+                echo json_encode(['success' => false, 'errors' => ["No user found with role: $role"]]);
+                exit();
+            }
+        }
+    }
+
     public function register()
     {
         $this->view("auth/register");

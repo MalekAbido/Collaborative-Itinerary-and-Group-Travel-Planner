@@ -1,40 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Add Expense - VoyageSync</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#f65a41", "on-primary-fixed-variant": "#7b2a1a",
-                        "surface": "#fcf8f8", "surface-container-lowest": "#ffffff", 
-                        "surface-container": "#edeeef", "on-surface": "#191c1d", 
-                        "on-surface-variant": "#414754", "outline": "#727785", 
-                        "outline-variant": "#c1c6d6",
-                    },
-                    fontFamily: { display: ["'Plus Jakarta Sans'", "sans-serif"], body: ["'Inter'", "sans-serif"] },
-                    fontSize: {
-                        "h2": ["28px", { lineHeight: "1.3", fontWeight: "600" }],
-                        "h4": ["17px", { lineHeight: "1.4", fontWeight: "600" }],
-                        "body-md": ["16px", { lineHeight: "1.5", fontWeight: "400" }],
-                        "body-sm": ["14px", { lineHeight: "1.5", fontWeight: "400" }],
-                        "label-caps": ["12px", { lineHeight: "1", letterSpacing: "0.05em", fontWeight: "700" }],
-                    }
-                }
-            }
-        };
-    </script>
-</head>
-<body class="bg-surface font-body text-on-surface min-h-screen p-6 lg:p-8">
+<?php require __DIR__ . '/../layouts/header.php'; ?>
 
-    <main class="max-w-2xl mx-auto">
+    <!-- <main class="max-w-2xl mx-auto"> -->
         <div class="mb-6 flex items-center justify-between">
             <h1 class="font-display text-h2 text-on-surface m-0">Log a New Expense</h1>
-            <a href="/finance/dashboard/<?= htmlspecialchars($financeId ?? '') ?>" class="text-body-sm font-semibold text-outline hover:text-primary transition">Cancel</a>        </div>
+            <a href="/finance/dashboard/<?= htmlspecialchars($itineraryId ?? '') ?>" class="text-body-sm font-semibold text-outline hover:text-primary transition">Cancel</a>        </div>
 
         <form action="/finance/expense/create" method="POST" class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 md:p-8">
             
@@ -91,7 +60,7 @@
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <?php foreach ($members as $member): ?>
                         <label class="flex items-center gap-2 p-3 border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container transition">
-                            <input type="radio" name="payerId" value="<?= $member['id'] ?>" required class="text-primary focus:ring-primary">
+                            <input type="radio" name="payerId" value="<?= $member['memberId'] ?>" required class="text-primary focus:ring-primary">
                             <span class="text-body-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis">
                                 <?= htmlspecialchars($member['firstName'] . ' ' . $member['lastName']) ?>
                             </span>
@@ -118,7 +87,7 @@
                             <label class="text-body-sm font-medium text-on-surface truncate pr-4">
                                 <?= htmlspecialchars($member['firstName'] . ' ' . $member['lastName']) ?>
                             </label>
-                            <input type="number" step="0.01" name="shares[<?= $member['id'] ?>]" class="share-input w-32 rounded-md border border-outline-variant bg-surface-container-lowest px-2 py-1 text-body-sm text-right focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition" value="0.00">
+                            <input type="number" step="0.01" name="shares[<?= $member['memberId'] ?>]" class="share-input w-32 rounded-md border border-outline-variant bg-surface-container-lowest px-2 py-1 text-body-sm text-right focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition" value="0.00">
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -152,5 +121,4 @@
         
         splitMethodDropdown.dispatchEvent(new Event('change'));
     </script>
-</body>
-</html>
+<?php require __DIR__ . '/../layouts/footer.php'; ?>

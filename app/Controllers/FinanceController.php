@@ -38,7 +38,6 @@ class FinanceController extends Controller
         $actualSpending = $finance->getActualSpending();
         $budgetAlert = $finance->checkBudgetAlert();
 
-        // --- FETCH REAL GROUP FUND DATA ---
         $groupFund = new GroupFund();
         $isFundFound = $groupFund->readByTripFinanceId($finance->getId());
         
@@ -57,7 +56,8 @@ class FinanceController extends Controller
             'kittyBalance' => $kittyBalance,
             'contributions' => $contributions,
             'expenses' => $finance->getExpenses(),
-            'userRole' => $member->getRole()
+            'userRole' => $member->getRole(),
+            'activeTab' => 'finance'
         ]);
     }
 

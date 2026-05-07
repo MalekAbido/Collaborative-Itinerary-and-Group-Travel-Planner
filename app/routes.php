@@ -32,6 +32,7 @@ $this->get('/styleguide', 'HomeController', 'styleguide');
 //Auth Routes
 $this->get('/login', 'AuthController', 'login');
 $this->post('/login/process', 'AuthController', 'processLogin');
+$this->post('/login/test', 'AuthController', 'testLogin');
 
 $this->get('/register', 'AuthController', 'register');
 $this->post('/register/process', 'AuthController', 'processRegister');
@@ -97,7 +98,14 @@ $this->post('/itinerary/members/remove/{id}', 'TripMemberController', 'destroy')
 
 // Group Fund (Kitty)
 $this->post('/fund/contribute/{id}', 'CommonPoolController', 'contribute');
-
 $this->post('/finance/expense/refund', 'ExpenseController', 'refundExpense');
+
+// History & Audit Log
+$this->get('/itinerary/{id}/history', 'HistoryController', 'index');
+$this->post('/itinerary/{id}/history/revert/{entryId}', 'HistoryController', 'revert');
+
+// History & Audit Log
+$this->get('/itinerary/{id}/history', 'HistoryController', 'index');
+$this->post('/itinerary/{id}/history/revert/{entryId}', 'HistoryController', 'revert');
 
 $this->get('/join/{token}', 'TripMemberController', 'joinTrip');

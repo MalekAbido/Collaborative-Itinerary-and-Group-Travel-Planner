@@ -157,7 +157,8 @@ class Itinerary
         ]);
 
         if ($success) {
-            return $this->db->lastInsertId();
+            $this->id = $this->db->lastInsertId();
+            return $this->id;
         }
 
         return false;

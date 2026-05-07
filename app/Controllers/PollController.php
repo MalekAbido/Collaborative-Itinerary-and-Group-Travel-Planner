@@ -16,7 +16,6 @@ class PollController extends Controller
     public function __construct()
     {
         Auth::requireLogin();
-        // Crucial: Set the baseline server time to UTC for all PHP time functions
         date_default_timezone_set('UTC');
     }
 
@@ -132,7 +131,7 @@ class PollController extends Controller
         $pollId = $_POST['pollId'] ?? null;
         $itineraryId = $_POST['itineraryId'] ?? null;
         $newDeadlineRaw = $_POST['newDeadline'] ?? null;
-        $clientTimezoneStr = $_POST['timezone'] ?? 'UTC'; // Fallback to UTC if not sent
+        $clientTimezoneStr = $_POST['timezone'] ?? 'UTC';
 
         if (!$pollId || !$itineraryId || !$newDeadlineRaw) {
             header("Location: " . $_SERVER['HTTP_REFERER']);
@@ -143,7 +142,6 @@ class PollController extends Controller
 
         $poll = new Poll();
         if ($poll->read($pollId)) {
-            // Convert the client's local deadline to a UTC string using the helper
             $formattedDeadline = TimeHelper::convertToUTC($newDeadlineRaw, $clientTimezoneStr);
 
             if ($formattedDeadline) {
@@ -188,7 +186,7 @@ class PollController extends Controller
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
         if ($member) {
-            $userRole = is_array($member) ? $member['role'] : $member->getRole();
+            $userRole = $member->getRole();
         } else {
             $userRole = 'Member';
         }
@@ -198,14 +196,12 @@ class PollController extends Controller
         $activePolls = [];
         $closedPolls = [];
 
-        // time() generates the current UTC timestamp because of our __construct setup
         $currentTime = time();
 
         foreach ($allPolls as $pollData) {
             $pollObj = new Poll();
             $pollObj->read($pollData['id']);
 
-            // $pollData['deadline'] is fetched from the DB, so it's safely in UTC
             $deadlineTime = strtotime($pollData['deadline']);
 
             if ($pollData['status'] === 'OPEN' && $deadlineTime <= $currentTime) {
@@ -215,7 +211,6 @@ class PollController extends Controller
                 $pollData['status'] = 'CLOSED';
             }
 
-            // Fetch extra data for the popup
             $pollData['stats'] = $pollObj->getVoteStats();
             $pollData['voters'] = $pollObj->getVoterDetails();
             $pollData['totalVotes'] = array_sum(array_column($pollData['stats'], 'count'));

@@ -12,7 +12,9 @@ class ItineraryController extends Controller {
 
     public function create(){
         Auth::requireLogin();
-        $this->view("itinerary/create");
+        $this->view("itinerary/create",[
+            'activeTab' => 'createItinerary'
+        ]);
     }
 
 public function store()
@@ -37,12 +39,13 @@ public function store()
 
             // 3. Create the Itinerary
             $itineraryModel = new Itinerary();
-            $stringTripId = $itineraryModel->create(
+            $itineraryModel->create(
                 $_POST['title'],
                 $_POST['description'],
                 $startDate, 
                 $endDate
             );
+            $stringTripId = $itineraryModel->getItineraryId();
             
             // Grab the numeric ID for database relationships
             $numericTripId = $itineraryModel->getId();
@@ -102,7 +105,11 @@ public function store()
         $itineraryModel = new Itinerary();
         $tripData = $itineraryModel->findByIdNumeric($id);
         
-        $this->view("itinerary/settings", ['trip' => $tripData]);
+        $this->view("itinerary/settings", [
+            'trip' => $tripData,
+            'itineraryId' => $tripData['id'],
+            'activeTab' => 'settings'
+        ]);
     }
 
     public function update($id){
@@ -180,6 +187,8 @@ public function store()
             'trip' => $tripData, 
             'members' => $members,
             'userRole' => $member->getRole(),
+            'itineraryId' => $tripData['id'],
+            'activeTab' => 'itinerary'
         ]);
     }
 }
