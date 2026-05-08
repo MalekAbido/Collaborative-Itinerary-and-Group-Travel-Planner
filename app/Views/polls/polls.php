@@ -433,7 +433,7 @@
                                     ? `<img src="/${v.profileImage}" class="w-6 h-6 rounded-full border border-outline-variant object-cover">`
                                     : `<div class="w-6 h-6 rounded-full bg-primary-fixed text-primary flex items-center justify-center text-[10px] font-bold border border-outline-variant">${v.firstName[0]}${v.lastName[0]}</div>`
                                 }
-                                <span class="text-sm font-medium">${v.firstName} ${v.lastName[0]}.</span>
+                                <span class="text-sm font-medium">${v.firstName} ${v.lastName[0]}. ${v.deletedAt ? '<span class="text-[10px] text-outline font-normal">(Former Member)</span>' : ''}</span>
                             </div>
                         `).join('');
 

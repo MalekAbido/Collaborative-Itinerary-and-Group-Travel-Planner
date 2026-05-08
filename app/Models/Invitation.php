@@ -58,6 +58,16 @@ class Invitation
         return $stmt->execute([':token' => $secureToken]);
     }
 
+    public function invalidateByEmail($itineraryId, $email)
+    {
+        $sql = "UPDATE Invitation SET isActive = 0 WHERE itineraryId = :itineraryId AND email = :email";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':itineraryId' => $itineraryId,
+            ':email'       => $email
+        ]);
+    }
+
     public function getOrCreateGeneralToken($itineraryId)
     {
         $sql = "SELECT secureToken FROM Invitation WHERE itineraryId = :itineraryId AND email IS NULL AND isActive = 1 LIMIT 1";

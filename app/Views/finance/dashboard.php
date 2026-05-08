@@ -165,6 +165,7 @@ if ($percentage >= 100) {
                                                         <div>
                                                             <p class="text-body-sm font-semibold text-on-surface m-0">
                                                                 <?= htmlspecialchars($contribution['firstName'] . ' ' . $contribution['lastName']) ?>
+                                                                <?= $contribution['deletedAt'] !== null ? '<span class="text-outline font-normal">(Former Member)</span>' : '' ?>
                                                             </p>
                                                             <p class="text-label-xs text-outline m-0 mt-0.5">
                                                                 <?= date('M j, Y - g:i A', strtotime($contribution['timestamp'])) ?>

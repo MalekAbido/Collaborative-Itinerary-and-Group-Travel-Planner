@@ -91,7 +91,7 @@ use App\Models\HistoryLogEntry;
                                     <?php endif; ?>
                                     <div>
                                         <p class="font-body text-body-md text-on-surface">
-                                            <span class="font-bold text-primary"><?php echo $user ? htmlspecialchars($user->getFirstName() . ' ' . $user->getLastName()) : 'System'; ?></span>
+                                            <span class="font-bold text-primary"><?php echo $member ? htmlspecialchars($member->getDisplayName()) : 'System'; ?></span>
                                             <?php
                                             // $actionMessage = explode('_', $entry->getTransactionType())??['', ''];
                                             // echo strtolower($actionMessage[1] . ' ' . $actionMessage[0]);
