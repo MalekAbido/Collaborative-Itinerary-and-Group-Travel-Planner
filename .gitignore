@@ -145,7 +145,6 @@ vite.config.ts.timestamp-*
 /vendor/
 GEMINI.md
 itineraryplanner-design-guide.html
-Class Diagram PlantUML Code.txt
 
 sequence diagrams.txt
 class-diagram.txt

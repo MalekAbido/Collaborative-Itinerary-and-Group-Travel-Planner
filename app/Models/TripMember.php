@@ -252,41 +252,4 @@ class TripMember
 
         return $this->itineraryObject;
     }
-
-    public function createSilentGuestUser($fullName)
-    {
-        // 1. Split the single name string into a First and Last name
-        $nameParts = explode(' ', trim($fullName), 2);
-        $firstName = $nameParts[0];
-        $lastName  = isset($nameParts[1]) ? $nameParts[1] : '';
-
-        // 2. Generate a random dummy email since the DB requires one
-        $dummyEmail = strtolower($firstName) . '_' . uniqid() . '@guest.voyagesync.com';
-
-        // 3. Insert the guest into the users table
-        $sql  = "INSERT INTO users (firstName, lastName, email) VALUES (:first, :last, :email)";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':first' => $firstName,
-            ':last'  => $lastName,
-            ':email' => $dummyEmail,
-        ]);
-
-        // 4. Return the new User ID so we can attach it to the trip
-        return $this->db->lastInsertId();
-    }
-
-    public function voteInPoll() {}
-
-    public function proposeActivity() {}
-
-    public function viewItinerary() {}
-
-    public function useEmergencyContact() {}
-
-    public function leaveTrip() {}
-
-    public function assignRole($newRole) {}
-
-    public function generateInvitation() {}
 }

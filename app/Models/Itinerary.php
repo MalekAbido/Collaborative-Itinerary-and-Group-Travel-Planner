@@ -251,18 +251,6 @@ class Itinerary
         return $stmt->execute([':id' => $id]);
     }
 
-    public function addActivity($activity)
-    {}
-
-    public function removeActivity($activityId)
-    {}
-
-    public function addSubtrip($subtrip)
-    {}
-
-    public function removeSubtrip($subtripId)
-    {}
-
     public function getActivities()
     {
 
@@ -275,19 +263,5 @@ class Itinerary
         }
 
         return $this->activities;
-    }
-
-    public function getSubtrips()
-    {
-
-        if ($this->subtrips === null) {
-            $this->subtrips = Subtrip::getAllByItineraryId($this->id);
-
-            if ($this->subtrips === false) {
-                $this->subtrips = [];
-            }
-        }
-
-        return $this->subtrips;
     }
 }
