@@ -152,7 +152,7 @@
 
                                         <!-- REOPEN BUTTON (Editors/Leaders only) -->
                                         <?php if ($canManagePolls): ?>
-                                            <button type="button" onclick="openReopenModal(<?= $closedPoll['id'] ?>)" class="text-[12px] text-primary hover:underline flex items-center gap-1 mt-1 font-semibold">
+                                            <button type="button" onclick="openReopenModal(<?= $closedPoll['id'] ?>, '<?= $closedPoll['startTime'] ?>')" class="text-[12px] text-primary hover:underline flex items-center gap-1 mt-1 font-semibold">
                                                 <span class="material-symbols-outlined text-[14px]">update</span> Reopen Poll
                                             </button>
                                         <?php endif; ?>
@@ -193,8 +193,9 @@
 
                 <div>
                     <label class="block text-[12px] font-bold uppercase tracking-wider text-on-surface-variant mb-2">New Deadline</label>
-                    <input type="datetime-local" name="newDeadline" required
+                    <input type="datetime-local" name="newDeadline" id="newDeadlineInput" required
                         class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-[14px] focus:border-primary focus:ring-primary focus:outline-none transition">
+                    <p class="text-[10px] text-on-surface-variant mt-1 italic">Must be at least 24 hours before activity start.</p>
                 </div>
 
                 <div class="mt-2 flex justify-end gap-3">
@@ -299,8 +300,24 @@
 <script src="/assets/js/timezone.js"></script>
 <script>
     // Modal functions
-    function openReopenModal(pollId) {
+    function openReopenModal(pollId, activityStartTime) {
         document.getElementById('reopenPollId').value = pollId;
+        const input = document.getElementById('newDeadlineInput');
+        
+        // Calculate max deadline (24 hours before activity start)
+        if (activityStartTime) {
+            const startTime = new Date(activityStartTime);
+            startTime.setHours(startTime.getHours() - 24);
+            // Format for datetime-local (YYYY-MM-DDTHH:MM)
+            const maxDate = startTime.toISOString().slice(0, 16);
+            input.max = maxDate;
+        }
+
+        // Set min to current time
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        input.min = now.toISOString().slice(0, 16);
+
         document.getElementById('reopenPollModal').classList.remove('hidden');
     }
 
@@ -445,15 +462,6 @@
 
     function closePollDetailsModal() {
         document.getElementById('pollDetailsModal').classList.add('hidden');
-    }
-
-    function openReopenModal(pollId) {
-        document.getElementById('reopenPollId').value = pollId;
-        document.getElementById('reopenPollModal').classList.remove('hidden');
-    }
-
-    function closeReopenModal() {
-        document.getElementById('reopenPollModal').classList.add('hidden');
     }
 
     // Close on escape or outside click

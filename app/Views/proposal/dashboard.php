@@ -28,12 +28,22 @@
                         $proposer = $activity->getTripMember();
                         $proposerUser = $proposer ? $proposer->getUser() : null;
                         $location = $activity->getLocation();
+                        $startTime = strtotime($activity->getStartTime());
+                        $maxDeadline = date('Y-m-d\TH:i', $startTime - 86400);
                     ?>
                     <article
                         class="bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-surface-variant p-6 border-l-4 border-l-primary flex flex-col gap-4 relative hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-shadow duration-200">
                         <!-- Header Row -->
                         <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold text-on-surface pr-4"><?php echo htmlspecialchars($activity->getName() ?? ''); ?></h3>
+                            <div>
+                                <h3 class="text-xl font-bold text-on-surface pr-4"><?php echo htmlspecialchars($activity->getName() ?? ''); ?></h3>
+                                <?php if (!empty($activity->conflicts)): ?>
+                                    <button type="button" onclick="showConflictDetails(<?= htmlspecialchars(json_encode(['name' => $activity->getName(), 'conflicts' => array_map(fn($c) => ['name' => $c->getName()], $activity->conflicts)]), ENT_QUOTES, 'UTF-8') ?>)" class="mt-1 flex items-center gap-1.5 text-error text-[12px] font-bold hover:underline">
+                                        <span class="material-symbols-outlined text-[16px]">warning</span>
+                                        Conflicts with confirmed activities!
+                                    </button>
+                                <?php endif; ?>
+                            </div>
                             <span
                                 class="inline-flex items-center px-3 py-1 rounded-full bg-surface-container-highest text-on-surface text-xs font-bold uppercase shrink-0">
                                 <?php echo $activity->getCategory(); ?>
@@ -92,8 +102,9 @@
                                     type="datetime-local" 
                                     name="poll_deadline" 
                                     min="<?= date('Y-m-d\TH:i') ?>"
+                                    max="<?= $maxDeadline ?>"
                                     required />
-                                <!-- <span class="text-[10px] text-on-surface-variant italic">Select the date and time for the poll to close.</span> -->
+                                <span class="text-[10px] text-on-surface-variant italic">Must be at least 24 hours before activity start.</span>
                             </div>
                             <!-- Description -->
                             <p class="text-sm text-on-surface-variant line-clamp-3 mb-4 flex-1">
@@ -204,8 +215,63 @@
             <span>Profile</span>
         </a>
     </nav>
+    <!-- Conflict Details Modal -->
+    <div id="conflictDetailsModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-on-background/50 backdrop-blur-sm transition-opacity">
+        <div class="w-full max-w-lg rounded-2xl bg-surface-container-lowest shadow-lg border border-outline-variant overflow-hidden">
+            <div class="flex items-center justify-between border-b border-outline-variant px-6 py-4 bg-surface">
+                <h3 class="font-display text-[20px] font-semibold text-on-surface m-0 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-error">warning</span> Conflict Details
+                </h3>
+                <button type="button" onclick="closeConflictDetailsModal()" class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition">
+                    <span class="material-symbols-outlined text-[20px]">close</span>
+                </button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-on-surface-variant mb-4">
+                    The activity "<span id="modalActivityName" class="font-bold"></span>" overlaps with the following confirmed activities:
+                </p>
+                <ul id="modalConflictsList" class="space-y-3 mb-6">
+                    <!-- Conflicts will be injected here -->
+                </ul>
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeConflictDetailsModal()" class="px-6 py-2 rounded-lg bg-surface-container-highest text-on-surface font-semibold text-sm hover:bg-outline-variant transition">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="/assets/js/timezone.js"></script>
     <script>
+        function showConflictDetails(data) {
+            document.getElementById('modalActivityName').innerText = data.name;
+            const list = document.getElementById('modalConflictsList');
+            list.innerHTML = data.conflicts.map(c => `
+                <li class="flex items-center gap-3 p-3 bg-error/5 rounded-lg border border-error/10 text-error">
+                    <span class="material-symbols-outlined text-[20px]">event_busy</span>
+                    <span class="font-medium">${c.name}</span>
+                </li>
+            `).join('');
+            document.getElementById('conflictDetailsModal').classList.remove('hidden');
+        }
+
+        function closeConflictDetailsModal() {
+            document.getElementById('conflictDetailsModal').classList.add('hidden');
+        }
+
+        // Close on escape or outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('conflictDetailsModal');
+            if (event.target == modal) closeConflictDetailsModal();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeConflictDetailsModal();
+            }
+        });
+
         // Set all hidden timezone inputs
         document.addEventListener('DOMContentLoaded', () => {
             const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;

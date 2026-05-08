@@ -30,7 +30,23 @@ class ProposalController extends Controller
 
         Auth::requireRole('Editor', $tripMember->getRole());
 
-        $draftActivities = Activity::getAllByStatusAndItinerary('Draft', $itineraryId);
+        $allDrafts = Activity::getAllByStatusAndItinerary('Draft', $itineraryId);
+        $draftActivities = [];
+        $currentTime = time();
+
+        foreach ($allDrafts as $activity) {
+            $startTime = strtotime($activity->getStartTime());
+            if ($startTime <= $currentTime) {
+                $activity->updateStatus('Rejected');
+                continue;
+            }
+
+            // Fetch conflicts
+            $conflicts = $activity->getConflictingConfirmedActivities();
+            $activity->conflicts = $conflicts; // Attach conflicts to the activity object
+            $draftActivities[] = $activity;
+        }
+
         $rejectedActivities = Activity::getAllByStatusAndItinerary('Rejected', $itineraryId);
 
         $this->view('proposal/dashboard', [
@@ -63,6 +79,16 @@ class ProposalController extends Controller
             exit;
         }
 
+        $currentTime = time();
+        $startTime = strtotime($activity->getStartTime());
+
+        if ($startTime <= $currentTime) {
+            $activity->updateStatus('Rejected');
+            Session::setFlash(Session::FLASH_ERROR, 'Activity start time has already passed. Proposal rejected.');
+            header("Location: /itinerary/{$itineraryId}/proposals");
+            exit;
+        }
+
         $pollDeadlineRaw   = $_POST['poll_deadline'] ?? '';
         $clientTimezoneStr = $_POST['timezone'] ?? 'UTC';
 
@@ -76,6 +102,13 @@ class ProposalController extends Controller
 
         if (!$pollDeadline) {
             Session::setFlash(Session::FLASH_ERROR, 'Invalid datetime or timezone provided.');
+            header("Location: /itinerary/{$itineraryId}/proposals");
+            exit;
+        }
+
+        $pollDeadlineTime = strtotime($pollDeadline);
+        if ($pollDeadlineTime > ($startTime - 86400)) {
+            Session::setFlash(Session::FLASH_ERROR, 'Poll deadline must be at least 24 hours before the activity starts.');
             header("Location: /itinerary/{$itineraryId}/proposals");
             exit;
         }

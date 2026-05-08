@@ -36,6 +36,15 @@ class PollController extends Controller
             die("Invalid datetime or timezone provided.");
         }
 
+        $activity = Activity::getByActivityId($activityId);
+        if ($activity) {
+            $startTime = strtotime($activity->getStartTime());
+            $deadlineTime = strtotime($formattedDeadline);
+            if ($deadlineTime > ($startTime - 86400)) {
+                die("Poll deadline must be at least 24 hours before the activity starts.");
+            }
+        }
+
         $poll = new Poll();
         $poll->setActivityId($activityId);
         $poll->setDeadline($formattedDeadline);
@@ -147,6 +156,15 @@ class PollController extends Controller
             $formattedDeadline = TimeHelper::convertToUTC($newDeadlineRaw, $clientTimezoneStr);
 
             if ($formattedDeadline) {
+                // Check against activity start time
+                $activity = Activity::getByActivityId($poll->getActivityId());
+                if ($activity) {
+                    $startTime = strtotime($activity->getStartTime());
+                    $deadlineTime = strtotime($formattedDeadline);
+                    if ($deadlineTime > ($startTime - 86400)) {
+                        die("Poll deadline must be at least 24 hours before the activity starts.");
+                    }
+                }
                 $poll->setDeadline($formattedDeadline);
                 $this->openPoll($itineraryId, $poll);
             } else {
