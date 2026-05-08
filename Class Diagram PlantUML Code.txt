@@ -1,0 +1,603 @@
+@startuml
+top to bottom direction
+
+enum TripRole {
+    MEMBER
+    EDITOR
+    ORGANIZER
+}
+
+class User {
+    - int id
+    - String firstName
+    - String lastName
+    - String email
+    - String passwordHash
+    - String nationality
+    - String policyNumber
+    - String profileImage
+    + create(): boolean
+    + read(id: int): User
+    + update(): void
+    + delete(): boolean
+    {static} + getById(id: int): User
+    {static} + getByEmail(email: String): User
+    + addEmergencyContact(contact: EmeregencyContact): void
+    + addAllergy(allergy: Allergy): void
+    + register(): boolean
+    + login(email: String, password: String): boolean
+    + updateProfile(data: array): void
+    + loadAllergies(): void
+    + loadEmergencyContacts(): void
+    + getUserItineraries(): User
+    + updateSessionToken(id: int, hashedSessionToken: String): boolean
+    + getBySessionToken(hashedSessionToken: String): User
+}
+
+class TripMember {
+    - int id
+    - TripRole role
+    - Date joinedAt
+    + create(): boolean
+    + read(id: int): TripMember
+    + update(): void
+    + delete(): boolean
+    + getAllByItineraryId(itineraryId: int): array
+    + getByUserAndItinerary(userId, itineraryId): TripMember
+    + getUser(): User
+    + getItinerary(): Itinerary
+}
+
+class Invitation {
+    - int id
+    - String secureToken
+    - boolean isActive
+    - String email
+    - TripRole role
+    + createToken(itineraryId: int, email: String, role: TripRole): boolean
+    + findByToken(secureToken: String): Invitation
+    + getPendingByItinerary(itineraryId: int): Invitation
+    + markUsed(secureToken: String): boolean
+    + getOrCreateGeneralToken(itineraryId: int): String
+}
+
+enum TransportMode {
+    Flight
+    Train
+    Bus
+    Car
+    PublicTransit
+    Walking
+    Bicycle
+    Ferry
+}
+
+enum ActivityStatus {
+    DRAFT
+    PROPOSED
+    VOTING
+    REJECTED
+    CONFIRMED
+}
+
+class Itinerary {
+    - int id
+    - String title
+    - String description
+    - Date startDate
+    - Date endDate
+    - String coverImage
+    + create(title: String, description: String, startDate: Date, endDate: Date, coverImage: String): boolean
+    + read(id: int): boolean
+    + update(id: int, title: String, description: String, startDate: Date, endDate: Date, coverImage: String): boolean
+    + delete(id: int): boolean
+    + findByIdNumeric(id: int): Itinerary
+    + getActivities(): array
+}
+
+abstract class ItineraryItem {
+    - String itemId
+    - String name
+    - String description
+    - Date startTime
+    - Date endTime
+}
+
+class Activity {
+    - int id
+    - String name
+    - String description
+    - Date startTime
+    - Date endTime
+    - String category
+    - ActivityStatus status
+    - boolean isAnonymous
+    - String bannerImage
+    + create(): boolean
+    + read(id: int): boolean
+    + delete(): boolean
+    + fill(row: array): void
+    + getConflictingConfirmedActivities(): Activity
+    {static} + getByActivityId(activityId: int): Activity
+    {static} + getByIdAndItinerary(activityId: int, itineraryId: int): Activity
+    {static} + getAllByItineraryId(itineraryId: int): array
+    {static} + getAllByStatusAndItinerary(status: ActivityStatus, itineraryId: int): array
+    + updateStatus(status: ActivityStatus): boolean
+    + getItinerary(): Itinerary
+    + getTripMember(): TripMember
+    + getAttendanceList(): AttendanceList
+    + getLocation(): Location
+}
+
+class Location {
+    - int id 
+    - String name
+    - String address
+    - double latitude
+    - double longitude
+    - String timeZoneId
+    + create(): boolean
+    + read(): boolean
+    + fill(row: array): void
+    {static} + getByLocationId(locationId: int): Location
+
+}
+
+enum RatingOption {
+    MUST_HAVE
+    NICE_TO_HAVE
+    NOT_NEEDED
+}
+
+enum AttendanceStatus {
+    PENDING
+    GOING
+    NOT_GOING
+}
+
+enum PollStatus {
+    OPEN
+    CLOSED
+}
+
+class Poll {
+    - int id
+    - DateTime deadline
+    - PollStatus status
+    - boolean isAnonymous
+    - Double weightedTotal
+    + create(): boolean
+    + read(id: int): boolean
+    + update(): boolean
+    + delete(): boolean
+    + openPoll(): void
+    + closePoll(): void
+    + calculateTotalPoints(): float
+    + assignLeadingOption(): float
+    + getVotes(): array
+    + getVoteStats(): array
+    + getVoterDetails(): array
+    + getByActivityId(activityId: int): array
+    + getPollsByItinerary(itineraryId: int): array
+
+}
+
+class Vote {
+    - int id
+    - DateTime timestamp
+    - RatingOption ratingChoice
+    {static} + getWeight(choice: int): int
+    {static} + getRatingOptions(): array
+    + create(): boolean
+    + read(id: int): boolean
+    + update(): boolean
+    + delete(): boolean
+    + getByMemberAndPoll(tripMemberId: int, pollId: int): Vote
+}
+
+class AttendanceList {
+    - int id
+    - int totalAttendeeCount
+    + create(activityId): boolean
+    + fill (row: array): void
+    + getMembers(): array
+    + updateStatus(tripMemberId: int, newStatus: AttendanceStatus, note: String): void
+    + getMembersByStatus(status: AttendanceStatus): array
+    + calculateTotalCount(): void
+    + getByActivityId(activityId: int): AttendanceList
+}
+
+class HistoryLog {
+    - int id
+    - DateTime createdAt
+    {static} + findByItineraryId(itineraryId: int): HistoryLog
+    + create(): boolean
+    + read(itineraryId): HistoryLog
+    + fill(data: array): void
+}
+
+class HistoryLogEntry {
+    - int id
+    - String transactionType
+    - DateTime timestamp
+    - String changedEntityId
+    - String changedEntityType
+    - HistoryLogEntry previousSnapshotId
+    - boolean isUndoable
+    + getTripMember(): TripMember
+    + getRelatedEntity(): Object
+    + getEntitySummary() : String
+    {string} + getFormattedDateHeader(dateStr: String): String
+    + fill(data: array): void
+    + create(): boolean
+    {static} + findLatestForEntity(entityId: int, entityType: String): HistoryLogEntry
+    {static} + getAllByItineraryId(itineraryId: int): array
+    {static} + findByEntryId(entryId: int): HistoryLogEntry
+}
+
+class TripFinance {
+    - int id
+    - String baseCurrency
+    - Double totalBudgetLimit
+    + create(itineraryId: int, baseCurrency: String, budgetLimit: Double): boolean
+    + getActualSpending(): double
+    + checkBudgetAlert(): String
+    + updateSettingsByItineraryId(itineraryId: int, budgetLimit: Double, baseCurrency: String): boolean
+    + read(id: int): boolean
+    + readByItinerary(itineraryId: int): boolean
+    + loadExpensesFromDatabase(): array
+}
+
+class GroupFund {
+    - String fundId
+    - double currentBalance
+    + create(tripFinanceId: int, targetBalance: Double): boolean
+    + addFunds(contributionId: int, amount: double): boolean
+    + deductExpense(amount: double): boolean
+    + processRefund(refundAmount: Double): boolean
+    + readByTripFinanceId(tripFinanceId: int): boolean
+    + getContributions(): array
+}
+
+class FundContribution {
+    - int id
+    - double amount
+    - DateTime timestamp
+    - DateTime deletedAt
+    + fill(data: array): void
+    + read(id: int): boolean
+    + delete(deletedByTripMemberId: int): boolean
+    + getItineraryId(): boolean
+    + update(): boolean
+}
+
+class TripSettlementManager <<service>> {
+    - String tripId
+    - Map<String, Boolean> memberSettlementStatuses
+    + confirmMemberSettlement(memberId: String): void
+    + finalizeTrip(): boolean
+}
+
+class FinanceService <<service>> {
+    + debtMinimizer(settlements: List<Settlement>): Double
+    + calculateRefunds(expenseId: String, refundAmount: Double): Map
+}
+
+enum SplitMethod {
+    SOLO_POLO
+    EVEN
+    UNEVEN
+}
+
+class Expense {
+    - String expenseId
+    - String financeId
+    - Double amount
+    - String currencyType
+    - String description
+    - String category
+    - boolean isNonCash
+    - boolean paidByKitty
+    - SplitMethod splitMethod
+    + expenseSplitter(): Double
+}
+
+class ExpenseShare <<AssociativeEntity>> {
+    - String shareId
+    - String expenseId
+    - String memberId
+    - Double amount
+    - boolean isPayer
+}
+
+class Settlement {
+    - String debtorId
+    - String creditorId
+    - Double amount
+    + markAsPaid(): void
+}
+
+class CurrencyConverterAPIWrapper <<Service>> {
+    + convert(amount: Double, fromCurrency: String, toCurrency: String): Double
+}
+
+abstract class Alert {
+    - String alertId
+    - String message
+    - DateTime timestamp
+    - boolean isRead
+    {abstract} + trigger(): void
+    + dismiss(): void
+}
+
+class BudgetAlert {
+    - Double threshold
+    - Double currentSpend
+    + trigger(): void
+}
+
+class DeadlineAlert {
+    - String pollId
+    + triggerAlert(): void
+    + closeAssociatedPoll(): void
+}
+
+class EmergencyContact {
+    - String id
+    - String name
+    - String phone
+    - String email
+    - String relationship
+}
+
+class Allergy {
+    - String id
+    - String allergen
+    - String severity
+    - String reaction
+}
+
+class InventoryItem {
+    - String id
+    - String name
+    - int quantity
+    - String category
+    - boolean isPacked
+    + markAsPacked(): void
+    + updateQuantity(qty: int): void
+}
+
+class TransportCalculator <<Service>> {
+    + calculateDistance(origin: Location, dest: Location): float
+    + estimateDuration(mode: TransportMode, origin: Location, dest: Location): int
+    + estimateCost(mode: TransportMode, distance: float): float
+    + getAvailableModes(): array
+}
+
+class EmergencyBroadcaster <<service>> {
+    + dispatchAlerts(user: User, currentLocation: Location): void
+}
+
+class ConflictDetectorService <<service>> {
+    + checkConflict(a1: Activity, a2: Activity): boolean
+    + checkOverlap(s1: Subtrip, s2: Subtrip): boolean
+    + validateActivityFit(activity: Activity, subtrip: Subtrip): boolean
+}
+
+class TimeZoneService <<Service>> {
+    + convertToLocalTime(baseTime: Date, loc: Location): Date
+    + calculateTimeDifference(l1: Location, l2: Location): int
+}
+
+' ========================================================
+' CONTROLLERS LAYER 
+' ========================================================
+class Router {
+    - routes: array
+    + add(route: String, controller: String, action: String): void
+    + dispatch(url: String): void
+    - match(url: String): boolean
+}
+
+abstract class Controller {
+    # route_params: array
+    + __construct(route_params: array)
+    # view(viewName: String, data: array): String
+}
+
+class ItineraryController extends Controller {
+    + getDashboard(itineraryId: String, userId: String): String
+    + getMembersList(itineraryId: String, userId: String): String
+    + updateMemberRole(itineraryId: String, memberId: String, role: TripRole): String
+    + validateItineraryAccess(itineraryId: String, userId: String): boolean
+}
+
+class InvitationController extends Controller {
+    + createInvitation(itineraryId: String, email: String, inviterId: String): String
+    + acceptInvitation(token: String, userId: String): String
+    + validateInvitationEmail(email: String): boolean
+}
+
+class ActivityController extends Controller {
+    + createActivityDraft(itineraryId: String, proposerId: String, details: array): String
+    + getDraftActivities(itineraryId: String): String
+    + getActivityDetails(activityId: String): String
+    + updateActivityDecision(activityId: String, decision: ActivityStatus, reviewerId: String): String
+    + deleteActivity(activityId: String, userId: String): String
+    + getTransportOptions(activityAId: String, activityBId: String): String
+    + validateActivityTimes(start: Date, end: Date): boolean
+}
+
+class ExpenseController extends Controller {
+    + createExpense(financeId: String, details: array, payerId: String, splitMethod: String): String
+    + deleteExpense(expenseId: String, userId: String): String
+    + getExpenseDetails(expenseId: String): String
+    + validateExpenseData(details: array): boolean
+}
+
+class SettlementController extends Controller {
+    + getBalances(financeId: String): String
+    + processSettlement(debtId: String, amount: Double, payerId: String): String
+    + applyLedgerFilters(criteria: String): String
+    + validateSettlementAmount(amount: Double, maxAllowed: Double): boolean
+}
+
+class CommonPoolController extends Controller {
+    + getPoolDashboard(financeId: String): String
+    + addContribution(financeId: String, contributorId: String, amount: Double): String
+    + validateContributionAmount(amount: Double): boolean
+}
+
+class HistoryLogController extends Controller {
+    + logChange(tripId: String, changeType: String, oldVal: String, newVal: String, userId: String): String
+    + rollbackVersion(snapshotId: String, userId: String): String
+    + validateRollbackRequest(snapshotId: String): boolean
+}
+
+class ComplianceController extends Controller {
+    + checkTripCompliance(tripId: String): String
+    + validateMemberCompliance(memberId: String): boolean
+}
+
+class AllergyController extends Controller {
+    + addAllergy(memberId: String, allergyData: array): String
+    + getTripAllergies(tripId: String): String
+    + validateAllergyInput(allergyData: array): boolean
+}
+
+class InventoryController extends Controller {
+    + declareInventoryItem(activityId: String, memberId: String, itemDetails: array): String
+    + getInventoryList(activityId: String): String
+    + volunteerForBringingItem(itemId: String, memberId: String): String
+    + validateItemDeclaration(itemDetails: array): boolean
+}
+
+class AuthController extends Controller {
+    + registerUser(registrationData: array): String
+    + loginUser(credentials: array): String
+    + validateRegistrationData(registrationData: array): boolean
+    + validateLoginCredentials(credentials: array): boolean
+}
+
+class UserController extends Controller {
+    + getUserProfile(userId: String): String
+    + updateProfile(userId: String, standardData: array, optionalData: array): String
+    + validateProfileData(data: array): boolean
+}
+
+class EmergencyController extends Controller {
+    + triggerEmergencyAlert(userId: String, location: Location): String
+    + validateEmergencyRequest(userId: String): boolean
+}
+
+' ========================================================
+' RELATIONSHIPS 
+' ========================================================
+
+ItineraryItem <|-- Subtrip
+ItineraryItem <|-- Activity
+Alert <|-- BudgetAlert
+Alert <|-- DeadlineAlert
+User <|-- TripMember
+
+Subtrip "0..1" o-- "0..*" Activity : contains
+ItineraryItem "*" --> "1" Location : located at
+
+User "1" <-- "0..*" Itinerary : created by
+Itinerary "1" --> "0..*" TripMember : includes
+Itinerary "1" *-- "0..*" Invitation : has
+Itinerary "1" *-- "1" HistoryLog : maintains
+Itinerary "1" *-- "1" TripFinance : contains
+Itinerary "1" *-- "0..*" ItineraryItem : contains
+
+User "1" *-- "0..*" EmergencyContact : has
+User "1" *-- "0..*" Allergy : has
+
+TripMember "*" --> "1" TripRole : assigned
+Activity "*" --> "1" ActivityStatus : currently
+Vote "*" --> "1" RatingOption : utilizes
+AttendanceList "*" --> "1" AttendanceStatus : tracks
+TransportDetails "*" --> "1" TransportMode : uses
+
+Activity "1" *-- "0..*" Poll : contains
+Activity "1" *-- "1" AttendanceList : tracks
+Activity "1" *-- "0..*" InventoryItem : contains
+Activity "2" *-- "0..1" TransportDetails : has
+
+InventoryItem "*" --> "0..1" TripMember : assigned to
+Poll "1" *-- "0..*" Vote : contains
+HistoryLog "1" *-- "0..*" HistoryLogEntry : contains
+HistoryLogEntry "1" --> "1" HistoryLogEntry : points to
+DeadlineAlert "1" --> "1" Poll : monitors
+
+TripFinance "1" *-- "1" GroupFund : contains
+TripFinance "1" *-- "0..*" Expense : tracks
+TripFinance "1" *-- "0..*" Settlement : resolves
+GroupFund "1" *-- "0..*" FundContribution : contains
+FundContribution "*" --> "1" TripMember : made by
+
+Expense "1" *-- "1..*" ExpenseShare : split via
+Expense "*" --> "1" SplitMethod : utilizes
+ExpenseShare "*" --> "1" TripMember : owed/paid by
+Settlement "*" --> "1" TripMember : debtor
+Settlement "*" --> "1" TripMember : creditor
+TripSettlementManager "1" --> "1" TripFinance : manages
+
+Expense "*" --> "1" CurrencyConverterAPIWrapper : uses
+BudgetAlert "1" --> "*" Expense : monitors
+
+TransportCalculator "1" --> "*" TransportDetails : creates
+EmergencyBroadcaster "1" --> "*" EmergencyContact : notifies
+
+FinanceService "1" --> "1" TripFinance : monitors
+FinanceService "1" --> "*" Expense : analyzes
+
+ConflictDetectorService "1" --> "*" Activity : analyzes
+ConflictDetectorService "1" --> "*" Subtrip : analyzes
+TimeZoneService "1" --> "*" Location : analyzes
+
+Router ..> Controller : <<instantiates>>\nvia dispatch()
+
+' ========================================================
+' CONTROLLER -> MODEL DEPENDENCIES
+' ========================================================
+ItineraryController --> Itinerary : manages
+ItineraryController --> TripMember : accesses
+ItineraryController --> Activity : accesses
+ItineraryController --> TimeZoneService : uses
+
+InvitationController --> Invitation : manages
+
+ActivityController --> Activity : manages
+ActivityController --> AttendanceList : accesses
+ActivityController --> Itinerary : accesses
+ActivityController --> ConflictDetectorService : uses
+ActivityController --> TransportCalculator : uses
+ActivityController --> TransportDetails : accesses
+
+ExpenseController --> Expense : manages
+ExpenseController --> CurrencyConverterAPIWrapper : uses
+ExpenseController --> TripFinance : accesses
+
+SettlementController --> Settlement : manages
+SettlementController --> TripFinance : accesses
+
+CommonPoolController --> GroupFund : manages
+
+HistoryLogController --> HistoryLog : manages
+HistoryLogController --> HistoryLogEntry : accesses
+
+ComplianceController --> TripMember : audits
+
+AllergyController --> Allergy : manages
+
+InventoryController --> InventoryItem : manages
+
+AuthController --> User : authenticates
+
+UserController --> User : manages
+
+EmergencyController --> TripMember : accesses
+EmergencyController --> EmergencyBroadcaster : uses
+
+@enduml

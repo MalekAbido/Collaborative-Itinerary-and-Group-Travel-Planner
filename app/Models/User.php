@@ -347,7 +347,7 @@ class User
         }
     }
 
-public function getUserItineraries()
+    public function getUserItineraries()
     {
         $sql = "SELECT i.id, i.itineraryId, i.title, i.description, i.startDate, i.endDate, i.coverImage, tm.role, tm.joinedAt
                 FROM Itinerary i
