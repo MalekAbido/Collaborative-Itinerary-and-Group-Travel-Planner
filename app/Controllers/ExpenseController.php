@@ -123,18 +123,22 @@ class ExpenseController extends Controller
             $shareModel = new ExpenseShare();
 
             if ($splitMethod === 'EVEN') {
-                $memberCount     = count($details['shares']);
-                $evenSplitAmount = $totalAmount / $memberCount;
+                $memberIds = array_keys($details['shares']);
+                $memberCount = count($memberIds);
+                $totalCents = (int) round($totalAmount * 100);
+                $baseCents = intdiv($totalCents, $memberCount);
+                $remainderCents = $totalCents % $memberCount;
 
-                foreach ($details['shares'] as $memberId => $dummyValue) {
+                foreach ($memberIds as $index => $memberId) {
+                    $shareCents = $baseCents + ($index < $remainderCents ? 1 : 0);
+                    $shareAmount = round($shareCents / 100, 2);
                     $isPayer = ((int) $memberId === $payerId) ? 1 : 0;
-                    $shareModel->create($expenseId, $memberId, $evenSplitAmount, $isPayer);
+                    $shareModel->create($expenseId, $memberId, $shareAmount, $isPayer);
                 }
             } elseif ($splitMethod === 'UNEVEN') {
-
                 foreach ($details['shares'] as $memberId => $amountOwed) {
                     $isPayer = ((int) $memberId === $payerId) ? 1 : 0;
-                    $shareModel->create($expenseId, $memberId, $amountOwed, $isPayer);
+                    $shareModel->create($expenseId, $memberId, round((float) $amountOwed, 2), $isPayer);
                 }
             }
         }
@@ -149,29 +153,28 @@ class ExpenseController extends Controller
 
     public function deleteExpense()
     {
-        $itineraryData = $expense->getItinerary();
-        $itineraryId   = $itineraryData['itineraryId'] ?? null;
-
         Auth::requireLogin();
-        $tripMember = Auth::requireMembership($itineraryId);
-        Auth::requireRole('Editor', $tripMember->getRole());
 
         $expenseId = $_POST['expenseId'] ?? null;
-
         if (! $expenseId) {
             die("Error: No Expense ID provided.");
         }
 
         $expenseModel = new Expense();
-        // Verify expense exists
         $expense = $expenseModel->findById($expenseId);
-
         if (! $expense) {
             die("Error: Expense not found.");
         }
 
+        $itineraryData = $expense->getItinerary();
+        $itineraryId   = $itineraryData['itineraryId'] ?? null;
+
+        $tripMember = Auth::requireMembership($itineraryId);
+        Auth::requireRole('Editor', $tripMember->getRole());
+
         if ($expense->delete($tripMember->getId())) {
-            HistoryLogger::log($itineraryId, TransactionType::DELETED_EXPENSE, $expense, $tripMember);
+            // I corrected a mistake, id should be numeric not string
+            HistoryLogger::log($itineraryId, TransactionType::DELETED_EXPENSE, $expense, $tripMember->getId());
         }
 
         header("Location: /finance/dashboard/" . $itineraryId . "?success=DELETED_EXPENSE");

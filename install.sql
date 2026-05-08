@@ -277,6 +277,27 @@ ALTER TABLE TripFinance
 ALTER TABLE TripFinance
   ADD CONSTRAINT UQ_financeId UNIQUE (financeId);
 
+CREATE TABLE SettlementPayment
+(
+  id                INT           NOT NULL AUTO_INCREMENT,
+  settlementId      VARCHAR(55)   NOT NULL,
+  fromTripMemberId  INT           NOT NULL,
+  toTripMemberId    INT           NOT NULL,
+  itineraryId       INT           NOT NULL,
+  amount            DECIMAL(15,2) NOT NULL,
+  status            VARCHAR(20)   NOT NULL DEFAULT 'PAID',
+  createdAt         DATETIME      DEFAULT CURRENT_TIMESTAMP,
+  paidAt            DATETIME      NULL,
+  deletedAt         DATETIME      NULL DEFAULT NULL,
+  PRIMARY KEY (id)
+);
+
+ALTER TABLE SettlementPayment
+  ADD CONSTRAINT UQ_id UNIQUE (id);
+
+ALTER TABLE SettlementPayment
+  ADD CONSTRAINT UQ_settlementId UNIQUE (settlementId);
+
 CREATE TABLE TripMember
 (
   id           INT         NOT NULL AUTO_INCREMENT,
@@ -437,6 +458,21 @@ ALTER TABLE HistoryLogEntry
   ADD CONSTRAINT FK_TripMember_TO_HistoryLogEntry
     FOREIGN KEY (tripMemberId)
     REFERENCES TripMember (id);
+
+ALTER TABLE SettlementPayment
+  ADD CONSTRAINT FK_TripMember_FROM_SettlementPayment
+    FOREIGN KEY (fromTripMemberId)
+    REFERENCES TripMember (id);
+
+ALTER TABLE SettlementPayment
+  ADD CONSTRAINT FK_TripMember_TO_SettlementPayment
+    FOREIGN KEY (toTripMemberId)
+    REFERENCES TripMember (id);
+
+ALTER TABLE SettlementPayment
+  ADD CONSTRAINT FK_Itinerary_TO_SettlementPayment
+    FOREIGN KEY (itineraryId)
+    REFERENCES Itinerary (id);
 
 ALTER TABLE Activity
   ADD CONSTRAINT FK_Itinerary_TO_Activity

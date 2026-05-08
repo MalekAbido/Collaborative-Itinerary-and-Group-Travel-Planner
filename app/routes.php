@@ -44,6 +44,7 @@ $this->get('/logout', 'AuthController', 'logout');
 $this->get('/finance/dashboard/{id}', 'FinanceController', 'dashboard');
 $this->post('/finance/update-settings/{id}', 'FinanceController', 'updateSettings');
 $this->post('/finance/create-fund/{id}', 'FinanceController', 'createGroupFund');
+$this->post('/finance/settlement/mark-paid/{id}', 'FinanceController', 'markSettlementPaid');
 
 // Expense routes
 $this->get('/finance/expense/add/{id}', 'ExpenseController', 'showAddForm');      // add expense form

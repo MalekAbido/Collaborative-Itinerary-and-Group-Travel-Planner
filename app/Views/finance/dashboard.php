@@ -207,6 +207,55 @@ if ($percentage >= 100) {
                     </div>
                 </div>
 
+                <!-- Settlement Ledger -->
+                <div class="mt-8 pt-8 border-t border-outline-variant">
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="material-symbols-outlined text-primary">sync_alt</span>
+                        <h2 class="font-display text-h2 text-on-surface m-0">Settlement Ledger</h2>
+                    </div>
+
+                    <?php if (!isset($settlementResult['success']) || !$settlementResult['success']): ?>
+                        <div class="mb-6 rounded-xl border border-error/30 bg-error-container p-5 text-on-error-container">
+                            <?= htmlspecialchars($settlementResult['message'] ?? 'There was a problem calculating settlements.') ?>
+                        </div>
+                    <?php elseif (empty($settlementResult['transactions'])): ?>
+                        <div class="mb-6 rounded-xl border border-outline-variant bg-surface-container-lowest p-5 text-on-surface-variant">
+                            <p class="text-body-md font-medium">Everything is settled or no shared expenses require payment.</p>
+                        </div>
+                    <?php else: ?>
+                        <div class="grid gap-4 mb-6">
+                            <?php foreach ($settlementResult['transactions'] as $transaction): ?>
+                                <?php
+                                    $fromName = $memberMap[$transaction['from']] ?? 'Member ' . $transaction['from'];
+                                    $toName = $memberMap[$transaction['to']] ?? 'Member ' . $transaction['to'];
+                                ?>
+                                <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                    <div>
+                                        <p class="text-body-sm text-on-surface-variant mb-1">Settle payment</p>
+                                        <p class="font-semibold text-body-md text-on-surface"><?= htmlspecialchars($fromName) ?> owes <?= htmlspecialchars($toName) ?></p>
+                                    </div>
+                                    <div class="flex items-center gap-4 flex-wrap justify-between sm:justify-end">
+                                        <div class="text-right">
+                                            <p class="text-body-lg font-bold text-on-surface"><?= number_format($transaction['amount'], 2) ?></p>
+                                            <p class="text-label-xs text-outline uppercase tracking-widest"><?= htmlspecialchars($baseCurrency) ?></p>
+                                        </div>
+                                        <?php if ($transaction['from'] === $currentMemberId): ?>
+                                            <form action="/finance/settlement/mark-paid/<?= htmlspecialchars($itineraryId) ?>" method="POST" class="m-0">
+                                                <input type="hidden" name="fromMemberId" value="<?= htmlspecialchars($transaction['from']) ?>">
+                                                <input type="hidden" name="toMemberId" value="<?= htmlspecialchars($transaction['to']) ?>">
+                                                <input type="hidden" name="amount" value="<?= htmlspecialchars(number_format($transaction['amount'], 2, '.', '')) ?>">
+                                                <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-success text-on-success font-semibold text-body-sm px-4 py-2 shadow-sm hover:bg-success/90 transition">
+                                                    <span class="material-symbols-outlined text-[18px]">check_circle</span> Mark as paid
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
                 <!-- Expenses Section -->
                 <div class="mt-8 pt-8 border-t border-outline-variant">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
