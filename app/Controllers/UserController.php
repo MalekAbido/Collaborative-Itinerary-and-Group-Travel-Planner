@@ -1,86 +1,108 @@
 <?php
 namespace App\Controllers;
 
+use App\Helpers\Auth;
 use App\Helpers\Validator;
 use App\Models\User;
 use Core\Controller;
 
 class UserController extends Controller
 {
-    public $userModel;
+    private $userId;
+
     public function __construct()
     {
-        $this->userModel = new User();
+        Auth::requireLogin();
+        $this->userId = Auth::id();
     }
 
-    // READ ALL
-    public function index()
+    public function showUserProfile()
     {
-        $users = $this->userModel->getAllUsers();
-        $this->view("users/index", ['users' => $users]);
-    }
+        Auth::requireLogin();
+        $user = new User();
+        if ($user->read($this->userId)) {
+            $user->loadAllergies();
+            $user->loadEmergencyContacts();
 
-    // SHOW ONE USER
-    public function show($id)
-    {
-        $user = $this->userModel->getUserById($id);
-        $this->view("users/show", ['user' => $user]);
-    }
-
-    // SHOW CREATE FORM
-    public function create()
-    {
-        $this->view("users/create");
-    }
-
-    // STORE NEW USER
-    public function store()
-    {
-        $validator = new Validator();
-
-        $name     = $_POST['firstName'];
-        $age      = $_POST['age'];
-        $email    = $_POST['email'];
-        $password = $_POST['passwordHash'];
-        $userType = "Student";
-
-        // Validation rules
-        $validator->required('name', $name);
-        $validator->required('age', $age);
-        $validator->email('email', $email);
-        $validator->minLength('password', $password, 8);
-
-        if ($validator->passes()) {
-            // Save to DB
-            $this->userModel->createUser($name, $age, $email, $password, $userType);
-            header("Location: " . BASE_URL . "users/");
-        } else {
-            // Return errors to view
-            $this->view("users/create", [
-                'errors' => $validator->getErrors(),
-                'old'    => $_POST,
+            return $this->view('user/profile', [
+                'user'              => $user,
+                'allergies'         => $user->getAllergies(),
+                'emergencyContacts' => $user->getEmergencyContacts(),
+                'activeTab' => 'userSettings'
             ]);
         }
+        die('User profile not found.');
     }
 
-    // EDIT FORM
-    public function edit($id)
+    public function showUserTripsDashboard()
     {
-        $user = $this->userModel->getUserById($id);
-        $this->view("users/edit", ['user' => $user]);
+        Auth::requireLogin();
+        $user = new User();
+        if ($user->read($this->userId)) {
+            $myTrips = method_exists($user, 'getUserItineraries') ? $user->getUserItineraries() : [];
+
+            return $this->view('user/dashboard', [
+                'myTrips' => $myTrips,
+                'activeTab' => 'dashboard'
+            ]);
+        }
+        die('User profile not found.');
     }
 
-    // UPDATE USER
-    public function update($id)
+    public function updateUserProfile()
     {
-        $name     = $_POST['name'];
-        $age      = $_POST['age'];
-        $email    = $_POST['email'];
-        $password = $_POST['password'];
-        $userType = "Student";
+        $data = $_POST;
 
-        $this->userModel->updateUser($id, $name, $age, $email, $password, $userType);
+        if (!$this->validateProfileData($data)) {
+            die("Invalid profile data provided. Please check your inputs.");
+        }
 
-        header("Location: " . BASE_URL . "users/");
+        $user = new User();
+        if ($user->read($this->userId)) {
+            if (isset($_FILES['profileImage']) && $_FILES['profileImage']['error'] === UPLOAD_ERR_OK) {
+                $fileTmpPath = $_FILES['profileImage']['tmp_name'];
+                $fileName = $_FILES['profileImage']['name'];
+                $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+                $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg');
+                if (in_array($fileExtension, $allowedfileExtensions)) {
+                    $uploadFileDir = dirname(__DIR__, 2) . '/public/uploads/profiles/';
+
+                    $mask = $uploadFileDir . $user->getUserId() . '.*';
+                    $existingFiles = glob($mask);
+                    if ($existingFiles) {
+                        foreach ($existingFiles as $file) {
+                            if (is_file($file)) {
+                                unlink($file);
+                            }
+                        }
+                    }
+
+                    $newFileName = $user->getUserId() . '.' . $fileExtension;
+                    $dest_path = $uploadFileDir . $newFileName;
+
+                    if(move_uploaded_file($fileTmpPath, $dest_path)) {
+                        $data['profileImage'] = 'uploads/profiles/' . $newFileName;
+                    }
+                }
+            }
+
+            $user->updateProfile($data);
+            
+            header("Location: /profile");
+            exit;
+        }
+
+        die('User not found.');
+    }
+
+    public function validateProfileData($data)
+    {
+        $validator = new Validator();
+        $validator->required('First Name', $data['firstName']);
+        $validator->required('Last Name', $data['lastName']);
+        $validator->required('Email', $data['email']);
+        $validator->email('Email', $data['email']);
+        return $validator->passes();
     }
 }

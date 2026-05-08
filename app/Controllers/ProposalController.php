@@ -1,0 +1,166 @@
+<?php
+
+namespace App\Controllers;
+
+use App\Helpers\Auth;
+use App\Helpers\Session;
+use App\Helpers\TimeHelper;
+use App\Models\Activity;
+use App\Models\Poll;
+use App\Models\TripMember;
+use Core\Controller;
+
+class ProposalController extends Controller
+{
+    public function __construct()
+    {
+        Auth::requireLogin();
+    }
+
+    public function index($itineraryId)
+    {
+        $userId = Auth::id();
+        $tripMember = TripMember::getByUserAndItinerary($userId, $itineraryId);
+
+        if ($tripMember === null) {
+            Session::setFlash(Session::FLASH_ERROR, 'You do not have access to this itinerary.');
+            header('Location: /dashboard');
+            exit;
+        }
+
+        Auth::requireRole('Editor', $tripMember->getRole());
+
+        $allDrafts = Activity::getAllByStatusAndItinerary('Draft', $itineraryId);
+        $draftActivities = [];
+        $currentTime = time();
+
+        foreach ($allDrafts as $activity) {
+            $startTime = strtotime($activity->getStartTime());
+            if ($startTime <= $currentTime) {
+                $activity->updateStatus('Rejected');
+                continue;
+            }
+
+            // Fetch conflicts
+            $conflicts = $activity->getConflictingConfirmedActivities();
+            $activity->conflicts = $conflicts; // Attach conflicts to the activity object
+            $draftActivities[] = $activity;
+        }
+
+        $rejectedActivities = Activity::getAllByStatusAndItinerary('Rejected', $itineraryId);
+
+        $this->view('proposal/dashboard', [
+            'itineraryId' => $itineraryId,
+            'draftActivities' => $draftActivities,
+            'rejectedActivities' => $rejectedActivities,
+            'memberRole' => $tripMember->getRole(),
+            'activeTab' => 'proposals'
+        ]);
+    }
+
+    public function approve($itineraryId, $activityId)
+    {
+        $userId = Auth::id();
+        $tripMember = TripMember::getByUserAndItinerary($userId, $itineraryId);
+
+        if ($tripMember === null) {
+            Session::setFlash(Session::FLASH_ERROR, 'You do not have access to this itinerary.');
+            header('Location: /dashboard');
+            exit;
+        }
+
+        Auth::requireRole('Editor', $tripMember->getRole());
+
+        $activity = Activity::getByIdAndItinerary($activityId, $itineraryId);
+
+        if ($activity === null || $activity->getActivityStatus() !== 'Draft') {
+            Session::setFlash(Session::FLASH_ERROR, 'Invalid activity or activity is not a draft.');
+            header("Location: /itinerary/{$itineraryId}/proposals");
+            exit;
+        }
+
+        $currentTime = time();
+        $startTime = strtotime($activity->getStartTime());
+
+        if ($startTime <= $currentTime) {
+            $activity->updateStatus('Rejected');
+            Session::setFlash(Session::FLASH_ERROR, 'Activity start time has already passed. Proposal rejected.');
+            header("Location: /itinerary/{$itineraryId}/proposals");
+            exit;
+        }
+
+        $pollDeadlineRaw   = $_POST['poll_deadline'] ?? '';
+        $clientTimezoneStr = $_POST['timezone'] ?? 'UTC';
+
+        if (empty($pollDeadlineRaw)) {
+            Session::setFlash(Session::FLASH_ERROR, 'Both date and time are required for the poll deadline.');
+            header("Location: /itinerary/{$itineraryId}/proposals");
+            exit;
+        }
+
+        $pollDeadline = TimeHelper::convertToUTC($pollDeadlineRaw, $clientTimezoneStr);
+
+        if (!$pollDeadline) {
+            Session::setFlash(Session::FLASH_ERROR, 'Invalid datetime or timezone provided.');
+            header("Location: /itinerary/{$itineraryId}/proposals");
+            exit;
+        }
+
+        $pollDeadlineTime = strtotime($pollDeadline);
+        if ($pollDeadlineTime > ($startTime - 86400)) {
+            Session::setFlash(Session::FLASH_ERROR, 'Poll deadline must be at least 24 hours before the activity starts.');
+            header("Location: /itinerary/{$itineraryId}/proposals");
+            exit;
+        }
+
+        if ($activity->updateStatus('Proposed')) {
+            $poll = new Poll();
+            $poll->setActivityId($activityId);
+            $poll->setDeadline($pollDeadline);
+            $poll->setStatus('OPEN');
+            $poll->setIsAnonymous($activity->getIsAnonymous());
+            
+            if ($poll->create()) {
+                Session::setFlash(Session::FLASH_SUCCESS, 'Proposal approved and poll created successfully.');
+            } else {
+                Session::setFlash(Session::FLASH_ERROR, 'Activity status updated, but failed to create poll.');
+            }
+        } else {
+            Session::setFlash(Session::FLASH_ERROR, 'Failed to update activity status.');
+        }
+
+        header("Location: /itinerary/{$itineraryId}/proposals");
+        exit;
+    }
+
+    public function reject($itineraryId, $activityId)
+    {
+        $userId = Auth::id();
+        $tripMember = TripMember::getByUserAndItinerary($userId, $itineraryId);
+
+        if ($tripMember === null) {
+            Session::setFlash(Session::FLASH_ERROR, 'You do not have access to this itinerary.');
+            header('Location: /dashboard');
+            exit;
+        }
+
+        Auth::requireRole('Editor', $tripMember->getRole());
+
+        $activity = Activity::getByIdAndItinerary($activityId, $itineraryId);
+
+        if ($activity === null || $activity->getActivityStatus() !== 'Draft') {
+            Session::setFlash(Session::FLASH_ERROR, 'Invalid activity or activity is not a draft.');
+            header("Location: /itinerary/{$itineraryId}/proposals");
+            exit;
+        }
+
+        if ($activity->updateStatus('Rejected')) {
+            Session::setFlash(Session::FLASH_SUCCESS, 'Proposal has been rejected.');
+        } else {
+            Session::setFlash(Session::FLASH_ERROR, 'Failed to reject the proposal.');
+        }
+
+        header("Location: /itinerary/{$itineraryId}/proposals");
+        exit;
+    }
+}

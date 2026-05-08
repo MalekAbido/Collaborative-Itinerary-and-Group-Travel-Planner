@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Itinerary | Login</title>
+
+    <link rel="stylesheet" href="/assets/css/tailwind.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body
+    class="bg-[#f65a411c] text-on-background font-body min-h-screen flex items-center justify-center p-4 md:p-8 animate-fade-in">
+
+    <div
+        class="w-full max-w-250 bg-surface-container-lowest rounded-3xl shadow-xl flex flex-col lg:flex-row overflow-hidden min-h-150">
+
+        <div class="hidden lg:block lg:w-1/2 relative bg-surface-variant">
+            <img src="/assets/images/log6.jpeg" alt="Travel Planning"
+                class="absolute inset-0 w-full h-full object-cover" />
+            <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent"></div>
+
+            <div class="absolute bottom-12 left-12 right-12 text-white">
+                <span class="material-symbols-outlined text-4xl text-tertiary-fixed mb-4">explore</span>
+                <h3 class="font-display text-[26px] font-bold leading-tight mb-4">
+                    The ultimate tool to sync up your group trips without the headache.
+                </h3>
+            </div>
+        </div>
+
+
+        <div class="w-full lg:w-1/2 p-8 md:p-14 flex flex-col justify-center">
+
+            <div class="flex items-center gap-2 mb-10">
+                <span class="material-symbols-outlined text-primary text-3xl">flight_takeoff</span>
+                <span class="text-xl font-display font-extrabold text-on-surface tracking-tight">Itinerary</span>
+            </div>
+
+            <h2 class="font-display text-3xl font-bold text-on-surface mb-2">Welcome back <?php echo \App\Helpers\Session::getFlash(\App\Helpers\Session::FLASH_SUCCESS); ?></h2>
+            <p class="font-body text-on-surface-variant mb-8">Please enter your details to login.</p>
+
+            <form id="login-form" action="/login/process" method="POST" class="flex flex-col gap-5" novalidate>
+                <div>
+                    <label
+                        class="block text-[12px] font-bold tracking-widest text-on-surface-variant uppercase mb-2">Email
+                        Address</label>
+                    <input type="email" name="email" placeholder="hello@example.com" required
+                        class="w-full px-4 py-3.5 bg-surface border border-outline-variant rounded-xl text-on-surface placeholder-outline/60 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none">
+                </div>
+
+                <div>
+                    <label
+                        class="block text-[12px] font-bold tracking-widest text-on-surface-variant uppercase mb-2">Password</label>
+                    <div class="relative">
+                        <input type="password" id="reg-password" name="password" placeholder="••••••••" required
+                            class="w-full pl-4 pr-12 py-3.5 bg-surface border border-outline-variant rounded-xl text-on-surface placeholder-outline/60 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none">
+                        <button type="button" onclick="toggleVisibility('reg-password', 'reg-eye')"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors flex items-center justify-center cursor-pointer">
+                            <span id="reg-eye" class="material-symbols-outlined">visibility_off</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center -mt-1 mb-2">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" name="remember_me"
+                            class="w-4 h-4 text-primary bg-surface border-outline-variant rounded focus:ring-primary focus:ring-2 cursor-pointer">
+                        <span class="text-sm text-on-surface-variant font-medium">Remember me</span>
+                    </label>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-primary text-white font-semibold py-4 rounded-xl shadow-lg hover:bg-on-primary-fixed-variant transition-colors flex justify-center items-center gap-2 cursor-pointer">
+                    Login
+                    <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+                </button>
+            </form>
+
+            <div class="mt-8 flex flex-col gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="h-px flex-1 bg-outline-variant"></div>
+                    <span class="text-[11px] font-bold tracking-[0.2em] text-on-surface-variant uppercase">Test Accounts</span>
+                    <div class="h-px flex-1 bg-outline-variant"></div>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <button type="button" onclick="testLogin('Organizer')"
+                        class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-primary/5 hover:bg-primary/10 border border-primary/10 transition-colors group cursor-pointer">
+                        <span class="material-symbols-outlined text-primary text-xl group-hover:scale-110 transition-transform">shield_person</span>
+                        <span class="text-[11px] font-bold text-primary">Organizer</span>
+                    </button>
+                    <button type="button" onclick="testLogin('Editor')"
+                        class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-tertiary/5 hover:bg-tertiary/10 border border-tertiary/10 transition-colors group cursor-pointer">
+                        <span class="material-symbols-outlined text-tertiary text-xl group-hover:scale-110 transition-transform">edit_square</span>
+                        <span class="text-[11px] font-bold text-tertiary">Editor</span>
+                    </button>
+                    <button type="button" onclick="testLogin('Member')"
+                        class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-on-surface-variant/5 hover:bg-on-surface-variant/10 border border-on-surface-variant/10 transition-colors group cursor-pointer">
+                        <span class="material-symbols-outlined text-on-surface-variant text-xl group-hover:scale-110 transition-transform">person</span>
+                        <span class="text-[11px] font-bold text-on-surface-variant">Member</span>
+                    </button>
+                </div>
+            </div>
+
+            <p class="text-center text-sm text-on-surface-variant mt-8">
+                Don't have an account?
+                <a href="/register" class="font-bold text-primary hover:underline ml-1">Register now</a>
+            </p>
+        </div>
+
+    </div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script src="/assets/js/main.js"></script>
+
+</html>
