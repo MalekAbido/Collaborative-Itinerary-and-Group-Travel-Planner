@@ -57,7 +57,7 @@ $canManageMembers = App\Helpers\Auth::hasRole('Organizer', $currentUserRole);
     <h3 class="font-display text-h4 text-on-surface mb-4">Current Members</h3>
     <div class="divide-y divide-outline-variant">
 
-        <div class="hidden sm:grid grid-cols-<?php echo ($canManageMembers ? '[1fr_120px_120px_100px]' : '[1fr_120px_120px]'); ?> gap-4 py-3 text-label-caps uppercase text-outline">
+        <div class="hidden sm:grid <?php echo ($canManageMembers ? 'sm:grid-cols-[1fr_120px_120px_100px]' : 'sm:grid-cols-[1fr_120px_120px]'); ?> gap-4 py-3 text-label-caps uppercase text-outline">
             <span>Member</span><span class="text-center">Role</span><span>Joined</span>
             <?php if ($canManageMembers): ?>
             <span class="text-right">Actions</span>
@@ -68,7 +68,7 @@ $canManageMembers = App\Helpers\Auth::hasRole('Organizer', $currentUserRole);
         if (! empty($data['members'])): ?>
         <?php
         foreach ($data['members'] as $member): ?>
-        <div class="grid grid-cols-1 sm:grid-cols-<?php echo ($canManageMembers ? '[1fr_120px_120px_100px]' : '[1fr_120px_120px]'); ?> gap-4 py-4 sm:py-3 items-center">
+        <div class="grid grid-cols-1 <?php echo ($canManageMembers ? 'sm:grid-cols-[1fr_120px_120px_100px]' : 'sm:grid-cols-[1fr_120px_120px]'); ?> gap-4 py-4 sm:py-3 items-center">
 
             <!-- 1. Avatar and Info -->
             <div class="flex items-center gap-3">

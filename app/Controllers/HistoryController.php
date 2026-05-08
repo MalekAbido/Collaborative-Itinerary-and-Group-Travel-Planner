@@ -142,6 +142,12 @@ class HistoryController extends Controller
                     $contribution->setDeletedAt(null);
                     $success = $contribution->update();
                     if ($success) {
+                        // Update balance
+                        $db = \Core\Database::getInstance()->getConnection();
+                        $sql = "UPDATE GroupFund SET currentBalance = currentBalance + :amount WHERE id = :id";
+                        $stmt = $db->prepare($sql);
+                        $stmt->execute([':amount' => $contribution->getAmount(), ':id' => $contribution->getGroupFundId()]);
+
                         HistoryLogger::log($itineraryId, TransactionType::RESTORED_FUND_CONTRIBUTION, $contribution, $member->getId());
                     }
                 }
