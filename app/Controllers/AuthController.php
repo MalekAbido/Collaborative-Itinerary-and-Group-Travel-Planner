@@ -10,7 +10,12 @@ class AuthController extends Controller
 {
     public function login()
     {
-        $this->view("auth/login");
+        if (Auth::check()) {
+            Session::setFlash(Session::FLASH_ERROR, 'You are already logged in!');
+            header("Location: /dashboard");
+        } else {
+            $this->view("auth/login");
+        }
     }
 
     public function processLogin()
@@ -57,8 +62,8 @@ class AuthController extends Controller
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $role = $_POST['role'] ?? 'Member';
-            $db  = \Core\Database::getInstance()->getConnection();
-            $sql = "SELECT u.id, u.email
+            $db   = \Core\Database::getInstance()->getConnection();
+            $sql  = "SELECT u.id, u.email
                     FROM User u
                     JOIN TripMember tm ON u.id = tm.userId
                     WHERE tm.role = :role
@@ -81,7 +86,12 @@ class AuthController extends Controller
 
     public function register()
     {
-        $this->view("auth/register");
+        if (Auth::check()) {
+            Session::setFlash(Session::FLASH_ERROR, 'You are already logged in!');
+            header("Location: /dashboard");
+        } else {
+            $this->view("auth/register");
+        }
     }
 
     public function processRegister()

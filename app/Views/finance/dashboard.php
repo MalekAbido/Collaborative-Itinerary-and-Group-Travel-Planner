@@ -347,15 +347,29 @@ if ($percentage >= 100) {
                 <form action="/finance/update-settings/<?= htmlspecialchars($itineraryId) ?>" method="POST" class="flex flex-col gap-5">
                     <div>
                         <label class="block text-label-caps uppercase text-on-surface-variant mb-2">Base Currency</label>
-                        <select name="baseCurrency" required class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-md focus:border-primary focus:ring-primary focus:outline-none transition">
+                        <select name="baseCurrency" disabled class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-md focus:border-primary focus:ring-primary focus:outline-none transition opacity-70 cursor-not-allowed">
                             <?php
-                            $currencies = ['USD' => 'US Dollar (USD)', 'EUR' => 'Euro (EUR)', 'GBP' => 'British Pound (GBP)', 'JPY' => 'Japanese Yen (JPY)', 'EGP' => 'Egyptian Pound (EGP)', 'AED' => 'Egyptian Pound (AED)', 'SAR' => 'Saudi Riyal (SAR)', 'CAD' => 'Canadian Dollar (CAD)', 'AUD' => 'Canadian Dollar (AUD)', 'CHF' => 'Swiss Franc (CHF)', 'CNY' => 'Chinese Yuan (CNY)', 'INR' => 'Chinese Yuan (INR)'];
+                            $currencies = [
+                                'USD' => 'US Dollar (USD)', 
+                                'EUR' => 'Euro (EUR)', 
+                                'GBP' => 'British Pound (GBP)', 
+                                'JPY' => 'Japanese Yen (JPY)', 
+                                'EGP' => 'Egyptian Pound (EGP)', 
+                                'AED' => 'United Arab Emirates Dirham (AED)', 
+                                'SAR' => 'Saudi Riyal (SAR)', 
+                                'CAD' => 'Canadian Dollar (CAD)', 
+                                'AUD' => 'Australian Dollar (AUD)', 
+                                'CHF' => 'Swiss Franc (CHF)', 
+                                'CNY' => 'Chinese Yuan (CNY)', 
+                                'INR' => 'Indian Rupee (INR)'
+                            ];
                             foreach ($currencies as $code => $name):
                                 $selected = ($baseCurrency === $code) ? 'selected' : '';
                                 echo "<option value=\"$code\" $selected>$name</option>";
                             endforeach;
                             ?>
                         </select>
+                        <p class="text-body-xs text-outline mt-2">The base currency was set during trip creation and cannot be changed.</p>
                     </div>
                     <div>
                         <label class="block text-label-caps uppercase text-on-surface-variant mb-2">Total Budget Limit</label>

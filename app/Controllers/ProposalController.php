@@ -43,7 +43,7 @@ class ProposalController extends Controller
 
             // Fetch conflicts
             $conflicts = $activity->getConflictingConfirmedActivities();
-            $activity->conflicts = $conflicts; // Attach conflicts to the activity object
+            // $activity->conflicts = $conflicts; // Attach conflicts to the activity object
             $draftActivities[] = $activity;
         }
 

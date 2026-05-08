@@ -42,7 +42,7 @@
             class="fixed inset-x-0 top-0 z-50 h-navbar bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant shadow-sm">
             <div class="mx-auto flex h-full max-w-[1280px] items-center justify-between px-6 lg:px-8">
                 <div class="flex items-center h-full gap-8">
-                    <a href="/dashboard"
+                    <a href="/"
                         class="font-display text-[22px] font-extrabold tracking-tight text-primary"><?php echo $websiteName; ?></a>
 
                     <div class="hidden md:flex items-center h-full gap-1">

@@ -1,6 +1,4 @@
-<?php
-require __DIR__ . '/../layouts/header-minimal.php';
-?>
+<?php require __DIR__ . '/../layouts/header-minimal.php'; ?>
 
     <main class="grow pt-navbar">
         <section
@@ -147,7 +145,7 @@ require __DIR__ . '/../layouts/header-minimal.php';
     </main>
 
     <footer
-        class="w-full py-8 px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center max-w-content mx-auto border-t border-outline-variant bg-surface-container-lowest mt-auto gap-4">
+        class="w-full py-8 px-8 lg:px-8 flex flex-col md:flex-row justify-between items-center max-w-content mx-auto border-t border-outline-variant bg-surface-container-lowest mt-auto gap-4">
         <div class="text-body-sm font-semibold font-display text-primary">
             Itinerary
         </div>

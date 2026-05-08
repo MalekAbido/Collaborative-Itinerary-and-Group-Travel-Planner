@@ -32,7 +32,7 @@
 <body class="bg-surface font-body text-on-surface min-h-screen p-6 lg:p-8">
     <?php if (!empty($error)): ?>
         <div class="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-800">
-            <p class="text-body-md font-medium">⚠️ <?= htmlspecialchars($error) ?></p>
+            <p class="text-body-md font-medium">⚠️ <?= htmlspecialchars($error) ?> yes this is me</p>
         </div>
     <?php endif; ?>
     <main class="max-w-2xl mx-auto">
@@ -41,7 +41,7 @@
             <h1 class="font-display text-h2 text-on-surface m-0">Log a New Expense</h1>
             <a href="/finance/dashboard/<?= htmlspecialchars($itineraryId ?? '') ?>" class="text-body-sm font-semibold text-outline hover:text-primary transition">Cancel</a>        </div>
 
-        <form action="/finance/expense/create" method="POST" class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 md:p-8">
+        <form action="/finance/expense/create" method="POST" id="expenseForm" class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 md:p-8">
             
             <input type="hidden" name="financeId" value="<?= htmlspecialchars($financeId ?? '') ?>"> 
 
@@ -62,17 +62,16 @@
                 <div>
                     <label class="block text-label-caps uppercase text-on-surface-variant mb-2">Total Amount</label>
                     <div class="flex items-center gap-2">
-                        <input type="number" step="0.01" id="amountInput" name="amount" required placeholder="0.00"
+                        <input type="number" step="100" min="0" max="999999999" id="amountInput" name="amount" required placeholder="0"
                                class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-md focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition">
                         
                         <!-- Currency Dropdown right next to Amount -->
-                        <select name="currencyType" required class="rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-md focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition">
-                            <option value="EGP">EGP</option>    
-                            <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
-                            <option value="GBP">GBP</option>
-                            <option value="NGN">NGN</option>
-                        </select>
+                        <div class="relative min-w-[100px]">
+                            <select name="currencyType_display" disabled class="w-full rounded-md border border-outline-variant bg-surface-container px-3 py-2 text-body-md focus:outline-none transition opacity-70 cursor-not-allowed appearance-none">
+                                <option value="<?= htmlspecialchars($baseCurrency) ?>" selected><?= htmlspecialchars($baseCurrency) ?></option>
+                            </select>
+                            <input type="hidden" name="currencyType" value="<?= htmlspecialchars($baseCurrency) ?>">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -118,16 +117,26 @@
 
             <!-- Dynamic Shares Section -->
             <div id="sharesSection" class="mb-8 bg-surface p-4 rounded-lg border border-outline-variant/50">
-                <h3 class="font-display text-h4 text-on-surface mb-4">Participant Shares</h3>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-display text-h4 text-on-surface m-0">Participant Shares</h3>
+                    <div id="remainingLabel" class="hidden text-body-xs font-semibold px-2 py-1 rounded bg-secondary-container text-on-secondary-container transition-colors duration-200">
+                        Remaining: <span id="remainingAmount">0.00</span>
+                    </div>
+                </div>
                 <div class="flex flex-col gap-3">
                     <?php foreach ($members as $member): ?>
                         <div class="flex items-center justify-between">
                             <label class="text-body-sm font-medium text-on-surface truncate pr-4">
                                 <?= htmlspecialchars($member['firstName'] . ' ' . $member['lastName']) ?>
                             </label>
-                            <input type="number" step="0.01" name="shares[<?= $member['memberId'] ?>]" class="share-input w-32 rounded-md border border-outline-variant bg-surface-container-lowest px-2 py-1 text-body-sm text-right focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition" value="0.00">
+                            <input type="number" step="10" name="shares[<?= $member['memberId'] ?>]" class="share-input w-32 rounded-md border border-outline-variant bg-surface-container-lowest px-2 py-1 text-body-sm text-right focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition" value="0.00">
                         </div>
                     <?php endforeach; ?>
+                </div>
+                
+                <div id="shareValidationError" class="hidden mt-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-800 flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
+                    <span class="material-symbols-outlined text-error">⚠️</span>
+                    <p class="text-body-sm font-medium">The total of participant shares must equal the total expense amount.</p>
                 </div>
             </div>
 
@@ -141,6 +150,7 @@
 
     <script>
         const groupFundBalance = <?= $groupFundBalance ?>;
+        const baseCurrency = "<?= htmlspecialchars($baseCurrency) ?>";
         const paidByKittyCheckbox = document.getElementById('paidByKittyCheckbox');
         const whoPaidSection = document.getElementById('whoPaidSection');
         const splitMethodSection = document.getElementById('splitMethodSection');
@@ -153,6 +163,78 @@
         const fundBalanceInfo = document.getElementById('fundBalanceInfo');
         const submitBtn = document.getElementById('submitBtn');
         const availableAmount = document.getElementById('availableAmount');
+        const remainingLabel = document.getElementById('remainingLabel');
+        const remainingAmountSpan = document.getElementById('remainingAmount');
+        const shareValidationError = document.getElementById('shareValidationError');
+        const expenseForm = document.getElementById('expenseForm');
+
+        // Force arrows to go by 100 but allow custom typed values
+        amountInput.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                let val = parseFloat(this.value) || 0;
+                let step = 100;
+                if (e.key === 'ArrowUp') {
+                    this.value = (val + step).toFixed(2);
+                } else {
+                    this.value = Math.max(0.00, val - step).toFixed(2);
+                }
+                this.dispatchEvent(new Event('input'));
+            }
+        });
+
+        function calculateEvenSplit() {
+            if (splitMethodDropdown.value === 'EVEN' && !paidByKittyCheckbox.checked) {
+                const totalAmount = parseFloat(amountInput.value) || 0;
+                const count = shareInputs.length;
+                if (count > 0) {
+                    const share = (totalAmount / count).toFixed(2);
+                    shareInputs.forEach(input => {
+                        input.value = share;
+                    });
+                }
+            }
+            updateRemainingAmount();
+        }
+
+        function updateRemainingAmount() {
+            const totalAmount = parseFloat(amountInput.value) || 0;
+            let sum = 0;
+            shareInputs.forEach(input => {
+                sum += parseFloat(input.value) || 0;
+            });
+
+            const diff = totalAmount - sum;
+            const absDiff = Math.abs(diff).toFixed(2);
+            
+            if (diff < 0) {
+                remainingLabel.childNodes[0].textContent = `Exceeds total by: `;
+                remainingAmountSpan.textContent = absDiff;
+            } else {
+                remainingLabel.childNodes[0].textContent = `Remaining: `;
+                remainingAmountSpan.textContent = diff.toFixed(2);
+            }
+            
+            if (splitMethodDropdown.value === 'UNEVEN' && !paidByKittyCheckbox.checked) {
+                remainingLabel.classList.remove('hidden');
+                if (Math.abs(diff) > 0.01) {
+                    remainingLabel.classList.add('bg-error-container', 'text-on-error-container');
+                    remainingLabel.classList.remove('bg-secondary-container', 'text-on-secondary-container');
+                } else {
+                    remainingLabel.classList.remove('bg-error-container', 'text-on-error-container');
+                    remainingLabel.classList.add('bg-secondary-container', 'text-on-secondary-container');
+                }
+            } else {
+                remainingLabel.classList.add('hidden');
+            }
+
+            // Real-time validation visual feedback
+            if (!paidByKittyCheckbox.checked && Math.abs(diff) > 0.01) {
+                shareValidationError.classList.remove('hidden');
+            } else {
+                shareValidationError.classList.add('hidden');
+            }
+        }
 
         function updateExpenseSections() {
             const isKitty = paidByKittyCheckbox.checked;
@@ -180,6 +262,13 @@
                 }
             });
 
+            if (isKitty) {
+                remainingLabel.classList.add('hidden');
+                shareValidationError.classList.add('hidden');
+            } else {
+                calculateEvenSplit();
+            }
+
             validateKittyAmount();
         }
 
@@ -200,20 +289,47 @@
             }
         }
 
-        amountInput.addEventListener('input', validateKittyAmount);
+        amountInput.addEventListener('input', () => {
+            validateKittyAmount();
+            calculateEvenSplit();
+        });
+
         paidByKittyCheckbox.addEventListener('change', updateExpenseSections);
 
         splitMethodDropdown.addEventListener('change', function() {
-            if (!paidByKittyCheckbox.checked) {
-                shareInputs.forEach(input => {
-                    if (this.value === 'EVEN') {
-                        input.readOnly = true;
-                        input.classList.add('opacity-50', 'bg-surface-container');
+            updateExpenseSections();
+        });
+
+        shareInputs.forEach(input => {
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    let val = parseFloat(this.value) || 0;
+                    let step = 10;
+                    if (e.key === 'ArrowUp') {
+                        this.value = (val + step).toFixed(2);
                     } else {
-                        input.readOnly = false;
-                        input.classList.remove('opacity-50', 'bg-surface-container');
+                        this.value = Math.max(0.00, val - step).toFixed(2);
                     }
+                    this.dispatchEvent(new Event('input'));
+                }
+            });
+            input.addEventListener('input', updateRemainingAmount);
+        });
+
+        expenseForm.addEventListener('submit', function(e) {
+            if (!paidByKittyCheckbox.checked) {
+                const totalAmount = parseFloat(amountInput.value) || 0;
+                let sum = 0;
+                shareInputs.forEach(input => {
+                    sum += parseFloat(input.value) || 0;
                 });
+
+                if (Math.abs(sum - totalAmount) > 0.01) {
+                    e.preventDefault();
+                    shareValidationError.classList.remove('hidden');
+                    shareValidationError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
             }
         });
 

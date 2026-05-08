@@ -1,4 +1,8 @@
-<?php require __DIR__ . '/../layouts/header.php'; ?>
+<?php
+
+use App\Models\TripMember;
+use App\Models\User;
+require __DIR__ . '/../layouts/header.php'; ?>
 
     <!-- <main class="max-w-2xl mx-auto"> -->
         
@@ -51,7 +55,8 @@
                     </h3>
                     <?php if ($payer): ?>
                         <div class="flex justify-between items-center bg-surface p-4 rounded-lg border border-outline-variant/50">
-                            <span class="text-body-lg font-semibold">Member ID <?= $payer->getTripMemberId() ?></span>
+                            <?php $payerUser = (new User())->read(((new TripMember())->read($payer->getTripMemberId()))->getUserId()); ?>
+                            <span class="text-body-lg font-semibold"><?= $payerUser->getFirstName() ?> <?= $payerUser->getLastName() ?></span>
                             <div class="text-right">
                                 <span class="block text-label-caps uppercase text-outline mb-0.5">Their Share</span>
                                 <span class="text-body-md font-bold"><?= number_format($payer->getAmount(), 2) ?> <?= htmlspecialchars($expense->getCurrencyType()) ?></span>
@@ -75,7 +80,8 @@
                         <ul class="divide-y divide-outline-variant/50 border border-outline-variant/50 rounded-lg overflow-hidden">
                             <?php foreach ($debtors as $debtor): ?>
                                 <li class="px-5 py-4 flex items-center justify-between bg-surface-container-lowest">
-                                    <span class="text-body-md font-medium text-on-surface">Member ID <?= $debtor->getTripMemberId() ?></span>
+                                    <?php $debtorUser = (new User())->read(((new TripMember())->read($debtor->getTripMemberId()))->getUserId()); ?>
+                                    <span class="text-body-md font-medium text-on-surface"> <?= $debtorUser->getFirstName() ?> <?= $debtorUser->getLastName() ?></span>
                                     <span class="text-body-md font-bold text-on-surface">
                                         <?= number_format($debtor->getAmount(), 2) ?> <span class="text-body-sm font-normal text-outline"><?= htmlspecialchars($expense->getCurrencyType()) ?></span>
                                     </span>

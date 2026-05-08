@@ -79,13 +79,12 @@ class TripFinance
         return ['status' => 'ok', 'message' => 'Within budget'];
     }
 
-    public function updateSettingsByItineraryId($itineraryId, $budgetLimit, $baseCurrency)
+    public function updateBudgetByItineraryId($itineraryId, $budgetLimit)
     {
-        $sql = "UPDATE TripFinance SET budgetLimit = :budgetLimit, baseCurrency = :baseCurrency WHERE itineraryId = :itineraryId";
+        $sql = "UPDATE TripFinance SET budgetLimit = :budgetLimit WHERE itineraryId = :itineraryId";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             ':budgetLimit' => $budgetLimit,
-            ':baseCurrency' => $baseCurrency,
             ':itineraryId' => $itineraryId
         ]);
     }

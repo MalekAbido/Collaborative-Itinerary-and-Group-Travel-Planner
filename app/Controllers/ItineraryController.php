@@ -83,7 +83,9 @@ class ItineraryController extends Controller {
             $tripMember->create();
             
             // 5. Initialize Trip Finances
+            $baseCurrency = $_POST['baseCurrency'] ?? 'USD';
             $tripFinance = new \App\Models\TripFinance(); 
+            $tripFinance->create($numericTripId, $baseCurrency, 0);
 
             // 6. Handle Email Invitations
             $inviteEmailsRaw = $_POST['inviteEmails'] ?? '';

@@ -92,10 +92,9 @@ class FinanceController extends Controller
         Auth::requireRole('Editor', $member->getRole());
 
         $budget = floatval($_POST['budgetLimit'] ?? 0);
-        $currency = $_POST['baseCurrency'] ?? 'USD';
 
         $finance = new TripFinance();
-        $finance->updateSettingsByItineraryId($itineraryId, $budget, $currency);
+        $finance->updateBudgetByItineraryId($itineraryId, $budget);
 
         header("Location: /finance/dashboard/" . $itineraryId);
         exit;

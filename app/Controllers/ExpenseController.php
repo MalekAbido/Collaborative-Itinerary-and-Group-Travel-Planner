@@ -34,6 +34,7 @@ class ExpenseController extends Controller
             'financeId'        => $financeId,
             'itineraryId'      => $id,
             'groupFundBalance' => $groupFundBalance,
+            'baseCurrency'     => $financeModel->getBaseCurrency(),
             'activeTab'        => 'addExpense',
         ]);
     }

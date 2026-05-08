@@ -48,6 +48,26 @@
                 </div>
             </div>
 
+            <div class="mb-6">
+                <label class="block text-label-caps uppercase text-on-surface-variant mb-2" for="baseCurrency">Itinerary Base Currency</label>
+                <select id="baseCurrency" name="baseCurrency" required
+                    class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-body-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/30 focus:outline-none transition">
+                    <option value="USD">US Dollar (USD)</option>
+                    <option value="EUR">Euro (EUR)</option>
+                    <option value="GBP">British Pound (GBP)</option>
+                    <option value="JPY">Japanese Yen (JPY)</option>
+                    <option value="EGP">Egyptian Pound (EGP)</option>
+                    <option value="AED">United Arab Emirates Dirham (AED)</option>
+                    <option value="SAR">Saudi Riyal (SAR)</option>
+                    <option value="CAD">Canadian Dollar (CAD)</option>
+                    <option value="AUD">Australian Dollar (AUD)</option>
+                    <option value="CHF">Swiss Franc (CHF)</option>
+                    <option value="CNY">Chinese Yuan (CNY)</option>
+                    <option value="INR">Indian Rupee (INR)</option>
+                </select>
+                <p class="mt-1.5 text-body-xs text-outline">This will be the main currency for all trip expenses and cannot be changed later.</p>
+            </div>
+
             <div class="mb-8">
                 <label class="block text-label-caps uppercase text-on-surface-variant mb-2" for="inviteEmails">
                     Invite Members <span class="normal-case text-outline font-normal ml-1">(Optional)</span>
