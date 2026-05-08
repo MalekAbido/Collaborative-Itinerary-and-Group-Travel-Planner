@@ -306,6 +306,7 @@ CREATE TABLE TripMember
   joinedAt     DATETIME    NULL    ,
   userId       INT         NOT NULL,
   itineraryId  INT         NOT NULL,
+  deletedAt    DATETIME    NULL DEFAULT NULL,
   PRIMARY KEY (id)
 );
 

@@ -52,10 +52,17 @@ class FinanceController extends Controller
         $financeService = new FinanceService();
         $settlementResult = $financeService->getTripSettlementLedger($itineraryId);
 
-        $members = (new TripMember())->getAllByItineraryId($itineraryId);
+        // Fetch all members (active and deleted) for the mapping
+        $memberModel = new TripMember();
+        $allMembers = $memberModel->getAllByItineraryId($itineraryId, true);
+
         $memberMap = [];
-        foreach ($members as $memberRow) {
-            $memberMap[$memberRow['memberId']] = trim($memberRow['firstName'] . ' ' . $memberRow['lastName']);
+        foreach ($allMembers as $memberRow) {
+            $name = trim($memberRow['firstName'] . ' ' . $memberRow['lastName']);
+            if ($memberRow['deletedAt'] !== null) {
+                $name .= ' (Former Member)';
+            }
+            $memberMap[$memberRow['memberId']] = $name;
         }
 
         $this->view('finance/dashboard', [

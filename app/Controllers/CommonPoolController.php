@@ -13,14 +13,15 @@ class CommonPoolController extends Controller
 
     public function contribute($fundId)
     {
-        $contributorId = Auth::id(); // Using dummy ID 1 for now
         $amount        = floatval($_POST['amount'] ?? 0);
         $itineraryId   = $_POST['itineraryId'] ?? 1;
+
+        $member = Auth::requireMembership($itineraryId);
 
         if ($amount > 0) {
             $pool = new GroupFund();
             $pool->setFundId($fundId);
-            $pool->addFunds($contributorId, $amount);
+            $pool->addFunds($member->getId(), $amount);
         }
 
         header("Location: /finance/dashboard/" . $itineraryId);

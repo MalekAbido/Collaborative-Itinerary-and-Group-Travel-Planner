@@ -79,7 +79,7 @@
                                     <span
                                         class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Proposed
                                         By</span>
-                                    <span class="text-sm text-on-surface font-semibold"><?php echo $proposerUser ? htmlspecialchars(($proposerUser->getFirstName() ?? '') . ' ' . ($proposerUser->getLastName() ?? '')) : 'Unknown'; ?></span>
+                                    <span class="text-sm text-on-surface font-semibold"><?php echo $proposer ? htmlspecialchars($proposer->getDisplayName()) : 'Unknown'; ?></span>
                                 </div>
                             </div>
                             <div
@@ -181,7 +181,7 @@
                             <div class="mt-1 flex items-center gap-1.5">
                                 <span class="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Proposed
                                     by:</span>
-                                <span class="text-xs text-on-surface-variant font-medium"><?php echo $proposerUser ? htmlspecialchars(($proposerUser->getFirstName() ?? '') . ' ' . ($proposerUser->getLastName() ?? '')) : 'Unknown'; ?></span>
+                                <span class="text-xs text-on-surface-variant font-medium"><?php echo $proposer ? htmlspecialchars($proposer->getDisplayName()) : 'Unknown'; ?></span>
                             </div>
                         </article>
                         <?php endforeach; ?>
