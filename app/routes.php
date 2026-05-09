@@ -103,6 +103,7 @@ $this->post('/itinerary/members/updateRole/{id}', 'TripMemberController', 'updat
 
 // 4. Remove a member
 $this->post('/itinerary/members/remove/{id}', 'TripMemberController', 'destroy');
+$this->post('/itinerary/members/leave/{id}', 'TripMemberController', 'leave');
 
 // Group Fund (Kitty)
 $this->post('/fund/contribute/{id}', 'CommonPoolController', 'contribute');

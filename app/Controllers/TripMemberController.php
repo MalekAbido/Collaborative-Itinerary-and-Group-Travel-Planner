@@ -154,6 +154,23 @@ class TripMemberController extends Controller
         }
     }
 
+    public function leave($id)
+    {
+        $currentMember = Auth::requireMembership($id);
+        $currentMemberRole = $currentMember->getRole();
+
+        if (Auth::hasRole('Organizer', $currentMemberRole)) {
+            header("Location: /itinerary/members/" . $id . "?status=error_organizer_cannot_leave");
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $currentMember->delete();
+            header("Location: /dashboard?status=left_trip");
+            exit;
+        }
+    }
+
     public function joinTrip($token)
     {
         Auth::requireLogin();
