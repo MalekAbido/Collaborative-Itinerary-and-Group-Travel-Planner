@@ -13,25 +13,26 @@ function formatLocalTimes(elements) {
 
         const formatType = el.getAttribute('data-format');
 
-        let options = {};
         if (formatType === 'date') {
-            options = { month: 'short', day: 'numeric' };
+            el.textContent = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        } else if (formatType === 'time') {
+            el.textContent = date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
         } else if (formatType === 'datetime') {
-            options = { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' };
+            el.textContent = date.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
         } else {
-            options = { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' };
+            el.textContent = date.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
         }
-
-        el.textContent = date.toLocaleString(undefined, options);
     });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const reopenTzInput = document.getElementById('clientTimezoneReopen');
-    if (reopenTzInput) {
-        reopenTzInput.value = userTimezone;
-    }
+    
+    // Support both ID (for legacy) and name="timezone" (for multiple forms)
+    const timezoneInputs = document.querySelectorAll('#clientTimezoneReopen, input[name="timezone"]');
+    timezoneInputs.forEach(input => {
+        input.value = userTimezone;
+    });
 
     formatLocalTimes();
 });

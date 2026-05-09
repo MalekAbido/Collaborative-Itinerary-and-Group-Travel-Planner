@@ -2,10 +2,12 @@
 namespace App\Controllers;
 
 use App\Helpers\Auth;
+use App\Helpers\HistoryLogger;
 use App\Helpers\TimeHelper;
 use App\Models\Activity;
 use App\Models\Itinerary;
 use App\Models\Poll;
+use App\Models\TransactionType;
 use App\Models\TripMember;
 use App\Models\Vote;
 use Core\Controller;
@@ -302,6 +304,7 @@ class PollController extends Controller
         }
 
         if ($canConfirm) {
+            HistoryLogger::log($itineraryId, TransactionType::ADDED_ACTIVITY, $activity, $activity->getTripMemberId());
             $activity->updateStatus('Confirmed');
             foreach ($conflicts as $conflict) {
                 $conflict->updateStatus('DECLINED');

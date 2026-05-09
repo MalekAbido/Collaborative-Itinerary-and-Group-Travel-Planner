@@ -98,7 +98,7 @@ use App\Models\HistoryLogEntry;
                                             echo strtolower(str_replace('_', ' ', $entry->getTransactionType())); ?>
                                         </p>
                                         <p class="text-label-xs text-on-surface-variant uppercase tracking-wider font-bold">
-                                            <?php echo date('h:i A', strtotime($entry->getTimestamp())); ?>
+                                            <span class="local-time" data-utc="<?= date('c', strtotime($entry->getTimestamp())) ?>" data-format="time"></span>
                                         </p>
                                     </div>
                                 </div>
@@ -132,8 +132,8 @@ use App\Models\HistoryLogEntry;
                                             <div class="flex items-center gap-2">
                                                 <span class="material-symbols-outlined text-[16px]">schedule</span>
                                                 <span>
-                                                    <?= date('M j, Y • g:i A', strtotime($activity->getStartTime())) ?> - 
-                                                    <?= date('g:i A', strtotime($activity->getEndTime())) ?>
+                                                    <span class="local-time" data-utc="<?= date('c', strtotime($activity->getStartTime())) ?>" data-format="datetime"></span> - 
+                                                    <span class="local-time" data-utc="<?= date('c', strtotime($activity->getEndTime())) ?>" data-format="time"></span>
                                                 </span>
                                             </div>
                                             <div class="flex items-center gap-2">
@@ -161,6 +161,7 @@ use App\Models\HistoryLogEntry;
                             <?php if ($entry->isUndoable && Auth::hasRole('Editor', $memberRole)): ?>
                             <div class="mt-4 flex justify-end">
                                 <form action="/itinerary/<?php echo $itineraryId; ?>/history/revert/<?php echo $entry->getId(); ?>" method="POST">
+                                    <input type="hidden" name="timezone" id="clientTimezoneReopen" value="">
                                     <button type="submit" 
                                         class="cursor-pointer inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-bold text-sm px-6 py-2.5 rounded-lg 
                                             transition-transform duration-200 ease-out 
@@ -210,4 +211,5 @@ use App\Models\HistoryLogEntry;
             </div>
         </main>
     </div>
+    <script src="/assets/js/timezone.js"></script>
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
