@@ -363,14 +363,16 @@ ALTER TABLE Vote
 
 CREATE TABLE InventoryItem
 (
-  id           INT          NOT NULL AUTO_INCREMENT,
-  itemId       VARCHAR(55)  NOT NULL,
-  name         VARCHAR(150) NULL    ,
-  quantity     INT          NULL    ,
-  description  VARCHAR(255) NULL    ,
-  isPacked     BOOLEAN      NULL    ,
-  activityId   INT          NOT NULL,
-  tripMemberId INT          NULL    ,
+  id              INT          NOT NULL AUTO_INCREMENT,
+  itemId          VARCHAR(55)  NOT NULL,
+  name            VARCHAR(150) NULL    ,
+  quantity        INT          NULL    ,
+  description     VARCHAR(255) NULL    ,
+  isPacked        BOOLEAN      NULL    ,
+  activityId      INT          NOT NULL,
+  tripMemberId    INT          NULL    ,
+  creatorMemberId INT          NULL    ,
+  deletedAt       DATETIME     NULL    ,
   PRIMARY KEY (id)
 );
 
@@ -535,6 +537,11 @@ ALTER TABLE InventoryItem
 ALTER TABLE InventoryItem
   ADD CONSTRAINT FK_TripMember_TO_InventoryItem
     FOREIGN KEY (tripMemberId)
+    REFERENCES TripMember (id);
+
+ALTER TABLE InventoryItem
+  ADD CONSTRAINT FK_TripMember_TO_InventoryItem_Creator
+    FOREIGN KEY (creatorMemberId)
     REFERENCES TripMember (id);
 
 -- 1. Independent Tables

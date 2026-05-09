@@ -87,6 +87,7 @@ $this->post('/poll/reopen', 'PollController', 'reopen');
 // Inventory Routes
 $this->get('/itinerary/inventory/{id}', 'InventoryController', 'showInventory');
 $this->post('/inventory/add', 'InventoryController', 'addInventoryItem');
+$this->post('/inventory/delete', 'InventoryController', 'deleteInventoryItem');
 $this->post('/inventory/volunteer', 'InventoryController', 'volunteerToBringItem');
 $this->post('/inventory/unvolunteer', 'InventoryController', 'unvolunteer');
 

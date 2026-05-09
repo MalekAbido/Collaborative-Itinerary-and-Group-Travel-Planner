@@ -15,6 +15,8 @@ class InventoryItem
     private $isPacked;
     private $activityId;
     private $tripMemberId;
+    private $creatorMemberId;
+    private $deletedAt;
 
     public function __construct()
     {
@@ -46,6 +48,12 @@ class InventoryItem
     public function getTripMemberId() { return $this->tripMemberId; }
     public function setTripMemberId($tripMemberId) { $this->tripMemberId = $tripMemberId; }
 
+    public function getCreatorMemberId() { return $this->creatorMemberId; }
+    public function setCreatorMemberId($creatorMemberId) { $this->creatorMemberId = $creatorMemberId; }
+
+    public function getDeletedAt() { return $this->deletedAt; }
+    public function setDeletedAt($deletedAt) { $this->deletedAt = $deletedAt; }
+
     public function fill(array $row)
     {
         $this->id = $row['id'];
@@ -56,13 +64,15 @@ class InventoryItem
         $this->isPacked = (bool)$row['isPacked'];
         $this->activityId = $row['activityId'];
         $this->tripMemberId = $row['tripMemberId'];
+        $this->creatorMemberId = $row['creatorMemberId'] ?? null;
+        $this->deletedAt = $row['deletedAt'] ?? null;
     }
 
     public function create()
     {
         $this->itemId = uniqid('inv_');
-        $sql = "INSERT INTO InventoryItem (itemId, name, quantity, description, isPacked, activityId, tripMemberId)
-                VALUES (:itemId, :name, :quantity, :description, :isPacked, :activityId, :tripMemberId)";
+        $sql = "INSERT INTO InventoryItem (itemId, name, quantity, description, isPacked, activityId, tripMemberId, creatorMemberId)
+                VALUES (:itemId, :name, :quantity, :description, :isPacked, :activityId, :tripMemberId, :creatorMemberId)";
         $stmt = $this->db->prepare($sql);
         $success = $stmt->execute([
             ':itemId' => $this->itemId,
@@ -71,7 +81,8 @@ class InventoryItem
             ':description' => $this->description,
             ':isPacked' => $this->isPacked ? 1 : 0,
             ':activityId' => $this->activityId,
-            ':tripMemberId' => $this->tripMemberId
+            ':tripMemberId' => $this->tripMemberId,
+            ':creatorMemberId' => $this->creatorMemberId
         ]);
         if ($success) {
             $this->id = $this->db->lastInsertId();
@@ -81,7 +92,7 @@ class InventoryItem
 
     public function read($id)
     {
-        $sql = "SELECT * FROM InventoryItem WHERE id = :id LIMIT 1";
+        $sql = "SELECT * FROM InventoryItem WHERE id = :id AND deletedAt IS NULL LIMIT 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -95,7 +106,8 @@ class InventoryItem
     public function update()
     {
         $sql = "UPDATE InventoryItem SET name = :name, quantity = :quantity, description = :description, 
-                isPacked = :isPacked, activityId = :activityId, tripMemberId = :tripMemberId 
+                isPacked = :isPacked, activityId = :activityId, tripMemberId = :tripMemberId,
+                creatorMemberId = :creatorMemberId
                 WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
@@ -105,13 +117,14 @@ class InventoryItem
             ':isPacked' => $this->isPacked ? 1 : 0,
             ':activityId' => $this->activityId,
             ':tripMemberId' => $this->tripMemberId,
+            ':creatorMemberId' => $this->creatorMemberId,
             ':id' => $this->id
         ]);
     }
 
     public function delete()
     {
-        $sql = "DELETE FROM InventoryItem WHERE id = :id";
+        $sql = "UPDATE InventoryItem SET deletedAt = NOW() WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([':id' => $this->id]);
     }
@@ -125,6 +138,7 @@ class InventoryItem
                 LEFT JOIN TripMember tm ON ii.tripMemberId = tm.id
                 LEFT JOIN User u ON tm.userId = u.id
                 WHERE a.itineraryId = :itineraryId
+                AND ii.deletedAt IS NULL
                 ORDER BY a.startTime ASC, ii.name ASC";
         $stmt = $db->prepare($sql);
         $stmt->execute([':itineraryId' => $itineraryId]);
@@ -134,7 +148,7 @@ class InventoryItem
     public static function getByActivityId($activityId)
     {
         $db = Database::getInstance()->getConnection();
-        $sql = "SELECT * FROM InventoryItem WHERE activityId = :activityId";
+        $sql = "SELECT * FROM InventoryItem WHERE activityId = :activityId AND deletedAt IS NULL";
         $stmt = $db->prepare($sql);
         $stmt->execute([':activityId' => $activityId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

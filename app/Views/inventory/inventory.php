@@ -32,10 +32,21 @@
                 <?php else: ?>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <?php foreach ($myVolunteers as $item): ?>
-                            <div class="bg-surface-container-low border border-outline-variant rounded-xl p-5 shadow-sm">
+                            <div class="bg-surface-container-low border border-outline-variant rounded-xl p-5 shadow-sm relative group">
                                 <div class="flex justify-between items-start mb-3">
                                     <h3 class="font-display text-[18px] font-bold text-on-surface"><?= htmlspecialchars($item['name']) ?></h3>
-                                    <span class="bg-primary-fixed text-primary px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide">Qty: <?= htmlspecialchars($item['quantity']) ?></span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-primary-fixed text-primary px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide">Qty: <?= htmlspecialchars($item['quantity']) ?></span>
+                                        <?php if ($item['creatorMemberId'] == $currentMemberId || App\Helpers\Auth::hasRole('Editor', $currentMemberRole)): ?>
+                                            <form action="/inventory/delete" method="POST" onsubmit="return confirm('Are you sure you want to remove this item from the inventory?');">
+                                                <input type="hidden" name="itemId" value="<?= $item['id'] ?>">
+                                                <input type="hidden" name="itineraryId" value="<?= $itineraryId ?>">
+                                                <button type="submit" class="text-error hover:text-error/80 transition p-1 leading-none" title="Delete Item">
+                                                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                                 <p class="text-[14px] text-on-surface-variant mb-4"><?= htmlspecialchars($item['description']) ?></p>
                                 <div class="flex items-center gap-2 text-[12px] text-outline mb-4">
@@ -69,10 +80,21 @@
                 <?php else: ?>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <?php foreach ($otherItems as $item): ?>
-                            <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm">
+                            <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm relative group">
                                 <div class="flex justify-between items-start mb-3">
                                     <h3 class="font-display text-[18px] font-bold text-on-surface"><?= htmlspecialchars($item['name']) ?></h3>
-                                    <span class="bg-surface-container-highest text-on-surface-variant px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide">Qty: <?= htmlspecialchars($item['quantity']) ?></span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-surface-container-highest text-on-surface-variant px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide">Qty: <?= htmlspecialchars($item['quantity']) ?></span>
+                                        <?php if ($item['creatorMemberId'] == $currentMemberId || App\Helpers\Auth::hasRole('Editor', $currentMemberRole)): ?>
+                                            <form action="/inventory/delete" method="POST" onsubmit="return confirm('Are you sure you want to remove this item from the inventory?');">
+                                                <input type="hidden" name="itemId" value="<?= $item['id'] ?>">
+                                                <input type="hidden" name="itineraryId" value="<?= $itineraryId ?>">
+                                                <button type="submit" class="text-error hover:text-error/80 transition p-1 leading-none" title="Delete Item">
+                                                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                                 <p class="text-[14px] text-on-surface-variant mb-4"><?= htmlspecialchars($item['description']) ?></p>
                                 <div class="flex items-center gap-2 text-[12px] text-outline mb-4">
