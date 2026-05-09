@@ -1,5 +1,7 @@
 @startuml
 top to bottom direction
+skinparam linetype ortho
+
 
 enum TripRole {
     MEMBER
@@ -63,23 +65,13 @@ class Invitation {
     + getOrCreateGeneralToken(itineraryId: int): String
 }
 
-enum TransportMode {
-    Flight
-    Train
-    Bus
-    Car
-    PublicTransit
-    Walking
-    Bicycle
-    Ferry
-}
-
 enum ActivityStatus {
     DRAFT
     PROPOSED
-    VOTING
     REJECTED
     CONFIRMED
+    DECLINED
+    REMOVED
 }
 
 class Itinerary {
@@ -95,14 +87,6 @@ class Itinerary {
     + delete(id: int): boolean
     + findByIdNumeric(id: int): Itinerary
     + getActivities(): array
-}
-
-abstract class ItineraryItem {
-    - String itemId
-    - String name
-    - String description
-    - Date startTime
-    - Date endTime
 }
 
 class Activity {
@@ -210,7 +194,6 @@ class AttendanceList {
 }
 
 class AttendanceMember {
-    - PDO db
     - int id
     - string status
     - string note
@@ -305,13 +288,11 @@ class FinanceService <<service>> {
 }
 
 enum SplitMethod {
-    SOLO_POLO
     EVEN
     UNEVEN
 }
 
 class Expense {
-    - PDO pdo
     - int id
     - double amount 
     - int expenseId
@@ -346,7 +327,6 @@ class ExpenseShare <<AssociativeEntity>> {
 }
 
 class SettlementPayment {
-    - PDO db
     - int id
     - string settlementId
     - int fromTripMemberId
@@ -365,7 +345,6 @@ class SettlementPayment {
 }
 
 class EmergencyContact {
-    - PDO db
     - int id
     - string contactId
     - string name
@@ -380,7 +359,6 @@ class EmergencyContact {
 }
 
 class Allergy {
-    - PDO db
     - int id
     - string allergenId
     - string allergen
@@ -394,7 +372,6 @@ class Allergy {
 }
 
 class InventoryItem {
-    - PDO db
     - int id
     - string itemId
     - string name
@@ -454,7 +431,7 @@ class TimeHelper <<service>> {
     + {static} formatLocal(utcDatetime: string, targetTimezone: string = 'Africa/Cairo'): string
 }
 
-class Validator {.
+class Validator {
     + array errors
     + required(field: string, value: string, message: string = null): void
     + email(field: string, value: string, message: string = null): void
@@ -480,21 +457,6 @@ class Router {
 
 class Controller {
     + view(view: string, data: array = []): void
-}
-
-class Database <<Singleton>> {
-    - {static} Database instance
-    - PDO pdo
-    - string host
-    - string username
-    - string password
-    - string dbname
-    + {static} getInstance(): Database
-    + getConnection(): PDO
-}
-
-class LoadEnv <<Helper>> {
-    + {static} load(path: string): void
 }
 
 class FinanceController extends Controller {
@@ -617,25 +579,36 @@ class EmergencyController extends Controller {
     + validateEmergencyInput(contactData: array): boolean
 }
 
+
+class Database <<Singleton>> {
+    - {static} Database instance
+    - PDO pdo
+    - string host
+    - string username
+    - string password
+    - string dbname
+    + {static} getInstance(): Database
+    + getConnection(): PDO
+}
+
+class LoadEnv <<Helper>> {
+    + {static} load(path: string): void
+}
+
 ' ========================================================
 ' RELATIONSHIPS 
 ' ========================================================
 
-ItineraryItem <|-- Subtrip
-ItineraryItem <|-- Activity
-Alert <|-- BudgetAlert
-Alert <|-- DeadlineAlert
-User <|-- TripMember
+TripMember "*" --> "1" User : belongs to
 
-Subtrip "0..1" o-- "0..*" Activity : contains
-ItineraryItem "*" --> "1" Location : located at
+Activity "*" --> "1" Location : located at
 
-User "1" <-- "0..*" Itinerary : created by
+Itinerary "0..*" --> "1" User : created by
 Itinerary "1" --> "0..*" TripMember : includes
 Itinerary "1" *-- "0..*" Invitation : has
 Itinerary "1" *-- "1" HistoryLog : maintains
 Itinerary "1" *-- "1" TripFinance : contains
-Itinerary "1" *-- "0..*" ItineraryItem : contains
+Itinerary "1" *-- "0..*" Activity : contains
 
 User "1" *-- "0..*" EmergencyContact : has
 User "1" *-- "0..*" Allergy : has
@@ -644,87 +617,125 @@ TripMember "*" --> "1" TripRole : assigned
 Activity "*" --> "1" ActivityStatus : currently
 Vote "*" --> "1" RatingOption : utilizes
 AttendanceList "*" --> "1" AttendanceStatus : tracks
-TransportDetails "*" --> "1" TransportMode : uses
+AttendanceList "1" *-- "0..*" AttendanceMember : contains
 
 Activity "1" *-- "0..*" Poll : contains
 Activity "1" *-- "1" AttendanceList : tracks
 Activity "1" *-- "0..*" InventoryItem : contains
-Activity "2" *-- "0..1" TransportDetails : has
 
 InventoryItem "*" --> "0..1" TripMember : assigned to
 Poll "1" *-- "0..*" Vote : contains
 HistoryLog "1" *-- "0..*" HistoryLogEntry : contains
 HistoryLogEntry "1" --> "1" HistoryLogEntry : points to
-DeadlineAlert "1" --> "1" Poll : monitors
 
 TripFinance "1" *-- "1" GroupFund : contains
 TripFinance "1" *-- "0..*" Expense : tracks
-TripFinance "1" *-- "0..*" Settlement : resolves
+TripFinance "1" *-- "0..*" SettlementPayment : resolves
 GroupFund "1" *-- "0..*" FundContribution : contains
 FundContribution "*" --> "1" TripMember : made by
 
 Expense "1" *-- "1..*" ExpenseShare : split via
 Expense "*" --> "1" SplitMethod : utilizes
 ExpenseShare "*" --> "1" TripMember : owed/paid by
-Settlement "*" --> "1" TripMember : debtor
-Settlement "*" --> "1" TripMember : creditor
+SettlementPayment "*" --> "1" TripMember : debtor
+SettlementPayment "*" --> "1" TripMember : creditor
 TripSettlementManager "1" --> "1" TripFinance : manages
-
-Expense "*" --> "1" CurrencyConverterAPIWrapper : uses
-BudgetAlert "1" --> "*" Expense : monitors
-
-TransportCalculator "1" --> "*" TransportDetails : creates
-EmergencyBroadcaster "1" --> "*" EmergencyContact : notifies
 
 FinanceService "1" --> "1" TripFinance : monitors
 FinanceService "1" --> "*" Expense : analyzes
-
-ConflictDetectorService "1" --> "*" Activity : analyzes
-ConflictDetectorService "1" --> "*" Subtrip : analyzes
-TimeZoneService "1" --> "*" Location : analyzes
 
 Router ..> Controller : <<instantiates>>\nvia dispatch()
 
 ' ========================================================
 ' CONTROLLER -> MODEL DEPENDENCIES
 ' ========================================================
-ItineraryController --> Itinerary : manages
-ItineraryController --> TripMember : accesses
-ItineraryController --> Activity : accesses
-ItineraryController --> TimeZoneService : uses
+ItineraryController ..> Itinerary : manages
+ItineraryController ..> TripFinance : accesses
+ItineraryController ..> TripMember : accesses
+ItineraryController ..> Activity : accesses
 
-InvitationController --> Invitation : manages
+TripMemberController ..> TripMember : manages
+TripMemberController ..> Itinerary : accesses
+TripMemberController ..> Invitation : accesses
 
-ActivityController --> Activity : manages
-ActivityController --> AttendanceList : accesses
-ActivityController --> Itinerary : accesses
-ActivityController --> ConflictDetectorService : uses
-ActivityController --> TransportCalculator : uses
-ActivityController --> TransportDetails : accesses
+ActivityController ..> Activity : manages
+ActivityController ..> AttendanceList : accesses
+ActivityController ..> AttendanceMember : accesses
+ActivityController ..> Itinerary : accesses
+ActivityController ..> Location : accesses
+ActivityController ..> TripMember : accesses
 
-ExpenseController --> Expense : manages
-ExpenseController --> CurrencyConverterAPIWrapper : uses
-ExpenseController --> TripFinance : accesses
+ExpenseController ..> Expense : manages
+ExpenseController ..> ExpenseShare : manages
+ExpenseController ..> TripFinance : accesses
 
-SettlementController --> Settlement : manages
-SettlementController --> TripFinance : accesses
+FinanceController ..> GroupFund : accesses
+FinanceController ..> Itinerary : accesses
+FinanceController ..> TripMember : accesses
+FinanceController ..> FinanceService : uses
+FinanceController ..> SettlementPayment : manages
+FinanceController ..> TripFinance : accesses
 
-CommonPoolController --> GroupFund : manages
+CommonPoolController ..> GroupFund : manages
+CommonPoolController ..> FundContribution : manages
+CommonPoolController ..> TripMember : accesses
 
-HistoryLogController --> HistoryLog : manages
-HistoryLogController --> HistoryLogEntry : accesses
+HistoryController ..> HistoryLog : manages
+HistoryController ..> HistoryLogEntry : accesses
+HistoryController ..> Activity : accesses
+HistoryController ..> Expense : accesses
+HistoryController ..> FundContribution : accesses
 
-ComplianceController --> TripMember : audits
+AllergyController ..> Allergy : manages
 
-AllergyController --> Allergy : manages
+InventoryController ..> InventoryItem : manages
+InventoryController ..> Activity : accesses
+InventoryController ..> Itinerary : accesses
+InventoryController ..> TripMember : accesses
 
-InventoryController --> InventoryItem : manages
+AuthController ..> User : authenticates
+AuthController ..> Auth : uses
+AuthController ..> Session : uses
 
-AuthController --> User : authenticates
+UserController ..> User : manages
+UserController ..> Validator : uses
 
-UserController --> User : manages
+EmergencyController ..> EmergencyContact : manages
+EmergencyController ..> User : accesses
+EmergencyController ..> TripMember : accesses
 
-EmergencyController --> TripMember : accesses
-EmergencyController --> EmergencyBroadcaster : uses
+PollController ..> Poll : manages
+PollController ..> Vote : manages
+PollController ..> Activity : accesses
+PollController ..> Itinerary : accesses
+PollController ..> TripMember : accesses
+
+ProposalController ..> Activity : accesses
+ProposalController ..> Poll : accesses
+ProposalController ..> TripMember : accesses
+
+' ========================================================
+' SERVICE & HELPER DEPENDENCIES
+' ========================================================
+Auth ..> Session : uses
+
+Poll "*" --> "1" PollStatus : has
+AttendanceMember "*" --> "1" AttendanceStatus : currently
+
+PollController ..> TimeHelper : uses
+ActivityController ..> TimeHelper : uses
+ProposalController ..> TimeHelper : uses
+
+EmergencyController ..> Mailer : uses
+ItineraryController ..> Mailer : uses
+TripMemberController ..> Mailer : uses
+
+ExpenseController ..> HistoryLogger : uses
+ActivityController ..> HistoryLogger : uses
+FinanceController ..> HistoryLogger : uses
+InventoryController ..> HistoryLogger : uses
+TripMemberController ..> HistoryLogger : uses
+
+Database .right.> LoadEnv : uses
 
 @enduml
