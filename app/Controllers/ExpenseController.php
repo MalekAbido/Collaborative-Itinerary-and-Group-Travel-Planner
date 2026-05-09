@@ -5,7 +5,7 @@ use App\Helpers\Auth;
 use App\Helpers\HistoryLogger;
 use App\Models\Expense;
 use App\Models\ExpenseShare;
-use App\Models\TransactionType;
+use App\Enums\TransactionType;
 use App\Models\TripFinance;
 use Core\Controller;
 

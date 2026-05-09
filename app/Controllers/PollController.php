@@ -7,7 +7,7 @@ use App\Helpers\TimeHelper;
 use App\Models\Activity;
 use App\Models\Itinerary;
 use App\Models\Poll;
-use App\Models\TransactionType;
+use App\Enums\TransactionType;
 use App\Models\TripMember;
 use App\Models\Vote;
 use Core\Controller;

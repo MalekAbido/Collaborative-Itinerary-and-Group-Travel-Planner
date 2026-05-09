@@ -9,7 +9,7 @@ use App\Models\Expense;
 use App\Models\FundContribution;
 use App\Models\HistoryLogEntry;
 use App\Models\Subtrip;
-use App\Models\TransactionType;
+use App\Enums\TransactionType;
 use Core\Controller;
 
 class HistoryController extends Controller

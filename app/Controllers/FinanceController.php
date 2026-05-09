@@ -6,7 +6,7 @@ use App\Models\TripFinance;
 use App\Models\GroupFund;
 use App\Models\Itinerary;
 use App\Models\SettlementPayment;
-use App\Models\TransactionType;
+use App\Enums\TransactionType;
 use App\Helpers\Auth;
 use App\Helpers\HistoryLogger;
 use App\Models\TripMember;

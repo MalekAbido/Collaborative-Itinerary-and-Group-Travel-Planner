@@ -9,7 +9,7 @@ use App\Models\Activity;
 use App\Models\AttendanceList;
 use App\Models\AttendanceMember;
 use App\Models\Location;
-use App\Models\TransactionType;
+use App\Enums\TransactionType;
 use App\Models\TripMember;
 use Core\Controller;
 

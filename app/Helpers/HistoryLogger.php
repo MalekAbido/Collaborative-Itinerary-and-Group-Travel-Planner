@@ -3,7 +3,7 @@ namespace App\Helpers;
 
 use App\Models\HistoryLog;
 use App\Models\HistoryLogEntry;
-use App\Models\TransactionType;
+use App\Enums\TransactionType;
 use ReflectionClass;
 
 class HistoryLogger

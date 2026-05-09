@@ -3,7 +3,7 @@ namespace App\Models;
 
 use App\Helpers\HistoryLogger;
 use App\Models\FundContribution;
-use App\Models\TransactionType;
+use App\Enums\TransactionType;
 use Core\Database;
 use PDO;
 
