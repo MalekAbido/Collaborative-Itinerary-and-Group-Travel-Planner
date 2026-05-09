@@ -89,7 +89,7 @@ class AttendanceMember
             $syncSql = "INSERT INTO AttendanceMember (status, attendanceListId, tripMemberId)
                         SELECT 'Pending', :listId, tm.id
                         FROM TripMember tm
-                        WHERE tm.itineraryId = :itineraryId
+                        WHERE tm.itineraryId = :itineraryId AND tm.deletedAt IS NULL
                         AND tm.id NOT IN (
                             SELECT tripMemberId FROM AttendanceMember WHERE attendanceListId = :listId
                         )";

@@ -203,13 +203,8 @@ class PollController extends Controller
 
         $userId = Auth::id() ?? 1;
 
-        $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
-
-        if ($member) {
-            $userRole = $member->getRole();
-        } else {
-            $userRole = 'Member';
-        }
+        $member = Auth::requireMembership($itineraryId);
+        $userRole = $member->getRole();
 
         $canManagePolls = Auth::hasRole('Editor', $userRole);
 

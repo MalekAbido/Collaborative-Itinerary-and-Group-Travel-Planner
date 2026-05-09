@@ -65,7 +65,7 @@
                                 Inventory
                             </a>
                             <?php $currentMember = TripMember::getByUserAndItinerary($currentUser->getId(), $itineraryId); ?>
-                            <?php if (Auth::hasRole("Editor", $currentMember->getRole() ?? null)): ?>
+                            <?php if ($currentMember && Auth::hasRole("Editor", $currentMember->getRole())): ?>
                             <a href="/itinerary/<?= htmlspecialchars($itineraryId) ?>/proposals"
                                 class="flex items-center h-full px-4 text-body-sm transition-all <?= ($activeTab ?? '') === 'proposals' ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-b-2 border-transparent hover:text-primary' ?>">
                                 Proposals

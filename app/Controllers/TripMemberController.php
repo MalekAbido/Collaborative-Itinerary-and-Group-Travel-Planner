@@ -113,15 +113,41 @@ class TripMemberController extends Controller
 
     public function destroy($id)
     {
-        $member = Auth::requireMembership($id);
-        $memberRole = $member->getRole();
-        Auth::requireRole('Organizer', $memberRole);
+        $currentMember = Auth::requireMembership($id);
+        $currentMemberRole = $currentMember->getRole();
+        Auth::requireRole('Organizer', $currentMemberRole);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $memberId = $_POST['memberId'];
-            $member = new \App\Models\TripMember();
-            $member->setId($memberId);
-            $member->delete();
+            $memberModel = new \App\Models\TripMember();
+            
+            if ($memberModel->read($memberId)) {
+                // Ensure this is the correct itinerary
+                if ($memberModel->getItineraryId() != $id) {
+                    header("Location: /itinerary/members/" . $id . "?status=error");
+                    exit;
+                }
+
+                // Check if this is the last organizer
+                $allMembers = $memberModel->getAllByItineraryId($id);
+                $organizers = array_filter($allMembers, function($m) {
+                    return $m['role'] === 'Organizer';
+                });
+
+                if ($memberModel->getRole() === 'Organizer' && count($organizers) <= 1) {
+                    header("Location: /itinerary/members/" . $id . "?status=error_last_organizer");
+                    exit;
+                }
+
+                // Invalidate pending invitations for this user's email if possible
+                $user = $memberModel->getUser();
+                if ($user) {
+                    $invitationModel = new Invitation();
+                    $invitationModel->invalidateByEmail($id, $user->getEmail());
+                }
+
+                $memberModel->delete(); // This is now a soft delete
+            }
 
             header("Location: /itinerary/members/" . $id . "?status=removed");
             exit;
@@ -143,10 +169,22 @@ class TripMemberController extends Controller
         $itineraryId = $invitation['itineraryId'];
         $role = $invitation['role'];
 
-        $existingMember = TripMember::getByUserAndItinerary($userId, $itineraryId);
+        $existingMember = TripMember::getByUserAndItinerary($userId, $itineraryId, true);
+        
         if ($existingMember) {
-            header("Location: /itinerary/dashboard/" . $itineraryId . "?status=already_joined");
-            exit;
+            if ($existingMember->getDeletedAt() === null) {
+                header("Location: /itinerary/dashboard/" . $itineraryId . "?status=already_joined");
+                exit;
+            } else {
+                // Reactivate
+                if ($existingMember->reactivate($role)) {
+                    if ($invitation['email'] !== null) {
+                        $invitationModel->markUsed($invitation['secureToken']);
+                    }
+                    header("Location: /itinerary/dashboard/" . $itineraryId . "?status=joined");
+                    exit;
+                }
+            }
         }
 
         $newMember = new TripMember();

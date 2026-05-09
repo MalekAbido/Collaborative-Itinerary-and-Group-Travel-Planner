@@ -208,7 +208,7 @@ class Poll
 
     public function getVoterDetails()
     {
-        $sql = "SELECT v.*, u.firstName, u.lastName, u.profileImage, tm.role 
+        $sql = "SELECT v.*, u.firstName, u.lastName, u.profileImage, tm.role, tm.deletedAt 
                 FROM Vote v
                 JOIN TripMember tm ON v.tripMemberId = tm.id
                 JOIN User u ON tm.userId = u.id

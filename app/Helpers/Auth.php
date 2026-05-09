@@ -119,7 +119,7 @@ class Auth
         $userId = Auth::id();
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
-        if (!$member) {
+        if (!$member || $member->getDeletedAt() !== null) {
             Session::setFlash(Session::FLASH_ERROR, 'Access denied. You are not a member of this itinerary.');
             header("Location: /dashboard");
             exit;

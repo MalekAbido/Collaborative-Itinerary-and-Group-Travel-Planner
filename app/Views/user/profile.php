@@ -263,8 +263,8 @@
                                 </div>
                                 <div>
                                     <label class="block text-label-xs uppercase text-outline mb-1.5">Email
-                                        (Optional)</label>
-                                    <input type="email" name="email"
+                                        Address</label>
+                                    <input type="email" name="email" required
                                         class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2 text-body-sm text-on-surface placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/30 focus:outline-none transition" />
                                 </div>
                             </div>

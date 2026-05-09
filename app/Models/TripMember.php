@@ -16,6 +16,7 @@ class TripMember
     private $joinedAt;
     private $userId;
     private $itineraryId;
+    private $deletedAt;
 
     private $userObject      = null;
     private $itineraryObject = null;
@@ -85,6 +86,16 @@ class TripMember
         $this->itineraryId = $itineraryId;
     }
 
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
+    }
+
     public function create()
     {
         $this->membershipId = uniqid('mem_');
@@ -119,6 +130,7 @@ class TripMember
             $this->joinedAt     = $data['joinedAt'];
             $this->userId       = $data['userId'];
             $this->itineraryId  = $data['itineraryId'];
+            $this->deletedAt    = $data['deletedAt'];
             return $this;
         }
 
@@ -137,51 +149,59 @@ class TripMember
 
     public function delete()
     {
-        if (empty($this->itineraryId)) {
-            $this->read($this->id);
+        if (empty($this->id)) {
+            return false;
         }
 
-        // 1. Clean up participation records (These are safe to delete)
-        $this->db->prepare("DELETE FROM AttendanceMember WHERE tripMemberId = :id")->execute([':id' => $this->id]);
-        $this->db->prepare("DELETE FROM Vote WHERE tripMemberId = :id")->execute([':id' => $this->id]);
-        $this->db->prepare("DELETE FROM ExpenseShare WHERE tripMemberId = :id")->execute([':id' => $this->id]);
-        $this->db->prepare("DELETE FROM FundContribution WHERE tripMemberId = :id")->execute([':id' => $this->id]);
-        $this->db->prepare("DELETE FROM HistoryLogEntry WHERE tripMemberId = :id")->execute([':id' => $this->id]);
-        $this->db->prepare("DELETE FROM InventoryItem WHERE tripMemberId = :id")->execute([':id' => $this->id]);
+        // 1. Physically delete attendance records (User's request)
+        $stmt = $this->db->prepare("DELETE FROM AttendanceMember WHERE tripMemberId = :id");
+        $stmt->execute([':id' => $this->id]);
 
-        $stmt = $this->db->prepare("SELECT id FROM TripMember WHERE itineraryId = :itinId AND role IN ('Leader', 'Organizer') AND id != :myId LIMIT 1");
-        $stmt->execute([
-            ':itinId' => $this->itineraryId, 
-            ':myId'   => $this->id
-        ]);
-        $organizer = $stmt->fetch(\PDO::FETCH_ASSOC);
+        // 2. Unassign inventory items (User's request)
+        $stmt = $this->db->prepare("UPDATE InventoryItem SET tripMemberId = NULL WHERE tripMemberId = :id");
+        $stmt->execute([':id' => $this->id]);
 
-        if ($organizer) {
-            $newOwnerId = $organizer['id'];
-            
-            $this->db->prepare("UPDATE Activity SET tripMemberId = :newId WHERE tripMemberId = :oldId")->execute([':newId' => $newOwnerId, ':oldId' => $this->id]);
-            $this->db->prepare("UPDATE Subtrip SET tripMemberId = :newId WHERE tripMemberId = :oldId")->execute([':newId' => $newOwnerId, ':oldId' => $this->id]);
-            $this->db->prepare("UPDATE Expense SET tripMemberId = :newId WHERE tripMemberId = :oldId")->execute([':newId' => $newOwnerId, ':oldId' => $this->id]);
-        } else {
-            $this->db->prepare("DELETE FROM Activity WHERE tripMemberId = :id")->execute([':id' => $this->id]);
-            $this->db->prepare("DELETE FROM Subtrip WHERE tripMemberId = :id")->execute([':id' => $this->id]);
-            $this->db->prepare("DELETE FROM Expense WHERE tripMemberId = :id")->execute([':id' => $this->id]);
-        }
-        $sql  = "DELETE FROM TripMember WHERE id = :id";
+        // 3. Perform Soft Delete
+        $this->deletedAt = date('Y-m-d H:i:s');
+        $sql  = "UPDATE TripMember SET deletedAt = :deletedAt WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         
-        return $stmt->execute([':id' => $this->id]);
+        return $stmt->execute([
+            ':deletedAt' => $this->deletedAt,
+            ':id'        => $this->id
+        ]);
     }
 
-    public function getAllByItineraryId($itineraryId)
+    public function reactivate($role = null)
+    {
+        $this->deletedAt = null;
+        if ($role) {
+            $this->role = $role;
+        }
+        
+        $sql  = "UPDATE TripMember SET deletedAt = NULL, role = :role WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        
+        return $stmt->execute([
+            ':role' => $this->role,
+            ':id'   => $this->id
+        ]);
+    }
+
+    public function getAllByItineraryId($itineraryId, $includeDeleted = false)
     {
         // REAL FIX: Joining the TripMember table with the User table
-        $sql = "SELECT m.id as memberId, m.role, m.joinedAt, m.itineraryId,
+        $sql = "SELECT m.id as memberId, m.role, m.joinedAt, m.itineraryId, m.deletedAt,
                        u.id as userId, u.firstName, u.lastName, u.email
                 FROM TripMember m
                 JOIN User u ON m.userId = u.id
-                WHERE m.itineraryId = :itineraryId
-                ORDER BY 
+                WHERE m.itineraryId = :itineraryId";
+        
+        if (!$includeDeleted) {
+            $sql .= " AND m.deletedAt IS NULL";
+        }
+
+        $sql .= " ORDER BY 
                     CASE m.role 
                         WHEN 'Organizer' THEN 1 
                         WHEN 'Editor' THEN 2 
@@ -196,12 +216,16 @@ class TripMember
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public static function getByUserAndItinerary($userId, $itineraryId)
+    public static function getByUserAndItinerary($userId, $itineraryId, $includeDeleted = false)
     {
         $db = \Core\Database::getInstance()->getConnection();
 
-        // Added the \PDO:: namespace slash to prevent any namespace crashing
-        $sql  = "SELECT * FROM TripMember WHERE userId = :userId AND itineraryId = :itineraryId LIMIT 1";
+        $sql  = "SELECT * FROM TripMember WHERE userId = :userId AND itineraryId = :itineraryId";
+        if (!$includeDeleted) {
+            $sql .= " AND deletedAt IS NULL";
+        }
+        $sql .= " LIMIT 1";
+
         $stmt = $db->prepare($sql);
         $stmt->execute([
             ':userId'      => $userId,
@@ -218,6 +242,7 @@ class TripMember
             $member->setJoinedAt($row['joinedAt']);
             $member->setUserId($row['userId']);
             $member->setItineraryId($row['itineraryId']);
+            $member->setDeletedAt($row['deletedAt']);
 
             return $member;
         }
@@ -251,5 +276,17 @@ class TripMember
         }
 
         return $this->itineraryObject;
+    }
+
+    public function getDisplayName()
+    {
+        $user = $this->getUser();
+        if (!$user) return 'Unknown User';
+        
+        $name = $user->getFirstName() . ' ' . $user->getLastName();
+        if ($this->deletedAt !== null) {
+            $name .= ' (Former Member)';
+        }
+        return $name;
     }
 }

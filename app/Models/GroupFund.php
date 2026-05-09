@@ -138,7 +138,7 @@ class GroupFund
             return [];
         }
 
-        $sql = "SELECT fc.id, fc.tripMemberId, fc.amount, fc.timestamp, u.firstName, u.lastName
+        $sql = "SELECT fc.id, fc.tripMemberId, fc.amount, fc.timestamp, u.firstName, u.lastName, tm.deletedAt
                 FROM FundContribution fc
                 JOIN TripMember tm ON fc.tripMemberId = tm.id
                 JOIN User u ON tm.userId = u.id

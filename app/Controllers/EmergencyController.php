@@ -130,7 +130,11 @@ class EmergencyController extends Controller
 
     public function validateEmergencyInput($contactData)
     {
-        if (empty($contactData['name']) || empty($contactData['relationship'])) {
+        if (empty($contactData['name']) || empty($contactData['relationship']) || empty($contactData['email'])) {
+            return false;
+        }
+
+        if (!filter_var($contactData['email'], FILTER_VALIDATE_EMAIL)) {
             return false;
         }
 
