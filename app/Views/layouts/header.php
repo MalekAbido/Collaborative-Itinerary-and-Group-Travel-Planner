@@ -23,6 +23,8 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
         rel="stylesheet" />
     <link rel="stylesheet" href="/assets/css/tailwind.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 
     <style type="text/tailwindcss">
         @layer base {
@@ -84,12 +86,11 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <?php if ($itineraryId ?? false): ?>
-                        <form action="/sos/trigger" method="POST" class="m-0 flex items-center" onsubmit="return confirm('⚠️ WARNING: This will immediately send an emergency email to all your saved emergency contacts. Are you sure you want to proceed?');">
-                            <button type="submit"
-                                class="inline-flex items-center gap-1 rounded-lg border-2 border-error px-3 py-1.5 text-body-xs font-bold tracking-wide text-error hover:bg-error-container transition focus:ring-2 focus:ring-error focus:outline-none">
-                                <span class="material-symbols-outlined text-base">warning</span>SOS
-                            </button>
-                        </form>
+                        <button id="sos-btn" type="button"
+                            class="inline-flex items-center gap-1 rounded-lg border-2 border-error px-3 py-1.5 text-body-xs font-bold tracking-wide text-error hover:bg-error-container transition focus:ring-2 focus:ring-error focus:outline-none">
+                            <span class="material-symbols-outlined text-base">warning</span>SOS
+                        </button>
+                        <script src="/assets/js/triggerEmergency.js"></script>
                     <?php endif; ?>
                     <a href="/profile" class="flex items-center gap-2 cursor-pointer">
                         <?php

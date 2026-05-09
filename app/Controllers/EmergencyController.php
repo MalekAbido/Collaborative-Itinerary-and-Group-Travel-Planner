@@ -14,6 +14,7 @@ class EmergencyController extends Controller
 
     public function __construct()
     {
+        Auth::requireLogin();
         $this->userId = Auth::id();
     }
 
@@ -84,9 +85,25 @@ class EmergencyController extends Controller
 
     public function triggerSOS()
     {
+        $userId = $this->userId;
+        session_write_close();
+
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'success']);
+
+        ignore_user_abort(true);
+        ob_start();
+        $size = ob_get_length();
+        header("Content-Length: $size");
+        header('Connection: close');
+        ob_end_flush();
+        flush();
+
+        ignore_user_abort(true);
+        set_time_limit(0);
+
         $user = new User();
-        if (!$user->read($this->userId)) {
-            header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? '/dashboard'));
+        if (!$user->read($userId)) {
             exit;
         }
 
@@ -94,7 +111,6 @@ class EmergencyController extends Controller
         $contacts = $user->getEmergencyContacts();
 
         if (empty($contacts)) {
-            header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? '/dashboard'));
             exit;
         }
 
@@ -117,10 +133,10 @@ class EmergencyController extends Controller
             if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $personalizedBody = "<h3 style='color: #333;'>Dear {$contactName},</h3>" . $baseBody; 
                 Mailer::send($email, $subject, $personalizedBody);
+                
+                sleep(7);
             }
         }
-
-        header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? '/dashboard'));
         exit;
     }
 

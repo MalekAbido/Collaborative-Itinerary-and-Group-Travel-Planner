@@ -198,6 +198,17 @@ if (! empty($pendingInvites)): ?>
     </div>
 </div>
 <?php endif; ?>
+<?php if (!$canManageMembers): ?>
+<div class="flex justify-end mt-12 pb-12">
+    <form action="/itinerary/members/leave/<?php echo htmlspecialchars($trip['id'] ?? '') ?>" method="POST"
+        onsubmit="return confirm('Are you sure you want to leave this itinerary? This action cannot be undone.');">
+        <button type="submit"
+            class="inline-flex items-center gap-2 rounded-lg border-2 border-error text-error font-semibold text-body-sm px-6 py-2.5 hover:bg-error-container transition cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">logout</span> Leave Itinerary
+        </button>
+    </form>
+</div>
+<?php endif; ?>
 
 <script>
 function copyInviteLink(link) {
@@ -210,5 +221,7 @@ function copyInviteLink(link) {
 </script>
 
 </main>
+
+
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>

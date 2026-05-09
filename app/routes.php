@@ -87,6 +87,7 @@ $this->post('/poll/reopen', 'PollController', 'reopen');
 // Inventory Routes
 $this->get('/itinerary/inventory/{id}', 'InventoryController', 'showInventory');
 $this->post('/inventory/add', 'InventoryController', 'addInventoryItem');
+$this->post('/inventory/delete', 'InventoryController', 'deleteInventoryItem');
 $this->post('/inventory/volunteer', 'InventoryController', 'volunteerToBringItem');
 $this->post('/inventory/unvolunteer', 'InventoryController', 'unvolunteer');
 
@@ -103,6 +104,7 @@ $this->post('/itinerary/members/updateRole/{id}', 'TripMemberController', 'updat
 
 // 4. Remove a member
 $this->post('/itinerary/members/remove/{id}', 'TripMemberController', 'destroy');
+$this->post('/itinerary/members/leave/{id}', 'TripMemberController', 'leave');
 
 // Group Fund (Kitty)
 $this->post('/fund/contribute/{id}', 'CommonPoolController', 'contribute');

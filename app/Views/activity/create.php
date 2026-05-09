@@ -1,9 +1,12 @@
 <?php
     require __DIR__ . '/../layouts/header.php';
     $itineraryId = $data['itineraryId'];
+    $itineraryStartDate = $data['itineraryStartDate'] ?? null;
+    $itineraryEndDate = $data['itineraryEndDate'] ?? null;
     $pendingActivity = $data['pendingActivity'] ?? [];
     $conflictingActivities = $data['conflictingActivities'] ?? [];
 ?>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
 
     <!-- <div class="max-w-2xl mx-auto py-10 px-6"> -->
         <?php if (!empty($conflictingActivities)): ?>
@@ -53,7 +56,7 @@
         <?php endif; ?>
 
         <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6">
-            <form id="activity-form" action="/itinerary/<?= htmlspecialchars($itineraryId) ?>/activity/store" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <form id="activity-form" action="/itinerary/<?= htmlspecialchars($itineraryId) ?>/activity/store" method="POST" enctype="multipart/form-data" class="space-y-6" onsubmit="return validateActivityForm()">
                 <input type="hidden" name="timezone" id="clientTimezoneReopen" value="">
 
                 <!-- Banner Image Upload -->
@@ -150,6 +153,61 @@
             </form>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+    <script>
+        const notyf = new Notyf({
+            duration: 4000,
+            position: { x: "right", y: "bottom" },
+            dismissible: true,
+        });
+
+        const itinStart = "<?= $itineraryStartDate ?>";
+        const itinEnd = "<?= $itineraryEndDate ?>";
+
+        function validateActivityForm() {
+            const startInput = document.querySelector('input[name="start_time"]');
+            const endInput = document.querySelector('input[name="end_time"]');
+            const nameInput = document.querySelector('input[name="name"]');
+
+            if (!nameInput.value || !startInput.value || !endInput.value) {
+                return true; // Let browser HTML5 validation handle required fields
+            }
+
+            const startDate = new Date(startInput.value);
+            const endDate = new Date(endInput.value);
+
+            if (endDate <= startDate) {
+                notyf.error("End time must be after start time.");
+                return false;
+            }
+
+            // Duration check (24 hours = 86,400,000 milliseconds)
+            const duration = endDate - startDate;
+            if (duration > 86400000) {
+                notyf.error("Activity duration cannot exceed 24 hours.");
+                return false;
+            }
+
+            // Itinerary range check
+            if (itinStart && itinEnd) {
+                // Itinerary dates are YYYY-MM-DD
+                // We compare based on local date components of the selected times
+                const startStr = startInput.value.substring(0, 10);
+                const endStr = endInput.value.substring(0, 10);
+
+                if (startStr < itinStart) {
+                    notyf.error(`Activity cannot start before the trip begins (${itinStart}).`);
+                    return false;
+                }
+                if (endStr > itinEnd) {
+                    notyf.error(`Activity cannot end after the trip finishes (${itinEnd}).`);
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    </script>
     <script src="/assets/js/timezone.js"></script>
 </body>
 </html>

@@ -40,8 +40,13 @@ class ActivityController extends Controller
         Session::set('pending_activity', null);
         Session::set('conflicting_activities', null);
 
+        $itineraryModel = new \App\Models\Itinerary();
+        $itinerary = $itineraryModel->findByIdNumeric($itineraryId);
+
         $this->view('activity/create', [
             'itineraryId'           => $itineraryId,
+            'itineraryStartDate'    => $itinerary['startDate'] ?? null,
+            'itineraryEndDate'      => $itinerary['endDate'] ?? null,
             'pendingActivity'       => $pendingActivity,
             'conflictingActivities' => $conflictingActivities,
             'activeTab'             => 'createActivity',
@@ -84,6 +89,44 @@ class ActivityController extends Controller
             Session::setFlash(Session::FLASH_ERROR, 'End time must be after start time.');
             header("Location: /itinerary/{$itineraryId}/activity/create");
             exit;
+        }
+
+        // Validation: Duration shouldn't exceed 24 hours
+        $durationInSeconds = strtotime($endTime) - strtotime($startTime);
+        if ($durationInSeconds > 86400) {
+            Session::setFlash(Session::FLASH_ERROR, 'Activity duration cannot exceed 24 hours.');
+            header("Location: /itinerary/{$itineraryId}/activity/create");
+            exit;
+        }
+
+        // Fetch Itinerary for date validation
+        $itineraryModel = new \App\Models\Itinerary();
+        $itineraryData = $itineraryModel->findByIdNumeric($itineraryId);
+        if ($itineraryData) {
+            $itinStart = $itineraryData['startDate']; // YYYY-MM-DD
+            $itinEnd   = $itineraryData['endDate'];   // YYYY-MM-DD
+
+            // Compare as naive dates/times (ignoring timezone offset for range check)
+            // Itinerary start date is considered 00:00:00 of that day
+            // Itinerary end date is considered 23:59:59 of that day
+            
+            $activityStartNaive = strtotime(substr($startTimeRaw, 0, 10)); // Just the date part
+            $activityEndNaive   = strtotime(substr($endTimeRaw, 0, 10));   // Just the date part
+            
+            $itinStartTs = strtotime($itinStart);
+            $itinEndTs   = strtotime($itinEnd);
+
+            if ($activityStartNaive < $itinStartTs) {
+                Session::setFlash(Session::FLASH_ERROR, 'Activity cannot start before the trip begins (' . date('M j, Y', $itinStartTs) . ').');
+                header("Location: /itinerary/{$itineraryId}/activity/create");
+                exit;
+            }
+
+            if ($activityEndNaive > $itinEndTs) {
+                Session::setFlash(Session::FLASH_ERROR, 'Activity cannot end after the trip finishes (' . date('M j, Y', $itinEndTs) . ').');
+                header("Location: /itinerary/{$itineraryId}/activity/create");
+                exit;
+            }
         }
 
         $category        = $_POST['category'] ?? 'General';
@@ -162,7 +205,6 @@ class ActivityController extends Controller
         $activity->setBannerImage($bannerImage);
 
         if ($activity->create()) {
-            HistoryLogger::log($itineraryId, TransactionType::ADDED_ACTIVITY, $activity, $tripMember->getId());
             $attendanceList = new AttendanceList();
 
             if ($attendanceList->create($activity->getId())) {
