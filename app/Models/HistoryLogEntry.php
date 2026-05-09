@@ -182,6 +182,9 @@ class HistoryLogEntry
             case EntityType::FUND_CONTRIBUTION:
                 $item = new FundContribution();
                 return ($item->read($id)) ? 'Contribution of ' . $item->getAmount() : 'Unknown Contribution';
+            case EntityType::TRIP_MEMBER:
+                $item = new TripMember();
+                return ($item->read($id)) ? $item->getDisplayName() : 'Unknown Member';
         }
 
         return 'Unknown Entity';

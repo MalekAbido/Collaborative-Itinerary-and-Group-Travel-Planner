@@ -18,6 +18,9 @@ enum TransactionType: string
     case UNVOLUNTEERED_FOR_ITEM = 'UNVOLUNTEERED_FOR_ITEM';
     case REMOVED_INVENTORY_ITEM = 'REMOVED_INVENTORY_ITEM';
     case RESTORED_INVENTORY_ITEM = 'RESTORED_INVENTORY_ITEM';
+    case MEMBER_JOINED = 'MEMBER_JOINED';
+    case MEMBER_LEFT = 'MEMBER_LEFT';
+    case MEMBER_REMOVED = 'MEMBER_REMOVED';
 
     public function label(): string
     {
@@ -36,6 +39,9 @@ enum TransactionType: string
             self::UNVOLUNTEERED_FOR_ITEM => 'Unvolunteered for Item',
             self::REMOVED_INVENTORY_ITEM => 'Removed Inventory Item',
             self::RESTORED_INVENTORY_ITEM => 'Restored Inventory Item',
+            self::MEMBER_JOINED => 'Joined Itinerary',
+            self::MEMBER_LEFT => 'Left Itinerary',
+            self::MEMBER_REMOVED => 'Removed from Itinerary',
         };
     }
 }

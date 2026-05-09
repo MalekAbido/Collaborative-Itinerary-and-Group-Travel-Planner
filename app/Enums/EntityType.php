@@ -8,6 +8,7 @@ enum EntityType: string
     case EXPENSE = 'Expense';
     case FUND_CONTRIBUTION = 'FundContribution';
     case INVENTORY_ITEM = 'InventoryItem';
+    case TRIP_MEMBER = 'TripMember';
 
     public function label(): string
     {
@@ -16,6 +17,7 @@ enum EntityType: string
             self::EXPENSE => 'Expense',
             self::FUND_CONTRIBUTION => 'Fund Contribution',
             self::INVENTORY_ITEM => 'Inventory Item',
+            self::TRIP_MEMBER => 'Trip Member',
         };
     }
 }

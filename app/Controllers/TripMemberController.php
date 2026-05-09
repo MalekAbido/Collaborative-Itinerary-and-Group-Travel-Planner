@@ -7,7 +7,9 @@ use App\Models\Itinerary;
 use App\Models\Invitation;
 use App\Helpers\Auth;
 use App\Helpers\Mailer;
+use App\Helpers\HistoryLogger;
 use App\Enums\TripMemberRole;
+use App\Enums\TransactionType;
 
 class TripMemberController extends Controller
 {
@@ -147,6 +149,9 @@ class TripMemberController extends Controller
                 }
 
                 $memberModel->delete(); // This is now a soft delete
+
+                // Log history
+                HistoryLogger::log($id, TransactionType::MEMBER_REMOVED, $memberModel, $currentMember->getId());
             }
 
             header("Location: /itinerary/members/" . $id . "?status=removed");
@@ -165,7 +170,14 @@ class TripMemberController extends Controller
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $memberId = $currentMember->getId();
+            $itineraryId = $id;
+
             $currentMember->delete();
+
+            // Log history
+            HistoryLogger::log($itineraryId, TransactionType::MEMBER_LEFT, $currentMember, $memberId);
+
             header("Location: /dashboard?status=left_trip");
             exit;
         }
@@ -198,6 +210,10 @@ class TripMemberController extends Controller
                     if ($invitation['email'] !== null) {
                         $invitationModel->markUsed($invitation['secureToken']);
                     }
+
+                    // Log history
+                    HistoryLogger::log($itineraryId, TransactionType::MEMBER_JOINED, $existingMember, $existingMember->getId());
+
                     header("Location: /itinerary/dashboard/" . $itineraryId . "?status=joined");
                     exit;
                 }
@@ -216,6 +232,9 @@ class TripMemberController extends Controller
             if ($invitation['email'] !== null) {
                 $invitationModel->markUsed($invitation['secureToken']);
             }
+
+            // Log history
+            HistoryLogger::log($itineraryId, TransactionType::MEMBER_JOINED, $newMember, $newMember->getId());
             
             header("Location: /itinerary/dashboard/" . $itineraryId . "?status=joined");
             exit;

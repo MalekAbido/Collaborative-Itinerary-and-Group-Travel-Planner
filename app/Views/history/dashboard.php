@@ -58,20 +58,20 @@ use App\Enums\TransactionType;
                             $type   = $entry->getTransactionType();
 
                             $style = match(true) {
-                                str_contains($type, 'REMOVED') || str_contains($type, 'DELETED') => [
+                                str_contains($type, 'REMOVED') || str_contains($type, 'DELETED') || str_contains($type, 'LEFT') => [
                                     'bg' => 'bg-error-container text-on-error-container',
-                                    'icon' => 'delete',
-                                    'label' => 'Removed'
+                                    'icon' => str_contains($type, 'MEMBER') ? 'person_remove' : 'delete',
+                                    'label' => str_contains($type, 'LEFT') ? 'Left' : 'Removed'
                                 ],
                                 str_contains($type, 'RESTORED') => [
                                     'bg' => 'bg-primary-container text-on-primary-container',
                                     'icon' => 'history',
                                     'label' => 'Restored'
                                 ],
-                                str_contains($type, 'ADDED') || str_contains($type, 'CREATED') => [
+                                str_contains($type, 'ADDED') || str_contains($type, 'CREATED') || str_contains($type, 'JOINED') => [
                                     'bg' => 'bg-tertiary-fixed text-on-tertiary-fixed',
-                                    'icon' => 'add',
-                                    'label' => 'Added'
+                                    'icon' => str_contains($type, 'JOINED') ? 'person_add' : 'add',
+                                    'label' => str_contains($type, 'JOINED') ? 'Joined' : 'Added'
                                 ],
                                 default => [
                                     'bg' => 'bg-secondary-container text-on-secondary-container',
