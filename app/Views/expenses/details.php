@@ -97,7 +97,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
             <div class="p-4 border-t border-outline-variant bg-surface/50 flex justify-end">
                 <form action="/finance/expense/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this expense?');">
                     <input type="hidden" name="expenseId" value="<?= $expense->getId() ?>">
-                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-error text-white font-semibold text-body-sm px-5 py-2 shadow-sm hover:bg-error/90 transition">
+                    <button class="inline-flex items-center justify-center gap-2 rounded-lg bg-error text-white font-semibold text-body-sm px-5 py-2 shadow-sm hover:bg-error/90 transition cursor-pointer"    type="submit" >
                         <span class="material-symbols-outlined text-[18px]">delete</span> Delete Expense
                     </button>
                 </form>

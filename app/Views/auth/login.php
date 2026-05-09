@@ -65,8 +65,8 @@
                     <div class="relative">
                         <input type="password" id="reg-password" name="password" placeholder="••••••••" required
                             class="w-full pl-4 pr-12 py-3.5 bg-surface border border-outline-variant rounded-xl text-on-surface placeholder-outline/60 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none">
-                        <button type="button" onclick="toggleVisibility('reg-password', 'reg-eye')"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors flex items-center justify-center cursor-pointer">
+                        <button class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors flex items-center justify-center cursor-pointer"    type="button" onclick="toggleVisibility('reg-password', 'reg-eye')"
+                            >
                             <span id="reg-eye" class="material-symbols-outlined">visibility_off</span>
                         </button>
                     </div>
@@ -80,8 +80,8 @@
                     </label>
                 </div>
 
-                <button type="submit"
-                    class="w-full bg-primary text-white font-semibold py-4 rounded-xl shadow-lg hover:bg-on-primary-fixed-variant transition-colors flex justify-center items-center gap-2 cursor-pointer">
+                <button class="w-full bg-primary text-white font-semibold py-4 rounded-xl shadow-lg hover:bg-on-primary-fixed-variant transition-colors flex justify-center items-center gap-2 cursor-pointer"    type="submit"
+                    >
                     Login
                     <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
                 </button>
@@ -94,18 +94,18 @@
                     <div class="h-px flex-1 bg-outline-variant"></div>
                 </div>
                 <div class="grid grid-cols-3 gap-3">
-                    <button type="button" onclick="testLogin('<?= TripMemberRole::ORGANIZER->value ?>')"
-                        class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-primary/5 hover:bg-primary/10 border border-primary/10 transition-colors group cursor-pointer">
+                    <button class="cursor-pointer flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-primary/5 hover:bg-primary/10 border border-primary/10 transition-colors group"    type="button" onclick="testLogin('<?= TripMemberRole::ORGANIZER->value ?>')"
+                         >
                         <span class="material-symbols-outlined text-primary text-xl group-hover:scale-110 transition-transform">shield_person</span>
                         <span class="text-[11px] font-bold text-primary">Organizer</span>
                     </button>
-                    <button type="button" onclick="testLogin('<?= TripMemberRole::EDITOR->value ?>')"
-                        class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-tertiary/5 hover:bg-tertiary/10 border border-tertiary/10 transition-colors group cursor-pointer">
+                    <button class="cursor-pointer flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-tertiary/5 hover:bg-tertiary/10 border border-tertiary/10 transition-colors group"    type="button" onclick="testLogin('<?= TripMemberRole::EDITOR->value ?>')"
+                         >
                         <span class="material-symbols-outlined text-tertiary text-xl group-hover:scale-110 transition-transform">edit_square</span>
                         <span class="text-[11px] font-bold text-tertiary">Editor</span>
                     </button>
-                    <button type="button" onclick="testLogin('<?= TripMemberRole::MEMBER->value ?>')"
-                        class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-on-surface-variant/5 hover:bg-on-surface-variant/10 border border-on-surface-variant/10 transition-colors group cursor-pointer">
+                    <button class="cursor-pointer flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-on-surface-variant/5 hover:bg-on-surface-variant/10 border border-on-surface-variant/10 transition-colors group"    type="button" onclick="testLogin('<?= TripMemberRole::MEMBER->value ?>')"
+                         >
                         <span class="material-symbols-outlined text-on-surface-variant text-xl group-hover:scale-110 transition-transform">person</span>
                         <span class="text-[11px] font-bold text-on-surface-variant">Member</span>
                     </button>
@@ -114,7 +114,7 @@
 
             <p class="text-center text-sm text-on-surface-variant mt-8">
                 Don't have an account?
-                <a href="/register" class="font-bold text-primary hover:underline ml-1">Register now</a>
+                <a class="font-bold text-primary hover:underline ml-1 cursor-pointer"    href="/register" >Register now</a>
             </p>
         </div>
 

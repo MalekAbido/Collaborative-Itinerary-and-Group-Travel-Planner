@@ -9,10 +9,10 @@ require __DIR__ . '/../layouts/header.php'; ?>
             <p class="text-[18px] text-on-surface-variant">Coordinate items and equipment needed for the trip.</p>
         </div>
         <div class="flex gap-3">
-            <button onclick="openAddItemModal()" class="inline-flex items-center gap-2 rounded-lg bg-primary text-on-primary font-bold text-[14px] px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition">
+            <button class="inline-flex items-center gap-2 rounded-lg bg-primary text-on-primary font-bold text-[14px] px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition cursor-pointer"    onclick="openAddItemModal()" >
                 <span class="material-symbols-outlined text-[18px]">add_box</span> Add Item
             </button>
-            <a href="/itinerary/dashboard/<?= htmlspecialchars($itineraryId) ?>" class="inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-[14px] px-6 py-2.5 hover:bg-surface-container transition">
+            <a class="cursor-pointer inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-[14px] px-6 py-2.5 hover:bg-surface-container transition"    href="/itinerary/dashboard/<?= htmlspecialchars($itineraryId) ?>"  >
                 <span class="material-symbols-outlined text-[18px]">arrow_back</span> Back
             </a>
         </div>
@@ -43,7 +43,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                             <form action="/inventory/delete" method="POST" onsubmit="return confirm('Are you sure you want to remove this item from the inventory?');">
                                                 <input type="hidden" name="itemId" value="<?= $item['id'] ?>">
                                                 <input type="hidden" name="itineraryId" value="<?= $itineraryId ?>">
-                                                <button type="submit" class="text-error hover:text-error/80 transition p-1 leading-none" title="Delete Item">
+                                                <button class="text-error hover:text-error/80 transition p-1 leading-none cursor-pointer"    type="submit"  title="Delete Item">
                                                     <span class="material-symbols-outlined text-[18px]">delete</span>
                                                 </button>
                                             </form>
@@ -58,7 +58,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                 <form action="/inventory/unvolunteer" method="POST">
                                     <input type="hidden" name="itemId" value="<?= $item['id'] ?>">
                                     <input type="hidden" name="itineraryId" value="<?= $itineraryId ?>">
-                                    <button type="submit" class="w-full py-2 rounded-lg border border-error text-error text-[13px] font-bold hover:bg-error/5 transition flex items-center justify-center gap-2">
+                                    <button class="w-full py-2 rounded-lg border border-error text-error text-[13px] font-bold hover:bg-error/5 transition flex items-center justify-center gap-2 cursor-pointer"    type="submit" >
                                         <span class="material-symbols-outlined text-[16px]">undo</span> Unvolunteer
                                     </button>
                                 </form>
@@ -91,7 +91,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                             <form action="/inventory/delete" method="POST" onsubmit="return confirm('Are you sure you want to remove this item from the inventory?');">
                                                 <input type="hidden" name="itemId" value="<?= $item['id'] ?>">
                                                 <input type="hidden" name="itineraryId" value="<?= $itineraryId ?>">
-                                                <button type="submit" class="text-error hover:text-error/80 transition p-1 leading-none" title="Delete Item">
+                                                <button class="text-error hover:text-error/80 transition p-1 leading-none cursor-pointer"    type="submit"  title="Delete Item">
                                                     <span class="material-symbols-outlined text-[18px]">delete</span>
                                                 </button>
                                             </form>
@@ -120,7 +120,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                         <form action="/inventory/volunteer" method="POST" class="w-full">
                                             <input type="hidden" name="itemId" value="<?= $item['id'] ?>">
                                             <input type="hidden" name="itineraryId" value="<?= $itineraryId ?>">
-                                            <button type="submit" class="w-full py-2 rounded-lg bg-secondary text-on-secondary text-[13px] font-bold hover:bg-secondary/90 transition flex items-center justify-center gap-2 shadow-sm">
+                                            <button class="w-full py-2 rounded-lg bg-secondary text-on-secondary text-[13px] font-bold hover:bg-secondary/90 transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"    type="submit" >
                                                 <span class="material-symbols-outlined text-[16px]">volunteer_activism</span> Volunteer to Bring
                                             </button>
                                         </form>
@@ -171,7 +171,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
             <h3 class="font-display text-[20px] font-semibold text-on-surface m-0 flex items-center gap-2">
                 <span class="material-symbols-outlined text-primary">add_box</span> Add Inventory Item
             </h3>
-            <button type="button" onclick="closeAddItemModal()" class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition">
+            <button class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition cursor-pointer"    type="button" onclick="closeAddItemModal()" >
                 <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
         </div>
@@ -208,10 +208,10 @@ require __DIR__ . '/../layouts/header.php'; ?>
                 </div>
 
                 <div class="pt-4 flex justify-end gap-3">
-                    <button type="button" onclick="closeAddItemModal()" class="px-5 py-2.5 rounded-lg border border-outline-variant text-on-surface font-semibold text-[14px] hover:bg-surface-container transition">
+                    <button class="px-5 py-2.5 rounded-lg border border-outline-variant text-on-surface font-semibold text-[14px] hover:bg-surface-container transition cursor-pointer"    type="button" onclick="closeAddItemModal()" >
                         Cancel
                     </button>
-                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-[14px] px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition">
+                    <button class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-[14px] px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition cursor-pointer"    type="submit" >
                         Save Item
                     </button>
                 </div>

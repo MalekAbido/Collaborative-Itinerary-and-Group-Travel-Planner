@@ -103,8 +103,8 @@
                         </div>
 
                         <div class="md:col-span-2 flex justify-end mt-4">
-                            <button type="submit"
-                                class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition">
+                            <button class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition cursor-pointer"    type="submit"
+                                >
                                 Save Profile Changes
                             </button>
                         </div>
@@ -136,8 +136,8 @@
                             </div>
                             <form action="/allergy/remove" method="POST" class="delete-form">
                                 <input type="hidden" name="allergyId" value="<?= $allergy->getId() ?>">
-                                <button type="submit"
-                                    class="inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-error text-error hover:bg-error-container transition"
+                                <button class="inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-error text-error hover:bg-error-container transition cursor-pointer"    type="submit"
+                                    
                                     title="Remove">
                                     <span class="material-symbols-outlined text-[18px]">delete</span>
                                 </button>
@@ -175,8 +175,8 @@
                                     class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2 text-body-sm text-on-surface placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/30 focus:outline-none transition" />
                             </div>
                             <div class="w-full md:w-auto">
-                                <button type="submit"
-                                    class="w-full inline-flex items-center justify-center gap-2 rounded-lg border-2 border-primary text-primary font-semibold text-body-sm px-6 py-2 hover:bg-primary-fixed transition">
+                                <button class="w-full inline-flex items-center justify-center gap-2 rounded-lg border-2 border-primary text-primary font-semibold text-body-sm px-6 py-2 hover:bg-primary-fixed transition cursor-pointer"    type="submit"
+                                    >
                                     <span class="material-symbols-outlined text-[18px]">add</span> Add
                                 </button>
                             </div>
@@ -217,8 +217,8 @@
                             </div>
                             <form action="/emergency-contact/remove" method="POST" class="delete-form">
                                 <input type="hidden" name="contactId" value="<?= $contact->getId() ?>">
-                                <button type="submit"
-                                    class="inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-error text-error hover:bg-error-container transition"
+                                <button class="inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-error text-error hover:bg-error-container transition cursor-pointer"    type="submit"
+                                    
                                     title="Remove">
                                     <span class="material-symbols-outlined text-[18px]">delete</span>
                                 </button>
@@ -269,8 +269,8 @@
                                 </div>
                             </div>
                             <div class="flex justify-end">
-                                <button type="submit"
-                                    class="inline-flex items-center gap-2 rounded-lg bg-secondary-container text-on-secondary-container font-semibold text-body-sm px-6 py-2 shadow-sm hover:bg-secondary-fixed-dim transition">
+                                <button class="inline-flex items-center gap-2 rounded-lg bg-secondary-container text-on-secondary-container font-semibold text-body-sm px-6 py-2 shadow-sm hover:bg-secondary-fixed-dim transition cursor-pointer"    type="submit"
+                                    >
                                     <span class="material-symbols-outlined text-[18px]">person_add</span> Save Contact
                                 </button>
                             </div>
@@ -279,8 +279,8 @@
                 </section>
 
                 <div class="flex justify-end mt-8">
-                    <a href="/logout"
-                        class="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-error text-error font-semibold text-body-sm px-6 py-2.5 hover:bg-error-container transition">
+                    <a class="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-error text-error font-semibold text-body-sm px-6 py-2.5 hover:bg-error-container transition cursor-pointer"    href="/logout"
+                        >
                         <span class="material-symbols-outlined text-[20px]">logout</span>
                         Logout from Account
                     </a>

@@ -4,7 +4,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
     <!-- <main class="max-w-2xl mx-auto"> -->
         <div class="mb-6 flex items-center justify-between">
             <h1 class="font-display text-h2 text-on-surface m-0">Log a New Expense</h1>
-            <a href="/finance/dashboard/<?= htmlspecialchars($itineraryId ?? '') ?>" class="text-body-sm font-semibold text-outline hover:text-primary transition">Cancel</a>        </div>
+            <a class="cursor-pointer text-body-sm font-semibold text-outline hover:text-primary transition"    href="/finance/dashboard/<?= htmlspecialchars($itineraryId ?? '') ?>"  >Cancel</a>        </div>
 
         <form action="/finance/expense/create" method="POST" id="expenseForm" class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 md:p-8">
             
@@ -106,7 +106,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
             </div>
 
             <div class="flex justify-end">
-                <button id="submitBtn" type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-white font-semibold text-body-sm px-8 py-3 shadow-sm hover:bg-on-primary-fixed-variant transition w-full sm:w-auto">
+                <button class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-white font-semibold text-body-sm px-8 py-3 shadow-sm hover:bg-on-primary-fixed-variant transition w-full sm:w-auto cursor-pointer"    id="submitBtn" type="submit" >
                     Save Expense
                 </button>
             </div>

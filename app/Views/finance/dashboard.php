@@ -25,7 +25,7 @@ if ($percentage >= 100) {
                         <p class="text-body-lg text-on-surface-variant">Track group expenses and monitor budget limits.</p>
                     </div>
                     <?php if ($userRole !== TripMemberRole::MEMBER->value): ?>
-                    <button type="button" onclick="document.getElementById('financeSettingsModal').classList.remove('hidden')" class="inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-body-sm px-6 py-2.5 hover:bg-surface-container transition">
+                    <button class="inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-body-sm px-6 py-2.5 hover:bg-surface-container transition cursor-pointer"    type="button" onclick="document.getElementById('financeSettingsModal').classList.remove('hidden')" >
                         <span class="material-symbols-outlined text-[18px]">settings</span> Settings
                     </button>
                     <?php endif; ?>
@@ -140,7 +140,7 @@ if ($percentage >= 100) {
                                             <input type="number" name="amount" min="1" step="0.01" required placeholder="0.00"
                                                 class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-md focus:border-primary focus:ring-primary focus:outline-none transition">
                                         </div>
-                                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-tertiary text-on-tertiary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-tertiary/90 transition">
+                                        <button class="inline-flex items-center justify-center gap-2 rounded-lg bg-tertiary text-on-tertiary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-tertiary/90 transition cursor-pointer"    type="submit" >
                                             Add Funds
                                         </button>
                                     </form>
@@ -179,7 +179,7 @@ if ($percentage >= 100) {
                                                         </div>
                                                         <?php if ($contribution['tripMemberId'] == $currentMemberId || \App\Helpers\Auth::hasRole(TripMemberRole::EDITOR->value, $userRole)): ?>
                                                             <form action="/fund/contribution/delete/<?= htmlspecialchars($contribution['id']) ?>" method="POST" onsubmit="return confirm('Are you sure you want to delete this contribution? This will also deduct the amount from the kitty balance.')">
-                                                                <button type="submit" class="text-outline hover:text-error transition flex items-center">
+                                                                <button class="text-outline hover:text-error transition flex items-center cursor-pointer"    type="submit" >
                                                                     <span class="material-symbols-outlined text-[18px]">delete</span>
                                                                 </button>
                                                             </form>
@@ -196,7 +196,7 @@ if ($percentage >= 100) {
                                     <p class="text-body-md mb-4">No Group Fund exists for this trip yet.</p>
                                     <?php if (\App\Helpers\Auth::hasRole(TripMemberRole::EDITOR->value, $userRole)): ?>
                                         <form action="/finance/create-fund/<?= htmlspecialchars($itineraryId) ?>" method="POST">
-                                            <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-tertiary text-on-tertiary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-tertiary/90 transition">
+                                            <button class="inline-flex items-center gap-2 rounded-lg bg-tertiary text-on-tertiary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-tertiary/90 transition cursor-pointer"    type="submit" >
                                                 <span class="material-symbols-outlined text-base">add</span> Set up Group Fund
                                             </button>
                                         </form>
@@ -246,7 +246,7 @@ if ($percentage >= 100) {
                                                 <input type="hidden" name="fromMemberId" value="<?= htmlspecialchars($transaction['from']) ?>">
                                                 <input type="hidden" name="toMemberId" value="<?= htmlspecialchars($transaction['to']) ?>">
                                                 <input type="hidden" name="amount" value="<?= htmlspecialchars(number_format($transaction['amount'], 2, '.', '')) ?>">
-                                                <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-success text-on-success font-semibold text-body-sm px-4 py-2 shadow-sm hover:bg-success/90 transition">
+                                                <button class="inline-flex items-center gap-2 rounded-lg bg-success text-on-success font-semibold text-body-sm px-4 py-2 shadow-sm hover:bg-success/90 transition cursor-pointer"    type="submit" >
                                                     <span class="material-symbols-outlined text-[18px]">check_circle</span> Mark as paid
                                                 </button>
                                             </form>
@@ -265,7 +265,7 @@ if ($percentage >= 100) {
                             <span class="material-symbols-outlined text-primary">receipt_long</span>
                             <h2 class="font-display text-h2 text-on-surface m-0">Expenses</h2>
                         </div>
-                        <a href="/finance/expense/add/<?= htmlspecialchars($itineraryId) ?>" class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition">
+                        <a class="cursor-pointer inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition"    href="/finance/expense/add/<?= htmlspecialchars($itineraryId) ?>"  >
                             <span class="material-symbols-outlined text-[18px]">add</span> Add Expense
                         </a>
                     </div>
@@ -311,12 +311,12 @@ if ($percentage >= 100) {
 
                                     <!-- Card Actions -->
                                     <div class="mt-auto pt-5 flex items-center justify-between gap-3 border-t border-outline-variant/50">
-                                        <a href="/finance/expense/details?id=<?= htmlspecialchars($expense->getId()) ?>" class="text-body-sm font-semibold text-primary hover:underline group flex items-center gap-1">
+                                        <a class="cursor-pointer text-body-sm font-semibold text-primary hover:underline group flex items-center gap-1"    href="/finance/expense/details?id=<?= htmlspecialchars($expense->getId()) ?>"  >
                                             View Details <span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
                                         </a>
 
                                         <?php if ($expense->getAmount() > 0): ?>
-                                            <button onclick="openRefundModal(<?= htmlspecialchars($expense->getId()) ?>, <?= htmlspecialchars($expense->getAmount()) ?>)" class="inline-flex items-center gap-1.5 text-body-sm font-semibold text-outline hover:text-secondary transition">
+                                            <button class="cursor-pointer inline-flex items-center gap-1.5 text-body-sm font-semibold text-outline hover:text-secondary transition"    onclick="openRefundModal(<?= htmlspecialchars($expense->getId()) ?>, <?= htmlspecialchars($expense->getAmount()) ?>)"  >
                                                 <span class="material-symbols-outlined text-[18px]">undo</span> Partial Refund
                                             </button>
                                         <?php else: ?>
@@ -341,7 +341,7 @@ if ($percentage >= 100) {
                 <h3 class="font-display text-h3 text-on-surface m-0 flex items-center gap-2">
                     <span class="material-symbols-outlined text-primary">settings</span> Finance Settings
                 </h3>
-                <button type="button" onclick="document.getElementById('financeSettingsModal').classList.add('hidden')" class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition">
+                <button class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition cursor-pointer"    type="button" onclick="document.getElementById('financeSettingsModal').classList.add('hidden')" >
                     <span class="material-symbols-outlined text-[20px]">close</span>
                 </button>
             </div>
@@ -379,10 +379,10 @@ if ($percentage >= 100) {
                         <p class="text-body-xs text-outline mt-2">Set to 0 for no limit.</p>
                     </div>
                     <div class="mt-2 flex justify-end gap-3">
-                        <button type="button" onclick="document.getElementById('financeSettingsModal').classList.add('hidden')" class="px-5 py-2.5 rounded-lg border border-outline-variant text-on-surface font-semibold text-body-sm hover:bg-surface-container transition">
+                        <button class="px-5 py-2.5 rounded-lg border border-outline-variant text-on-surface font-semibold text-body-sm hover:bg-surface-container transition cursor-pointer"    type="button" onclick="document.getElementById('financeSettingsModal').classList.add('hidden')" >
                             Cancel
                         </button>
-                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition">
+                        <button class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition cursor-pointer"    type="submit" >
                             Save Settings
                         </button>
                     </div>
@@ -398,7 +398,7 @@ if ($percentage >= 100) {
                 <h3 class="font-display text-h3 text-on-surface m-0 flex items-center gap-2">
                     <span class="material-symbols-outlined text-secondary">currency_exchange</span> Apply Refund
                 </h3>
-                <button type="button" onclick="closeRefundModal()" class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition">
+                <button class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition cursor-pointer"    type="button" onclick="closeRefundModal()" >
                     <span class="material-symbols-outlined text-[20px]">close</span>
                 </button>
             </div>
@@ -417,10 +417,10 @@ if ($percentage >= 100) {
                     </div>
 
                     <div class="mt-2 flex justify-end gap-3">
-                        <button type="button" onclick="closeRefundModal()" class="px-5 py-2.5 rounded-lg border border-outline-variant text-on-surface font-semibold text-body-sm hover:bg-surface-container transition">
+                        <button class="px-5 py-2.5 rounded-lg border border-outline-variant text-on-surface font-semibold text-body-sm hover:bg-surface-container transition cursor-pointer"    type="button" onclick="closeRefundModal()" >
                             Cancel
                         </button>
-                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-secondary text-on-secondary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-secondary-container transition">
+                        <button class="inline-flex items-center justify-center gap-2 rounded-lg bg-secondary text-on-secondary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-secondary-container transition cursor-pointer"    type="submit" >
                             Process Refund
                         </button>
                     </div>

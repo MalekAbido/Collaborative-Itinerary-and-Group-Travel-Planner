@@ -165,8 +165,8 @@
                             <form
                                 action="/itinerary/<?php echo $itineraryId ?>/activity/<?php echo $activity->getId() ?>/delete"
                                 method="POST" onsubmit="return confirm('Are you sure you want to delete this activity?');">
-                                <button type="submit"
-                                    class="text-error font-button text-button flex items-center gap-1 hover:bg-error-container/50 px-3 py-2 rounded-md transition-colors opacity-70 hover:opacity-100">
+                                <button class="text-error font-button text-button flex items-center gap-1 hover:bg-error-container/50 px-3 py-2 rounded-md transition-colors opacity-70 hover:opacity-100 cursor-pointer"    type="submit"
+                                    >
                                     <span class="material-symbols-outlined text-[16px]">delete</span> Delete Activity
                                 </button>
                             </form>
@@ -176,18 +176,18 @@
         </div>
     <nav
         class="bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md font-['Plus_Jakarta_Sans'] text-[10px] font-semibold fixed bottom-0 w-full rounded-t-2xl border-t border-zinc-100 dark:border-zinc-800 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2">
-        <a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 active:bg-zinc-100 dark:active:bg-zinc-800 rounded-xl px-4 py-1"
+        <a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 active:bg-zinc-100 dark:active:bg-zinc-800 rounded-xl px-4 py-1 cursor-pointer"    
             href="#">
             <span class="material-symbols-outlined mb-1" data-icon="map">map</span>
             Trip
         </a>
-        <a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 active:bg-zinc-100 dark:active:bg-zinc-800 rounded-xl px-4 py-1"
+        <a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 active:bg-zinc-100 dark:active:bg-zinc-800 rounded-xl px-4 py-1 cursor-pointer"    
             href="#">
             <span class="material-symbols-outlined mb-1" data-icon="rule">rule</span>
             Manage
         </a>
 
-        <a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 active:bg-zinc-100 dark:active:bg-zinc-800 rounded-xl px-4 py-1"
+        <a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 active:bg-zinc-100 dark:active:bg-zinc-800 rounded-xl px-4 py-1 cursor-pointer"    
             href="#">
             <span class="material-symbols-outlined mb-1" data-icon="person">person</span>
             Profile

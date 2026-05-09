@@ -81,8 +81,8 @@
             </div>
 
             <div class="flex items-center justify-between pt-4 border-t border-outline-variant">
-                <a href="/dashboard" class="inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-body-sm px-6 py-2.5 hover:bg-surface-container transition">Cancel</a>
-                <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition">
+                <a class="inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-body-sm px-6 py-2.5 hover:bg-surface-container transition cursor-pointer"    href="/dashboard" >Cancel</a>
+                <button class="inline-flex items-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition cursor-pointer"    type="submit" >
                     Create Itinerary <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
                 </button>
             </div>

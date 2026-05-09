@@ -140,8 +140,16 @@ use App\Enums\TransactionType;
                                             <div class="flex items-center gap-2">
                                                 <span class="material-symbols-outlined text-[16px]">schedule</span>
                                                 <span>
-                                                    <span class="local-time" data-utc="<?= date('c', strtotime($activity->getStartTime())) ?>" data-format="datetime"></span> - 
-                                                    <span class="local-time" data-utc="<?= date('c', strtotime($activity->getEndTime())) ?>" data-format="time"></span>
+                                                    <?php 
+                                                        $start = strtotime($activity->getStartTime());
+                                                        $end = strtotime($activity->getEndTime());
+                                                        $isSameDay = date('Y-m-d', $start) === date('Y-m-d', $end);
+                                                    ?>
+                                                    <?php if ($isSameDay): ?>
+                                                        <?= date('M d, ', $start) ?> <?= date('h:i A', $start) ?> - <?= date('h:i A', $end) ?>
+                                                    <?php else: ?>
+                                                        <?= date('M d, h:i A', $start) ?> - <?= date('M d, h:i A', $end) ?>
+                                                    <?php endif; ?>
                                                 </span>
                                             </div>
                                             <div class="flex items-center gap-2">
@@ -170,11 +178,8 @@ use App\Enums\TransactionType;
                             <div class="mt-4 flex justify-end">
                                 <form action="/itinerary/<?php echo $itineraryId; ?>/history/revert/<?php echo $entry->getId(); ?>" method="POST">
                                     <input type="hidden" name="timezone" id="clientTimezoneReopen" value="">
-                                    <button type="submit" 
-                                        class="cursor-pointer inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-bold text-sm px-6 py-2.5 rounded-lg 
-                                            transition-transform duration-200 ease-out 
-                                            hover:scale-103 active:scale-98
-                                            transform-gpu antialiased shadow-sm">
+                                    <button class="cursor-pointer inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-bold text-sm px-6 py-2.5 rounded-lg transition-transform duration-200 ease-out hover:scale-103 active:scale-98 transform-gpu antialiased shadow-sm"    type="submit" 
+                                        >
                                         <span class="material-symbols-outlined text-[18px]">history</span>
                                         Undo this change
                                     </button>

@@ -40,7 +40,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                             <div>
                                 <h3 class="text-xl font-bold text-on-surface pr-4"><?php echo htmlspecialchars($activity->getName() ?? ''); ?></h3>
                                 <?php if (!empty($activity->conflicts)): ?>
-                                    <button type="button" onclick="showConflictDetails(<?= htmlspecialchars(json_encode(['name' => $activity->getName(), 'conflicts' => array_map(fn($c) => ['name' => $c->getName()], $activity->conflicts)]), ENT_QUOTES, 'UTF-8') ?>)" class="mt-1 flex items-center gap-1.5 text-error text-[12px] font-bold hover:underline">
+                                    <button class="cursor-pointer mt-1 flex items-center gap-1.5 text-error text-[12px] font-bold hover:underline"    type="button" onclick="showConflictDetails(<?= htmlspecialchars(json_encode(['name' => $activity->getName(), 'conflicts' => array_map(fn($c) => ['name' => $c->getName()], $activity->conflicts)]), ENT_QUOTES, 'UTF-8') ?>)"  >
                                         <span class="material-symbols-outlined text-[16px]">warning</span>
                                         Conflicts with confirmed activities!
                                     </button>
@@ -116,21 +116,14 @@ require __DIR__ . '/../layouts/header.php'; ?>
 
                         <!-- Actions Buttons -->
                         <div class="flex items-center gap-4 mt-auto pt-4 border-t border-surface-variant">
-                                <button type="submit" form="approve_form_<?php echo $activity->getId(); ?>"
-                                    class="cursor-pointer flex-1 bg-primary text-on-primary font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 
-                                        transition-transform duration-200 ease-out 
-                                        hover:scale-103 active:scale-98
-                                        transform-gpu antialiased shadow-sm text-sm">
+                                <button class="cursor-pointer flex-1 bg-primary text-on-primary font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-transform duration-200 ease-out hover:scale-103 active:scale-98 transform-gpu antialiased shadow-sm text-sm"    type="submit" form="approve_form_<?php echo $activity->getId(); ?>"
+                                     >
                                     <span class="material-symbols-outlined text-[18px]">check_circle</span>
                                     Confirm to Voting
                                 </button>
                             <form action="/itinerary/<?php echo $itineraryId; ?>/proposals/<?php echo $activity->getId(); ?>/reject" method="POST" class="flex-1">
-                                <button type="submit"
-                                    class="cursor-pointer w-full bg-transparent border border-outline text-on-surface font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 
-                                        transition-all duration-200 ease-out 
-                                        hover:bg-surface-variant hover:scale-103 
-                                        active:scale-98 
-                                        transform-gpu antialiased text-sm">
+                                <button class="cursor-pointer w-full bg-transparent border border-outline text-on-surface font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 ease-out hover:bg-surface-variant hover:scale-103 active:scale-98 transform-gpu antialiased text-sm"    type="submit"
+                                    >
                                     <span class="material-symbols-outlined text-[18px]">cancel</span>
                                     Reject
                                 </button>
@@ -200,18 +193,18 @@ require __DIR__ . '/../layouts/header.php'; ?>
     <!-- BottomNavBar (Mobile) -->
     <nav
         class="bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md text-orange-600 dark:text-orange-400 font-['Plus_Jakarta_Sans'] text-[10px] font-semibold fixed bottom-0 w-full rounded-t-2xl border-t border-zinc-100 dark:border-zinc-800 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] lg:hidden flex justify-around items-center px-4 pb-6 pt-2 z-50">
-        <a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 active:bg-zinc-100 dark:active:bg-zinc-800 w-16 h-14 rounded-xl transition-colors"
+        <a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 active:bg-zinc-100 dark:active:bg-zinc-800 w-16 h-14 rounded-xl transition-colors cursor-pointer"    
             href="/itinerary/dashboard/<?php echo htmlspecialchars($itineraryId ?? '') ?>">
             <span class="material-symbols-outlined mb-1 text-[24px]" data-icon="map">map</span>
             <span>Trip</span>
         </a>
-        <a class="flex flex-col items-center justify-center text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30 rounded-xl px-4 py-1 active:bg-zinc-100 dark:active:bg-zinc-800 w-16 h-14 transition-transform duration-100 scale-90"
+        <a class="flex flex-col items-center justify-center text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30 rounded-xl px-4 py-1 active:bg-zinc-100 dark:active:bg-zinc-800 w-16 h-14 transition-transform duration-100 scale-90 cursor-pointer"    
             href="/itinerary/<?php echo htmlspecialchars($itineraryId ?? '') ?>/proposals">
             <span class="material-symbols-outlined mb-1 text-[24px]" data-icon="rule"
                 style="font-variation-settings: 'FILL' 1;">rule</span>
             <span>Manage</span>
         </a>
-        <a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 active:bg-zinc-100 dark:active:bg-zinc-800 w-16 h-14 rounded-xl transition-colors"
+        <a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 active:bg-zinc-100 dark:active:bg-zinc-800 w-16 h-14 rounded-xl transition-colors cursor-pointer"    
             href="/profile">
             <span class="material-symbols-outlined mb-1 text-[24px]" data-icon="person">person</span>
             <span>Profile</span>
@@ -224,7 +217,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                 <h3 class="font-display text-[20px] font-semibold text-on-surface m-0 flex items-center gap-2">
                     <span class="material-symbols-outlined text-error">warning</span> Conflict Details
                 </h3>
-                <button type="button" onclick="closeConflictDetailsModal()" class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition">
+                <button class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition cursor-pointer"    type="button" onclick="closeConflictDetailsModal()" >
                     <span class="material-symbols-outlined text-[20px]">close</span>
                 </button>
             </div>
@@ -236,7 +229,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                     <!-- Conflicts will be injected here -->
                 </ul>
                 <div class="flex justify-end">
-                    <button type="button" onclick="closeConflictDetailsModal()" class="px-6 py-2 rounded-lg bg-surface-container-highest text-on-surface font-semibold text-sm hover:bg-outline-variant transition">
+                    <button class="px-6 py-2 rounded-lg bg-surface-container-highest text-on-surface font-semibold text-sm hover:bg-outline-variant transition cursor-pointer"    type="button" onclick="closeConflictDetailsModal()" >
                         Close
                     </button>
                 </div>

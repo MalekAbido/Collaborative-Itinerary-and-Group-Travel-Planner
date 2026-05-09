@@ -13,8 +13,8 @@
                         manage documents seamlessly for any group trip.
                     </p>
                     <div class="flex flex-wrap gap-3 pt-4">
-                        <a href="#learn-more"
-                            class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-md px-8 py-4 shadow-sm hover:bg-on-primary-fixed-variant transition">
+                        <a class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-md px-8 py-4 shadow-sm hover:bg-on-primary-fixed-variant transition cursor-pointer"    href="#learn-more"
+                            >
                             Learn More
                             <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
                         </a>
@@ -135,8 +135,8 @@
                 <h2 class="font-display text-[40px] font-bold leading-tight">Ready to synchronize your next trip?</h2>
                 <p class="font-body text-body-lg text-on-primary/90 mb-2">Join thousands of groups traveling smarter
                     with Itinerary.</p>
-                <a href="register"
-                    class="inline-flex items-center gap-2 rounded-lg bg-surface-container-lowest text-primary font-semibold text-body-md px-8 py-4 shadow-lg hover:scale-105 transition-transform">
+                <a class="inline-flex items-center gap-2 rounded-lg bg-surface-container-lowest text-primary font-semibold text-body-md px-8 py-4 shadow-lg hover:scale-105 transition-transform cursor-pointer"    href="register"
+                    >
                     Start Planning Now
                     <span class="material-symbols-outlined">flight_takeoff</span>
                 </a>
@@ -150,13 +150,13 @@
             Itinerary
         </div>
         <div class="flex flex-wrap justify-center gap-6">
-            <a class="font-body text-body-xs font-medium text-outline hover:text-primary transition-all duration-200"
+            <a class="font-body text-body-xs font-medium text-outline hover:text-primary transition-all duration-200 cursor-pointer"    
                 href="#">Privacy Policy</a>
-            <a class="font-body text-body-xs font-medium text-outline hover:text-primary transition-all duration-200"
+            <a class="font-body text-body-xs font-medium text-outline hover:text-primary transition-all duration-200 cursor-pointer"    
                 href="#">Terms of Service</a>
-            <a class="font-body text-body-xs font-medium text-outline hover:text-primary transition-all duration-200"
+            <a class="font-body text-body-xs font-medium text-outline hover:text-primary transition-all duration-200 cursor-pointer"    
                 href="#">Help Center</a>
-            <a class="font-body text-body-xs font-medium text-outline hover:text-primary transition-all duration-200"
+            <a class="font-body text-body-xs font-medium text-outline hover:text-primary transition-all duration-200 cursor-pointer"    
                 href="#">Emergency Contact</a>
         </div>
         <div class="font-body text-body-xs text-outline">

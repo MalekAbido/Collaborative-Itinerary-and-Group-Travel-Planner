@@ -21,12 +21,12 @@ require __DIR__ . '/../layouts/header.php'; ?>
                     </div>
                     <div class="flex gap-3">
                         <?php if(App\Helpers\Auth::hasRole(TripMemberRole::ORGANIZER->value, $userRole)):?>
-                        <a href="/itinerary/settings/<?= htmlspecialchars($data['trip']['id']) ?>" class="inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-body-sm px-6 py-2.5 hover:bg-surface-container transition">
+                        <a class="cursor-pointer inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-body-sm px-6 py-2.5 hover:bg-surface-container transition"    href="/itinerary/settings/<?= htmlspecialchars($data['trip']['id']) ?>"  >
                             <span class="material-symbols-outlined text-[18px]">settings</span> Settings
                         </a>
                         <?php endif;?>
-                        <a href="/itinerary/<?= htmlspecialchars($data['trip']['id']) ?>/activity/create"
-                            class="inline-flex items-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition">
+                        <a class="cursor-pointer inline-flex items-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition"    href="/itinerary/<?= htmlspecialchars($data['trip']['id']) ?>/activity/create"
+                             >
                             <span class="material-symbols-outlined text-[18px]">add</span> Add Activity
                         </a>
                     </div>
@@ -73,7 +73,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                         
                                         <div class="block bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5 hover:shadow-md transition relative">
                                             
-                                            <a href="/itinerary/<?= htmlspecialchars($data['trip']['id']) ?>/activity/<?= $activity->getId() ?>" class="absolute inset-0 z-0 rounded-xl focus:outline-none">
+                                            <a class="cursor-pointer absolute inset-0 z-0 rounded-xl focus:outline-none"    href="/itinerary/<?= htmlspecialchars($data['trip']['id']) ?>/activity/<?= $activity->getId() ?>"  >
                                                 <span class="sr-only">View Activity Details</span>
                                             </a>
 
@@ -111,7 +111,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                                     
                                                     <?php if($userRole !== TripMemberRole::MEMBER->value): ?>
                                                         <form action="/itinerary/<?= htmlspecialchars($data['trip']['id']) ?>/activity/<?= $activity->getId() ?>/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this activity?');" class="m-0">
-                                                            <button type="submit" class="text-error hover:bg-error-container/50 p-1.5 rounded-md transition-colors flex items-center justify-center" title="Delete Activity">
+                                                            <button class="text-error hover:bg-error-container/50 p-1.5 rounded-md transition-colors flex items-center justify-center cursor-pointer"    type="submit"  title="Delete Activity">
                                                                 <span class="material-symbols-outlined text-[20px]">delete</span>
                                                             </button>
                                                         </form>
@@ -151,7 +151,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                 <span class="material-symbols-outlined text-primary">group</span>
                                 <h2 class="font-display text-h3 text-on-surface m-0">Members</h2>
                             </div>
-                            <a href="/itinerary/members/<?= htmlspecialchars($data['trip']['id']) ?>" class="text-body-sm font-semibold text-primary hover:underline">Manage</a>                        
+                            <a class="cursor-pointer text-body-sm font-semibold text-primary hover:underline"    href="/itinerary/members/<?= htmlspecialchars($data['trip']['id']) ?>"  >Manage</a>                        
                         </div> 
                         
                         <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-4">

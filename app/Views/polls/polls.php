@@ -13,7 +13,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
             <p class="text-[18px] text-on-surface-variant">Help the group decide on activities and itinerary details.</p>
         </div>
         <div class="flex gap-3">
-            <a href="/itinerary/dashboard/<?= htmlspecialchars($itinerary['id']) ?>" class="inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-[14px] px-6 py-2.5 hover:bg-surface-container transition">
+            <a class="cursor-pointer inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-[14px] px-6 py-2.5 hover:bg-surface-container transition"    href="/itinerary/dashboard/<?= htmlspecialchars($itinerary['id']) ?>"  >
                 <span class="material-symbols-outlined text-[18px]">arrow_back</span> Back to Itinerary
             </a>
         </div>
@@ -42,7 +42,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                 <div>
                                     <span class="text-[12px] font-bold uppercase tracking-wider text-outline mb-1 block">Activity Poll</span>
                                     <h3 class="font-display text-[20px] font-semibold text-on-surface">
-                                        <button type="button" onclick="showPollDetails(<?= htmlspecialchars(json_encode($poll), ENT_QUOTES, 'UTF-8') ?>)" class="hover:text-primary transition text-left">
+                                        <button class="cursor-pointer hover:text-primary transition text-left"    type="button" onclick="showPollDetails(<?= htmlspecialchars(json_encode($poll), ENT_QUOTES, 'UTF-8') ?>)"  >
                                             <?= htmlspecialchars($poll['activityName']) ?>
                                         </button>
                                     </h3>
@@ -63,7 +63,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                         <form action="/poll/close-early" method="POST" class="mt-1">
                                             <input type="hidden" name="pollId" value="<?= $poll['id'] ?>">
                                             <input type="hidden" name="itineraryId" value="<?= $itinerary['id'] ?>">
-                                            <button type="submit" class="text-[12px] text-error hover:underline flex items-center gap-1 font-semibold" onclick="return confirm('Are you sure you want to close this poll early? No one else will be able to vote.')">
+                                            <button class="text-[12px] text-error hover:underline flex items-center gap-1 font-semibold cursor-pointer"    type="submit"  onclick="return confirm('Are you sure you want to close this poll early? No one else will be able to vote.')">
                                                 <span class="material-symbols-outlined text-[14px]">cancel</span> Close Early
                                             </button>
                                         </form>
@@ -97,7 +97,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                 </div>
 
                                 <div class="mt-6 flex justify-end">
-                                    <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-primary text-on-primary font-bold text-[14px] px-8 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition">
+                                    <button class="inline-flex items-center gap-2 rounded-lg bg-primary text-on-primary font-bold text-[14px] px-8 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition cursor-pointer"    type="submit" >
                                         Submit Vote
                                     </button>
                                 </div>
@@ -143,7 +143,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
                             <div class="p-3 bg-surface-container rounded-lg border border-outline-variant/50">
                                 <div class="flex justify-between items-start mb-1">
                                     <h4 class="font-semibold text-on-surface text-[15px]">
-                                        <button type="button" onclick="showPollDetails(<?= htmlspecialchars(json_encode($closedPoll), ENT_QUOTES, 'UTF-8') ?>)" class="hover:text-primary transition text-left">
+                                        <button class="cursor-pointer hover:text-primary transition text-left"    type="button" onclick="showPollDetails(<?= htmlspecialchars(json_encode($closedPoll), ENT_QUOTES, 'UTF-8') ?>)"  >
                                             <?= htmlspecialchars($closedPoll['activityName']) ?>
                                         </button>
                                     </h4>
@@ -156,7 +156,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
 
                                         <!-- REOPEN BUTTON (Editors/Leaders only) -->
                                         <?php if ($canManagePolls): ?>
-                                            <button type="button" onclick="openReopenModal(<?= $closedPoll['id'] ?>, '<?= $closedPoll['startTime'] ?>')" class="text-[12px] text-primary hover:underline flex items-center gap-1 mt-1 font-semibold">
+                                            <button class="cursor-pointer text-[12px] text-primary hover:underline flex items-center gap-1 mt-1 font-semibold"    type="button" onclick="openReopenModal(<?= $closedPoll['id'] ?>, '<?= $closedPoll['startTime'] ?>')"  >
                                                 <span class="material-symbols-outlined text-[14px]">update</span> Reopen Poll
                                             </button>
                                         <?php endif; ?>
@@ -184,7 +184,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
             <h3 class="font-display text-[20px] font-semibold text-on-surface m-0 flex items-center gap-2">
                 <span class="material-symbols-outlined text-primary">update</span> Reopen Poll
             </h3>
-            <button type="button" onclick="closeReopenModal()" class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition">
+            <button class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition cursor-pointer"    type="button" onclick="closeReopenModal()" >
                 <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
         </div>
@@ -203,10 +203,10 @@ require __DIR__ . '/../layouts/header.php'; ?>
                 </div>
 
                 <div class="mt-2 flex justify-end gap-3">
-                    <button type="button" onclick="closeReopenModal()" class="px-5 py-2.5 rounded-lg border border-outline-variant text-on-surface font-semibold text-[14px] hover:bg-surface-container transition">
+                    <button class="px-5 py-2.5 rounded-lg border border-outline-variant text-on-surface font-semibold text-[14px] hover:bg-surface-container transition cursor-pointer"    type="button" onclick="closeReopenModal()" >
                         Cancel
                     </button>
-                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-[14px] px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition">
+                    <button class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-[14px] px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition cursor-pointer"    type="submit" >
                         Reopen Poll
                     </button>
                 </div>
@@ -222,7 +222,7 @@ require __DIR__ . '/../layouts/header.php'; ?>
             <h3 id="modalPollTitle" class="font-display text-[20px] font-semibold text-on-surface m-0 flex items-center gap-2">
                 <span class="material-symbols-outlined text-primary">poll</span> Poll Details
             </h3>
-            <button type="button" onclick="closePollDetailsModal()" class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition">
+            <button class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition cursor-pointer"    type="button" onclick="closePollDetailsModal()" >
                 <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
         </div>

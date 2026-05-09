@@ -45,41 +45,41 @@
             class="fixed inset-x-0 top-0 z-50 h-navbar bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant shadow-sm">
             <div class="mx-auto flex h-full max-w-[1280px] items-center justify-between px-6 lg:px-8">
                 <div class="flex items-center h-full gap-8">
-                    <a href="/"
-                        class="font-display text-[22px] font-extrabold tracking-tight text-primary"><?php echo $websiteName; ?></a>
+                    <a class="font-display text-[22px] font-extrabold tracking-tight text-primary cursor-pointer"    href="/"
+                        ><?php echo $websiteName; ?></a>
 
                     <div class="hidden md:flex items-center h-full gap-1">
-                        <a href="/dashboard"
-                            class="flex items-center h-full px-4 text-body-sm transition-all <?= (in_array($activeTab ?? '', ['dashboard'])) ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-b-2 border-transparent hover:text-primary' ?>">
+                        <a class="flex items-center h-full px-4 text-body-sm transition-all <?= (in_array($activeTab ?? '', ['dashboard'])) ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-transparent hover:text-primary' ?> cursor-pointer"  href="/dashboard"
+                             >
                             Dashboard
                         </a>
 
                         <?php if ($itineraryId ?? false): ?>
-                            <a href="/itinerary/dashboard/<?= htmlspecialchars($itineraryId) ?>"
-                                class="flex items-center h-full px-4 text-body-sm transition-all <?= (in_array($activeTab ?? '', ['itinerary', 'activity', 'settings', 'members', 'createActivity'])) ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-b-2 border-transparent hover:text-primary' ?>">
+                            <a class="flex items-center h-full px-4 text-body-sm transition-all <?= (in_array($activeTab ?? '', ['itinerary', 'activity', 'settings', 'members', 'createActivity'])) ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-transparent hover:text-primary' ?> cursor-pointer"  href="/itinerary/dashboard/<?= htmlspecialchars($itineraryId) ?>"
+                                 >
                                 Itinerary
                             </a>
-                            <a href="/itinerary/polls/<?= htmlspecialchars($itineraryId) ?>"
-                                class="flex items-center h-full px-4 text-body-sm transition-all <?= (in_array($activeTab ?? '', ['polls', 'poll']))  ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-b-2 border-transparent hover:text-primary' ?>">
+                            <a class="flex items-center h-full px-4 text-body-sm transition-all <?= (in_array($activeTab ?? '', ['polls', 'poll'])) ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-transparent hover:text-primary' ?> cursor-pointer"  href="/itinerary/polls/<?= htmlspecialchars($itineraryId) ?>"
+                                 >
                                 Polls
                             </a>
-                            <a href="/itinerary/inventory/<?= htmlspecialchars($itineraryId) ?>"
-                                class="flex items-center h-full px-4 text-body-sm transition-all <?= ($activeTab ?? '') === 'inventory' ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-b-2 border-transparent hover:text-primary' ?>">
+                            <a class="flex items-center h-full px-4 text-body-sm transition-all <?= ($activeTab ?? '') === 'inventory' ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-transparent hover:text-primary' ?> cursor-pointer"  href="/itinerary/inventory/<?= htmlspecialchars($itineraryId) ?>"
+                                 >
                                 Inventory
                             </a>
                             <?php $currentMember = TripMember::getByUserAndItinerary($currentUser->getId(), $itineraryId); ?>
                             <?php if ($currentMember && Auth::hasRole(TripMemberRole::EDITOR->value, $currentMember->getRole())): ?>
-                            <a href="/itinerary/<?= htmlspecialchars($itineraryId) ?>/proposals"
-                                class="flex items-center h-full px-4 text-body-sm transition-all <?= ($activeTab ?? '') === 'proposals' ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-b-2 border-transparent hover:text-primary' ?>">
+                            <a class="flex items-center h-full px-4 text-body-sm transition-all <?= ($activeTab ?? '') === 'proposals' ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-transparent hover:text-primary' ?> cursor-pointer"  href="/itinerary/<?= htmlspecialchars($itineraryId) ?>/proposals"
+                                 >
                                 Proposals
                             </a>
                             <?php endif; ?>
-                            <a href="/finance/dashboard/<?= htmlspecialchars($itineraryId) ?>"
-                                class="flex items-center h-full px-4 text-body-sm transition-all <?= ($activeTab ?? '') === 'finance' ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-b-2 border-transparent hover:text-primary' ?>">
+                            <a class="flex items-center h-full px-4 text-body-sm transition-all <?= ($activeTab ?? '') === 'finance' ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-transparent hover:text-primary' ?> cursor-pointer"  href="/finance/dashboard/<?= htmlspecialchars($itineraryId) ?>"
+                                 >
                                 Finances
                             </a>
-                            <a href="/itinerary/<?= htmlspecialchars($itineraryId) ?>/history"
-                                class="flex items-center h-full px-4 text-body-sm transition-all <?= ($activeTab ?? '') === 'history' ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-b-2 border-transparent hover:text-primary' ?>">
+                            <a class="flex items-center h-full px-4 text-body-sm transition-all <?= ($activeTab ?? '') === 'history' ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-transparent hover:text-primary' ?> cursor-pointer"  href="/itinerary/<?= htmlspecialchars($itineraryId) ?>/history"
+                                 >
                                 History
                             </a>
                         <?php endif; ?>
@@ -87,13 +87,13 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <?php if ($itineraryId ?? false): ?>
-                        <button id="sos-btn" type="button"
-                            class="inline-flex items-center gap-1 rounded-lg border-2 border-error px-3 py-1.5 text-body-xs font-bold tracking-wide text-error hover:bg-error-container transition focus:ring-2 focus:ring-error focus:outline-none">
+                        <button class="inline-flex items-center gap-1 rounded-lg border-2 border-error px-3 py-1.5 text-body-xs font-bold tracking-wide text-error hover:bg-error-container transition focus:ring-2 focus:ring-error focus:outline-none cursor-pointer"    id="sos-btn" type="button"
+                            >
                             <span class="material-symbols-outlined text-base">warning</span>SOS
                         </button>
                         <script src="/assets/js/triggerEmergency.js"></script>
                     <?php endif; ?>
-                    <a href="/profile" class="flex items-center gap-2 cursor-pointer">
+                    <a class="flex items-center gap-2 cursor-pointer"    href="/profile" >
                         <?php
                         if ($currentUser->getProfileImage()): ?>
                             <img src="/<?php echo htmlspecialchars($currentUser->getProfileImage()) ?>" alt="Profile"
@@ -126,29 +126,29 @@
 
             <div class="mb-6">
                 <?php if (in_array($activeTab ?? '', ['activity', 'settings', 'members', 'createActivity'])): ?>
-                    <a href="/itinerary/dashboard/<?= htmlspecialchars($itineraryId ?? '') ?>" 
-                    class="inline-flex items-center gap-1 text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors">
+                    <a class="inline-flex items-center gap-1 text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors cursor-pointer"  href="/itinerary/dashboard/<?= htmlspecialchars($itineraryId ?? '') ?>" 
+                     >
                         <span class="material-symbols-outlined text-[18px]">arrow_back</span> 
                         Back to Itinerary Dashboard
                     </a>
 
                 <?php elseif (($activeTab ?? '') === 'poll'): ?>
-                    <a href="/itinerary/polls/<?= htmlspecialchars($itineraryId ?? '') ?>" 
-                    class="inline-flex items-center gap-1 text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors">
+                    <a class="inline-flex items-center gap-1 text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors cursor-pointer"  href="/itinerary/polls/<?= htmlspecialchars($itineraryId ?? '') ?>" 
+                     >
                         <span class="material-symbols-outlined text-[18px]">arrow_back</span> 
                         Back to Itinerary Polls
                     </a>
 
                 <?php elseif (in_array($activeTab ?? '', ['addExpense', 'expense'])): ?>
-                    <a href="/finance/dashboard/<?= htmlspecialchars($itineraryId ?? '') ?>" 
-                    class="inline-flex items-center gap-1 text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors">
+                    <a class="inline-flex items-center gap-1 text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors cursor-pointer"  href="/finance/dashboard/<?= htmlspecialchars($itineraryId ?? '') ?>" 
+                     >
                         <span class="material-symbols-outlined text-[18px]">arrow_back</span> 
                         Back to Itinerary Finance
                     </a>
                 
                 <?php elseif (($activeTab ?? '') === 'createItinerary'): ?>
-                    <a href="/dashboard" 
-                    class="inline-flex items-center gap-1 text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors">
+                    <a class="inline-flex items-center gap-1 text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors cursor-pointer"    href="/dashboard" 
+                    >
                         <span class="material-symbols-outlined text-[18px]">arrow_back</span> 
                         Back to Dashboard
                     </a>

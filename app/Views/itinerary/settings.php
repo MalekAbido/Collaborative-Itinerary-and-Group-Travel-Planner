@@ -59,8 +59,8 @@ if (isset($_GET['status']) && $_GET['status'] === 'updated'): ?>
         </div>
 
         <div class="pt-6 border-t border-outline-variant mt-6">
-            <button type="submit"
-                class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-md px-8 py-3 shadow-sm hover:bg-on-primary-fixed-variant transition">
+            <button class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-md px-8 py-3 shadow-sm hover:bg-on-primary-fixed-variant transition cursor-pointer"    type="submit"
+                >
                 <span class="material-symbols-outlined text-[20px]">save</span> Save Changes
             </button>
         </div>
@@ -74,8 +74,8 @@ if (isset($_GET['status']) && $_GET['status'] === 'updated'): ?>
 
     <form action="/itinerary/destroy/<?php echo htmlspecialchars($trip['itineraryId']) ?>" method="POST"
         onsubmit="return confirm('Are you absolutely sure you want to delete this trip?');">
-        <button type="submit"
-            class="inline-flex items-center gap-2 rounded-lg bg-error text-on-error font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-error-container transition">
+        <button class="inline-flex items-center gap-2 rounded-lg bg-error text-on-error font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-error-container transition cursor-pointer"    type="submit"
+            >
             <span class="material-symbols-outlined text-base">delete_forever</span> Delete Trip
         </button>
     </form>

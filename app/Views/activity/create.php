@@ -32,10 +32,10 @@
                         Do you still want to save this activity as a <?php echo strtolower(ActivityStatus::DRAFT->value); ?>?
                     </p>
                     <div class="flex justify-end gap-4">
-                        <button type="button" onclick="document.getElementById('conflict-modal').style.display='none';" class="px-4 py-2 rounded-lg border border-outline-variant text-on-surface hover:bg-surface-container transition">
+                        <button class="px-4 py-2 rounded-lg border border-outline-variant text-on-surface hover:bg-surface-container transition cursor-pointer"    type="button" onclick="document.getElementById('conflict-modal').style.display='none';" >
                             Cancel
                         </button>
-                        <button type="button" onclick="const form = document.getElementById('activity-form'); const input = document.createElement('input'); input.type = 'hidden'; input.name = 'confirm_override'; input.value = '1'; form.appendChild(input); form.submit();" class="px-4 py-2 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition font-semibold">
+                        <button class="px-4 py-2 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition font-semibold cursor-pointer"    type="button" onclick="const form = document.getElementById('activity-form'); const input = document.createElement('input'); input.type = 'hidden'; input.name = 'confirm_override'; input.value = '1'; form.appendChild(input); form.submit();" >
                             Confirm & Save <?php echo ActivityStatus::DRAFT->value; ?>
                         </button>
                     </div>
@@ -147,7 +147,7 @@
                 </div>
 
                 <div class="pt-4 border-t border-outline-variant flex justify-end">
-                    <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-primary text-on-primary font-semibold px-6 py-3 hover:bg-primary-container transition">
+                    <button class="inline-flex items-center gap-2 rounded-lg bg-primary text-on-primary font-semibold px-6 py-3 hover:bg-primary-container transition cursor-pointer"    type="submit" >
                         <span class="material-symbols-outlined text-[20px]">save</span> Create <?php echo ActivityStatus::DRAFT->value; ?> Activity
                     </button>
                 </div>

@@ -85,8 +85,8 @@
                         <div class="relative">
                             <input type="password" id="reg-password" name="password" placeholder="••••••••" required
                                 class="w-full pl-4 pr-12 py-3.5 bg-surface border border-outline-variant rounded-xl text-on-surface placeholder-outline/60 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none">
-                            <button type="button" onclick="toggleVisibility('reg-password', 'reg-eye')"
-                                class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors flex items-center justify-center cursor-pointer">
+                            <button class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors flex items-center justify-center cursor-pointer"    type="button" onclick="toggleVisibility('reg-password', 'reg-eye')"
+                                >
                                 <span id="reg-eye" class="material-symbols-outlined">visibility_off</span>
                             </button>
                         </div>
@@ -98,16 +98,16 @@
                             <input type="password" id="reg-confirm" name="confirm_password" placeholder="••••••••"
                                 required
                                 class="w-full pl-4 pr-12 py-3.5 bg-surface border border-outline-variant rounded-xl text-on-surface placeholder-outline/60 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none">
-                            <button type="button" onclick="toggleVisibility('reg-confirm', 'confirm-eye')"
-                                class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors flex items-center justify-center cursor-pointer">
+                            <button class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors flex items-center justify-center cursor-pointer"    type="button" onclick="toggleVisibility('reg-confirm', 'confirm-eye')"
+                                >
                                 <span id="confirm-eye" class="material-symbols-outlined">visibility_off</span>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <button type="submit"
-                    class="w-full bg-primary text-white font-semibold py-4 rounded-xl shadow-lg hover:bg-on-primary-fixed-variant transition-colors mt-2 flex justify-center items-center gap-2 cursor-pointer">
+                <button class="w-full bg-primary text-white font-semibold py-4 rounded-xl shadow-lg hover:bg-on-primary-fixed-variant transition-colors mt-2 flex justify-center items-center gap-2 cursor-pointer"    type="submit"
+                    >
                     Register
                     <span class="material-symbols-outlined text-[20px]">person_add</span>
                 </button>
@@ -115,7 +115,7 @@
 
             <p class="text-center text-sm text-on-surface-variant mt-8">
                 Already have an account?
-                <a href="/login" class="font-bold text-primary hover:underline ml-1">Login here</a>
+                <a class="font-bold text-primary hover:underline ml-1 cursor-pointer"    href="/login" >Login here</a>
             </p>
         </div>
 

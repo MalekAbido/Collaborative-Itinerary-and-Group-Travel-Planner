@@ -19,8 +19,8 @@ $canManageMembers = App\Helpers\Auth::hasRole(TripMemberRole::ORGANIZER->value, 
     <div class="flex items-center justify-between mb-4">
         <h3 class="font-display text-h4 text-on-surface m-0">Invite to Trip</h3>
 
-        <button onclick="copyInviteLink('<?php echo htmlspecialchars($generalLink) ?>')"
-            class="inline-flex items-center gap-1.5 rounded-lg border-2 border-outline-variant bg-surface-container-lowest text-on-surface-variant font-semibold text-body-sm px-3 py-1.5 shadow-sm hover:text-primary hover:border-primary transition">
+        <button class="cursor-pointer inline-flex items-center gap-1.5 rounded-lg border-2 border-outline-variant bg-surface-container-lowest text-on-surface-variant font-semibold text-body-sm px-3 py-1.5 shadow-sm hover:text-primary hover:border-primary transition"    onclick="copyInviteLink('<?php echo htmlspecialchars($generalLink) ?>')"
+             >
             <span class="material-symbols-outlined text-[18px]">link</span> Copy General Link
         </button>
     </div>
@@ -46,8 +46,8 @@ $canManageMembers = App\Helpers\Auth::hasRole(TripMemberRole::ORGANIZER->value, 
                 <option value="<?= TripMemberRole::EDITOR->value ?>">✏️ Editor</option>
             </select>
         </div>
-        <button type="submit"
-            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition h-[42px]">
+        <button class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition h-[42px] cursor-pointer"    type="submit"
+            >
             <span class="material-symbols-outlined text-base">person_add</span> Send Invite
         </button>
     </form>
@@ -117,8 +117,8 @@ $canManageMembers = App\Helpers\Auth::hasRole(TripMemberRole::ORGANIZER->value, 
                     <input type="hidden" name="memberId" value="<?php echo htmlspecialchars($member['memberId'] ?? '') ?>">
                     <input type="hidden" name="newRole"
                         value="<?php echo $member['role'] === TripMemberRole::MEMBER->value ? TripMemberRole::EDITOR->value : TripMemberRole::MEMBER->value ?>">
-                    <button type="submit" title="Toggle Role"
-                        class="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary text-primary hover:bg-primary-fixed transition">
+                    <button class="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary text-primary hover:bg-primary-fixed transition cursor-pointer"    type="submit" title="Toggle Role"
+                        >
                         <span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>
                     </button>
                 </form>
@@ -126,8 +126,8 @@ $canManageMembers = App\Helpers\Auth::hasRole(TripMemberRole::ORGANIZER->value, 
                 <form action="/itinerary/members/remove/<?php echo htmlspecialchars($data['trip']['id']) ?>" method="POST"
                     class="inline" onsubmit="return confirm('Remove this user from the trip?');">
                     <input type="hidden" name="memberId" value="<?php echo htmlspecialchars($member['memberId'] ?? '') ?>">
-                    <button type="submit" title="Remove Member"
-                        class="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-error text-error hover:bg-error-container transition">
+                    <button class="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-error text-error hover:bg-error-container transition cursor-pointer"    type="submit" title="Remove Member"
+                        >
                         <span class="material-symbols-outlined text-[16px]">person_remove</span>
                     </button>
                 </form>
@@ -188,8 +188,8 @@ if (! empty($pendingInvites)): ?>
             </div>
 
             <div class="flex justify-start sm:justify-end gap-2">
-                <button onclick="copyInviteLink('<?php echo $joinLink ?>')" title="Copy Join Link"
-                    class="inline-flex items-center gap-1 h-9 px-3 rounded-lg border-2 border-primary text-primary hover:bg-primary-fixed transition text-body-sm font-semibold">
+                <button class="cursor-pointer inline-flex items-center gap-1 h-9 px-3 rounded-lg border-2 border-primary text-primary hover:bg-primary-fixed transition text-body-sm font-semibold"    onclick="copyInviteLink('<?php echo $joinLink ?>')" title="Copy Join Link"
+                     >
                     <span class="material-symbols-outlined text-[16px]">content_copy</span> Copy Link
                 </button>
             </div>
@@ -203,8 +203,8 @@ if (! empty($pendingInvites)): ?>
 <div class="flex justify-end mt-12 pb-12">
     <form action="/itinerary/members/leave/<?php echo htmlspecialchars($trip['id'] ?? '') ?>" method="POST"
         onsubmit="return confirm('Are you sure you want to leave this itinerary? This action cannot be undone.');">
-        <button type="submit"
-            class="inline-flex items-center gap-2 rounded-lg border-2 border-error text-error font-semibold text-body-sm px-6 py-2.5 hover:bg-error-container transition cursor-pointer">
+        <button class="inline-flex items-center gap-2 rounded-lg border-2 border-error text-error font-semibold text-body-sm px-6 py-2.5 hover:bg-error-container transition cursor-pointer"    type="submit"
+            >
             <span class="material-symbols-outlined text-[18px]">logout</span> Leave Itinerary
         </button>
     </form>

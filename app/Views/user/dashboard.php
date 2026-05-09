@@ -15,8 +15,8 @@ require __DIR__ . '/../layouts/header.php'; ?>
                             <?php echo Session::getFlash(Session::FLASH_ERROR); ?>
                         </p>
                     </div>
-                    <a href="/itinerary/create"
-                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-md px-8 py-4 shadow-sm hover:bg-on-primary-fixed-variant transition shrink-0">
+                    <a class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-md px-8 py-4 shadow-sm hover:bg-on-primary-fixed-variant transition shrink-0 cursor-pointer"    href="/itinerary/create"
+                        >
                         <span class="material-symbols-outlined text-[20px]">add</span> Create Trip
                     </a>
                 </header>
@@ -55,8 +55,8 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                 <?= htmlspecialchars($trip['description']) ?>
                             </p>
 
-                            <a href="/itinerary/dashboard/<?= htmlspecialchars($trip['id']) ?>"
-                                class="mt-auto inline-flex items-center gap-1 text-body-sm font-semibold text-primary hover:underline group">
+                            <a class="cursor-pointer mt-auto inline-flex items-center gap-1 text-body-sm font-semibold text-primary hover:underline group"     href="/itinerary/dashboard/<?= htmlspecialchars($trip['id']) ?>"
+                                 >
                                 View Dashboard <span
                                     class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
                             </a>

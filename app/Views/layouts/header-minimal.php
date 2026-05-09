@@ -34,10 +34,10 @@
         class="fixed top-0 left-0 w-full h-navbar z-50 flex items-center justify-between px-6 lg:px-8 bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant shadow-sm">
         <?php if(Auth::check()): ?>
             <div class="flex items-center gap-4">
-                <a href="/" class="font-display text-[22px] font-extrabold tracking-tight text-primary"><?php echo $websiteName; ?></a>
-                <a href="/dashboard"class="flex items-center h-full px-4 text-body-sm transition-all font-medium text-on-surface-variant border-b-2 border-transparent hover:text-primary"> Dashboard </a>
+                <a class="font-display text-[22px] font-extrabold tracking-tight text-primary cursor-pointer"    href="/" ><?php echo $websiteName; ?></a>
+                <a class="flex items-center h-full px-4 text-body-sm transition-all font-medium text-on-surface-variant border-b-2 border-transparent hover:text-primary cursor-pointer"    href="/dashboard"> Dashboard </a>
             </div>
-            <a href="/profile" class="flex items-center gap-2 cursor-pointer">
+            <a class="flex items-center gap-2 cursor-pointer"    href="/profile" >
                         <?php
                         $currentUser = Auth::user();
                         if ($currentUser->getProfileImage()): ?>
@@ -51,14 +51,14 @@
                         <?php endif; ?>
                     </a>
         <?php else: ?>
-            <a href="/" class="font-display text-[22px] font-extrabold tracking-tight text-primary"><?php echo $websiteName; ?></a>
+            <a class="font-display text-[22px] font-extrabold tracking-tight text-primary cursor-pointer"    href="/" ><?php echo $websiteName; ?></a>
             <div class="flex items-center gap-4">
-                <a href="/login"
-                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition">
+                <a class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition cursor-pointer"    href="/login"
+                    >
                     Log In
                 </a>
-                <a href="/register"
-                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition">
+                <a class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition cursor-pointer"    href="/register"
+                    >
                     Register
                 </a>
             </div>
