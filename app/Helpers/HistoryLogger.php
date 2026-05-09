@@ -4,6 +4,7 @@ namespace App\Helpers;
 use App\Models\HistoryLog;
 use App\Models\HistoryLogEntry;
 use App\Enums\TransactionType;
+use App\Enums\EntityType;
 use ReflectionClass;
 
 class HistoryLogger
@@ -19,7 +20,8 @@ class HistoryLogger
         }
 
         $reflect    = new ReflectionClass($entity);
-        $entityType = $reflect->getShortName();
+        $entityTypeName = $reflect->getShortName();
+        $entityType = EntityType::tryFrom($entityTypeName);
         $entityId   = $entity->getId();
 
         $previousEntry      = HistoryLogEntry::findLatestForEntity($entityId, $entityType);

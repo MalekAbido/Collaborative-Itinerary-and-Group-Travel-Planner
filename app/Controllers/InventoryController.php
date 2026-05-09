@@ -4,12 +4,15 @@ namespace App\Controllers;
 
 use Core\Controller;
 use App\Helpers\Auth;
+use App\Helpers\HistoryLogger;
 use App\Helpers\Session;
 use App\Models\Activity;
 use App\Models\InventoryItem;
 use App\Models\Itinerary;
 use App\Models\TripMember;
 use App\Enums\TripMemberRole;
+use App\Enums\ActivityStatus;
+use App\Enums\TransactionType;
 
 class InventoryController extends Controller
 {
@@ -35,7 +38,14 @@ class InventoryController extends Controller
         }
 
         $allItems = InventoryItem::getByItineraryId($itineraryId);
-        $activities = Activity::getAllByItineraryId($itineraryId);
+        
+        // Filter activities: Only CONFIRMED and start time after Now
+        $allActivities = Activity::getAllByItineraryId($itineraryId);
+        $currentTime = time();
+        $activities = array_filter($allActivities, function($activity) use ($currentTime) {
+            return $activity->getActivityStatus() === ActivityStatus::CONFIRMED->value && 
+                   strtotime($activity->getStartTime()) > $currentTime;
+        });
 
         $myVolunteers = [];
         $otherItems = [];
@@ -80,6 +90,18 @@ class InventoryController extends Controller
             die("Member not found.");
         }
 
+        // Validate Activity: Must be CONFIRMED and start time after Now
+        $activity = Activity::getByActivityId($activityId);
+        if (!$activity || $activity->getItineraryId() != $itineraryId) {
+            die("Invalid activity selected.");
+        }
+
+        if ($activity->getActivityStatus() !== ActivityStatus::CONFIRMED->value || strtotime($activity->getStartTime()) <= time()) {
+            Session::setFlash(Session::FLASH_ERROR, "Inventory items can only be linked to future confirmed activities.");
+            header("Location: /itinerary/inventory/" . $itineraryId);
+            exit();
+        }
+
         $item = new InventoryItem();
         $item->setName($name);
         $item->setQuantity($quantity);
@@ -120,6 +142,7 @@ class InventoryController extends Controller
 
             if ($isCreator || $isManager) {
                 if ($item->delete()) {
+                    HistoryLogger::log($itineraryId, TransactionType::REMOVED_INVENTORY_ITEM, $item, $member->getId());
                     Session::setFlash(Session::FLASH_SUCCESS, "Item removed from inventory.");
                 } else {
                     Session::setFlash(Session::FLASH_ERROR, "Failed to remove item.");
@@ -153,7 +176,9 @@ class InventoryController extends Controller
         if ($item->read($itemId)) {
             if ($item->getTripMemberId() === null) {
                 $item->setTripMemberId($member->getId());
-                $item->update();
+                if ($item->update()) {
+                    HistoryLogger::log($itineraryId, TransactionType::VOLUNTEERED_FOR_ITEM, $item, $member->getId());
+                }
             }
         }
 
@@ -181,7 +206,9 @@ class InventoryController extends Controller
         if ($item->read($itemId)) {
             if ($item->getTripMemberId() == $member->getId()) {
                 $item->setTripMemberId(null);
-                $item->update();
+                if ($item->update()) {
+                    HistoryLogger::log($itineraryId, TransactionType::UNVOLUNTEERED_FOR_ITEM, $item, $member->getId());
+                }
             }
         }
 

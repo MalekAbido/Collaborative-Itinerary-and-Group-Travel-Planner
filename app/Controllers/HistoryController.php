@@ -1,6 +1,10 @@
 <?php
 namespace App\Controllers;
 
+use App\Enums\ActivityStatus;
+use App\Enums\EntityType;
+use App\Enums\TransactionType;
+use App\Enums\TripMemberRole;
 use App\Helpers\Auth;
 use App\Helpers\HistoryLogger;
 use App\Helpers\Session;
@@ -8,10 +12,7 @@ use App\Models\Activity;
 use App\Models\Expense;
 use App\Models\FundContribution;
 use App\Models\HistoryLogEntry;
-use App\Models\Subtrip;
-use App\Enums\TransactionType;
-use App\Enums\ActivityStatus;
-use App\Enums\TripMemberRole;
+use App\Models\InventoryItem;
 use Core\Controller;
 
 class HistoryController extends Controller
@@ -29,8 +30,8 @@ class HistoryController extends Controller
         $undoableTypes = [
             TransactionType::REMOVED_ACTIVITY->value,
             TransactionType::DELETED_EXPENSE->value,
-            TransactionType::DELETED_SUBTRIP->value,
             TransactionType::DELETED_FUND_CONTRIBUTION->value,
+            TransactionType::REMOVED_INVENTORY_ITEM->value,
         ];
 
         $processedEntities = [];
@@ -57,6 +58,9 @@ class HistoryController extends Controller
                 $counts['removals']++;
             } elseif (str_contains($type, 'RESTORED')) {
                 $counts['rollbacks']++;
+            } else {
+                if (!isset($counts['updated'])) $counts['updated'] = 0;
+                $counts['updated']++;
             }
         }
 
@@ -125,16 +129,15 @@ class HistoryController extends Controller
 
                 break;
 
-            case TransactionType::DELETED_SUBTRIP:
-                $subtrip = new Subtrip();
-                if ($subtrip->read($entry->getChangedEntityId())) {
-                    $subtrip->setDeletedAt(null);
-                    $success = $subtrip->update();
+            case TransactionType::REMOVED_INVENTORY_ITEM:
+                $item = new InventoryItem();
+                if ($item->read($entry->getChangedEntityId(), true)) {
+                    $item->setDeletedAt(null);
+                    $success = $item->update();
                     if ($success) {
-                        HistoryLogger::log($itineraryId, TransactionType::RESTORED_SUBTRIP, $subtrip, $member->getId());
+                        HistoryLogger::log($itineraryId, TransactionType::RESTORED_INVENTORY_ITEM, $item, $member->getId());
                     }
                 }
-
                 break;
 
             case TransactionType::DELETED_FUND_CONTRIBUTION:

@@ -90,9 +90,14 @@ class InventoryItem
         return $success;
     }
 
-    public function read($id)
+    public function read($id, $includeDeleted = false)
     {
-        $sql = "SELECT * FROM InventoryItem WHERE id = :id AND deletedAt IS NULL LIMIT 1";
+        $sql = "SELECT * FROM InventoryItem WHERE id = :id";
+        if (!$includeDeleted) {
+            $sql .= " AND deletedAt IS NULL";
+        }
+        $sql .= " LIMIT 1";
+        
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -107,7 +112,7 @@ class InventoryItem
     {
         $sql = "UPDATE InventoryItem SET name = :name, quantity = :quantity, description = :description, 
                 isPacked = :isPacked, activityId = :activityId, tripMemberId = :tripMemberId,
-                creatorMemberId = :creatorMemberId
+                creatorMemberId = :creatorMemberId, deletedAt = :deletedAt
                 WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
@@ -118,7 +123,8 @@ class InventoryItem
             ':activityId' => $this->activityId,
             ':tripMemberId' => $this->tripMemberId,
             ':creatorMemberId' => $this->creatorMemberId,
-            ':id' => $this->id
+            ':id' => $this->id,
+            ':deletedAt' => $this->deletedAt
         ]);
     }
 

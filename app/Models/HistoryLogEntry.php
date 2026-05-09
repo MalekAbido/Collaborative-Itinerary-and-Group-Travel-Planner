@@ -4,7 +4,8 @@ namespace App\Models;
 use App\Models\Activity;
 use App\Models\Expense;
 use App\Models\FundContribution;
-use App\Models\Subtrip;
+use App\Models\InventoryItem;
+use App\Enums\EntityType;
 use Core\Database;
 use DateTime;
 use PDO;
@@ -16,6 +17,7 @@ class HistoryLogEntry
     private $transactionType;
     private $timestamp;
     private $changedEntityId;
+    /** @var EntityType|null */
     private $changedEntityType;
     private $historyLogId;
     private $tripMemberId;
@@ -81,14 +83,19 @@ class HistoryLogEntry
         $this->changedEntityId = $changedEntityId;
     }
 
+    /** @return string|null */
     public function getChangedEntityType()
     {
-        return $this->changedEntityType;
+        return $this->changedEntityType instanceof EntityType ? $this->changedEntityType->value : $this->changedEntityType;
     }
 
     public function setChangedEntityType($changedEntityType)
     {
-        $this->changedEntityType = $changedEntityType;
+        if (is_string($changedEntityType)) {
+            $this->changedEntityType = EntityType::tryFrom($changedEntityType);
+        } else {
+            $this->changedEntityType = $changedEntityType;
+        }
     }
 
     public function getHistoryLogId()
@@ -140,9 +147,10 @@ class HistoryLogEntry
 
     public function getRelatedEntity()
     {
+        $type = $this->changedEntityType instanceof EntityType ? $this->changedEntityType : EntityType::tryFrom((string)$this->getChangedEntityType());
 
-        switch ($this->changedEntityType) {
-            case 'Activity':
+        switch ($type) {
+            case EntityType::ACTIVITY:
                 $activity = new Activity();
 
                 if ($activity->read($this->changedEntityId)) {
@@ -159,18 +167,19 @@ class HistoryLogEntry
     public function getEntitySummary(): string
     {
         $id = $this->changedEntityId;
+        $type = $this->changedEntityType instanceof EntityType ? $this->changedEntityType : EntityType::tryFrom((string)$this->getChangedEntityType());
 
-        switch ($this->changedEntityType) {
-            case 'Activity':
+        switch ($type) {
+            case EntityType::ACTIVITY:
                 $item = Activity::getByActivityId($id);
                 return $item ? $item->getName() : 'Unknown Activity';
-            case 'Expense':
+            case EntityType::EXPENSE:
                 $item = (new Expense())->findById($id);
                 return $item ? $item->getDescription() . ' (' . $item->getAmount() . ' ' . $item->getCurrencyType() . ')' : 'Unknown Expense';
-            case 'Subtrip':
-                $item = new Subtrip();
-                return ($item->read($id)) ? $item->getName() : 'Unknown Subtrip';
-            case 'FundContribution':
+            case EntityType::INVENTORY_ITEM:
+                $item = new InventoryItem();
+                return ($item->read($id, true)) ? $item->getName() : 'Unknown Item';
+            case EntityType::FUND_CONTRIBUTION:
                 $item = new FundContribution();
                 return ($item->read($id)) ? 'Contribution of ' . $item->getAmount() : 'Unknown Contribution';
         }
@@ -202,7 +211,7 @@ class HistoryLogEntry
         $this->transactionType    = $data['transactionType'];
         $this->timestamp          = $data['timestamp'];
         $this->changedEntityId    = $data['changedEntityId'];
-        $this->changedEntityType  = $data['changedEntityType'];
+        $this->changedEntityType  = EntityType::tryFrom($data['changedEntityType']);
         $this->historyLogId       = $data['historyLogId'];
         $this->tripMemberId       = $data['tripMemberId'];
         $this->previousSnapshotId = $data['previousSnapshotId'];
@@ -218,7 +227,7 @@ class HistoryLogEntry
             ':entryId'            => $this->entryId,
             ':transactionType'    => $this->transactionType,
             ':changedEntityId'    => $this->changedEntityId,
-            ':changedEntityType'  => $this->changedEntityType,
+            ':changedEntityType'  => $this->getChangedEntityType(),
             ':historyLogId'       => $this->historyLogId,
             ':tripMemberId'       => $this->tripMemberId,
             ':previousSnapshotId' => $this->previousSnapshotId,
@@ -231,10 +240,13 @@ class HistoryLogEntry
         $sql = "SELECT * FROM HistoryLogEntry
                 WHERE changedEntityId = :entityId AND changedEntityType = :entityType
                 ORDER BY timestamp DESC LIMIT 1";
+        
+        $typeValue = $entityType instanceof EntityType ? $entityType->value : $entityType;
+
         $stmt = $db->prepare($sql);
         $stmt->execute([
             ':entityId'   => $entityId,
-            ':entityType' => $entityType,
+            ':entityType' => $typeValue,
         ]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
 

@@ -4,6 +4,8 @@ require __DIR__ . '/../layouts/header.php';
 use App\Helpers\Auth;
 use App\Models\HistoryLogEntry;
 use App\Enums\TripMemberRole;
+use App\Enums\EntityType;
+use App\Enums\TransactionType;
 ?>
 
         <!-- <main class="max-w-[1280px] mx-auto px-6 lg:px-8 py-8 w-full"> -->
@@ -94,9 +96,9 @@ use App\Enums\TripMemberRole;
                                         <p class="font-body text-body-md text-on-surface">
                                             <span class="font-bold text-primary"><?php echo $member ? htmlspecialchars($member->getDisplayName()) : 'System'; ?></span>
                                             <?php
-                                            // $actionMessage = explode('_', $entry->getTransactionType())??['', ''];
-                                            // echo strtolower($actionMessage[1] . ' ' . $actionMessage[0]);
-                                            echo strtolower(str_replace('_', ' ', $entry->getTransactionType())); ?>
+                                            $transType = TransactionType::tryFrom($entry->getTransactionType());
+                                            echo strtolower($transType ? $transType->label() : str_replace('_', ' ', $entry->getTransactionType())); 
+                                            ?>
                                         </p>
                                         <p class="text-label-xs text-on-surface-variant uppercase tracking-wider font-bold">
                                             <span class="local-time" data-utc="<?= date('c', strtotime($entry->getTimestamp())) ?>" data-format="time"></span>
@@ -118,15 +120,20 @@ use App\Enums\TripMemberRole;
                                 </p>
                             </div> -->
                             <div class="bg-surface-container-low rounded-lg p-4 border border-outline-variant/50">
-                                <?php if ($entry->getChangedEntityType() === 'Activity'): ?>
+                                <?php 
+                                    $rawEntityType = $entry->getChangedEntityType();
+                                    $entityTypeEnum = EntityType::tryFrom($rawEntityType);
+                                    $entityTypeLabel = $entityTypeEnum ? $entityTypeEnum->label() : $rawEntityType;
+                                ?>
+                                <?php if ($rawEntityType === EntityType::ACTIVITY->value): ?>
                                     <?php $activity = $entry->getRelatedEntity(); ?>
                                     
                                     <?php if ($activity): ?>
                                         <h4 class="font-display text-h4 text-on-surface mb-1">
                                             <?= htmlspecialchars($activity->getName() ?? 'Unknown Activity'); ?>
                                         </h4>
-                                        <p class="text-label-xs text-on-surface-variant uppercase font-bold tracking-tight mb-3">
-                                            Type: Activity
+                                        <p class="text-label-xs text-on-surface-variant font-bold tracking-tight mb-3">
+                                            Type: <?= $entityTypeLabel ?>
                                         </p>
                                         
                                         <div class="flex flex-col gap-2 text-sm text-on-surface-variant">
@@ -144,8 +151,8 @@ use App\Enums\TripMemberRole;
                                         </div>
                                     <?php else: ?>
                                         <h4 class="font-display text-h4 text-on-surface mb-1">Activity Unavailable</h4>
-                                        <p class="text-label-xs text-on-surface-variant uppercase font-bold tracking-tight">
-                                            Type: Activity
+                                        <p class="text-label-xs text-on-surface-variant font-bold tracking-tight">
+                                            Type: <?= $entityTypeLabel ?>
                                         </p>
                                     <?php endif; ?>
 
@@ -153,8 +160,8 @@ use App\Enums\TripMemberRole;
                                     <h4 class="font-display text-h4 text-on-surface mb-1">
                                         <?= htmlspecialchars($entry->getEntitySummary()); ?>
                                     </h4>
-                                    <p class="text-label-xs text-on-surface-variant uppercase font-bold tracking-tight">
-                                        Type: <?= htmlspecialchars($entry->getChangedEntityType()); ?>
+                                    <p class="text-label-xs text-on-surface-variant font-bold tracking-tight">
+                                        Type: <?= $entityTypeLabel ?>
                                     </p>
                                 <?php endif; ?>
                             </div>                            
@@ -198,6 +205,13 @@ use App\Enums\TripMemberRole;
                                     Removals
                                 </span>
                                 <span class="text-h3 text-on-surface"><?php echo $counts['removals']; ?></span>
+                            </div>
+                            <div class="flex justify-between items-center py-3 border-b border-outline-variant/30">
+                                <span class="text-body-sm text-on-surface-variant flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[20px] text-secondary">edit</span>
+                                    Updates
+                                </span>
+                                <span class="text-h3 text-on-surface"><?php echo $counts['updated'] ?? 0; ?></span>
                             </div>
                             <div class="flex justify-between items-center py-3">
                                 <span class="text-body-sm text-on-surface-variant flex items-center gap-2">
