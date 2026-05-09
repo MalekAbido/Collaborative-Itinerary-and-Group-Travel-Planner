@@ -22,7 +22,15 @@ class HistoryController extends Controller
     {
         $member = Auth::requireMembership($itineraryId);
 
-        $entries = HistoryLogEntry::getAllByItineraryId($itineraryId);
+        $filters = [
+            'action' => $_GET['action'] ?? null,
+            'memberId' => $_GET['memberId'] ?? null,
+            'entityType' => $_GET['entityType'] ?? null,
+        ];
+
+        $entries = HistoryLogEntry::getAllByItineraryId($itineraryId, $filters);
+        $allMembers = (new \App\Models\TripMember())->getAllByItineraryId($itineraryId, true);
+        $historyLog = \App\Models\HistoryLog::findByItineraryId($itineraryId);
 
         $groupedEntries = [];
         $counts         = ['additions' => 0, 'removals' => 0, 'rollbacks' => 0];
@@ -70,6 +78,9 @@ class HistoryController extends Controller
             'itineraryId'    => $itineraryId,
             'memberRole'     => $member->getRole(),
             'activeTab'      => 'history',
+            'filters'        => $filters,
+            'allMembers'     => $allMembers,
+            'tripCreatedAt'  => $historyLog ? $historyLog->getCreatedAt() : null
         ]);
     }
 

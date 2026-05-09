@@ -262,15 +262,45 @@ class HistoryLogEntry
         return null;
     }
 
-    public static function getAllByItineraryId($itineraryId)
+    public static function getAllByItineraryId($itineraryId, array $filters = [])
     {
         $db  = Database::getInstance()->getConnection();
         $sql = "SELECT hle.* FROM HistoryLogEntry hle
                 JOIN HistoryLog hl ON hle.historyLogId = hl.id
-                WHERE hl.itineraryId = :itineraryId
-                ORDER BY hle.timestamp DESC";
+                WHERE hl.itineraryId = :itineraryId";
+        
+        $params = [':itineraryId' => $itineraryId];
+
+        if (!empty($filters['entityType'])) {
+            $sql .= " AND hle.changedEntityType = :entityType";
+            $params[':entityType'] = $filters['entityType'];
+        }
+
+        if (!empty($filters['memberId'])) {
+            $sql .= " AND hle.tripMemberId = :memberId";
+            $params[':memberId'] = $filters['memberId'];
+        }
+
+        if (!empty($filters['action'])) {
+            switch ($filters['action']) {
+                case 'additions':
+                    $sql .= " AND (hle.transactionType LIKE '%ADDED%' OR hle.transactionType LIKE '%CREATED%' OR hle.transactionType LIKE '%JOINED%')";
+                    break;
+                case 'removals':
+                    $sql .= " AND (hle.transactionType LIKE '%REMOVED%' OR hle.transactionType LIKE '%DELETED%' OR hle.transactionType LIKE '%LEFT%') AND hle.transactionType != 'MEMBER_REMOVED'";
+                    break;
+                case 'edits':
+                    $sql .= " AND (hle.transactionType LIKE '%VOLUNTEERED%' OR hle.transactionType LIKE '%SETTLEMENT%' OR hle.transactionType = 'MEMBER_REMOVED')";
+                    break;
+                case 'rollbacks':
+                    $sql .= " AND hle.transactionType LIKE '%RESTORED%'";
+                    break;
+            }
+        }
+
+        $sql .= " ORDER BY hle.timestamp DESC";
         $stmt = $db->prepare($sql);
-        $stmt->execute([':itineraryId' => $itineraryId]);
+        $stmt->execute($params);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $entries = [];

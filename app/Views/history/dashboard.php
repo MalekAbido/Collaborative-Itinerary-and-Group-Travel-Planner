@@ -191,9 +191,99 @@ use App\Enums\TransactionType;
                     </div>
                     <?php endforeach; ?>
                     <?php endif; ?>
+
+                    <!-- Start Marker -->
+                    <div class="relative pl-8">
+                        <div class="absolute -left-[7px] top-0 w-[14px] h-[14px] bg-outline rounded-full ring-4 ring-surface"></div>
+                        <p class="font-body text-body-sm text-on-surface-variant italic">
+                            Trip created on <?= $tripCreatedAt ? date('M j, Y', strtotime($tripCreatedAt)) : 'Oct 1, 2024' ?>
+                        </p>
+                    </div>
                 </div>
 
                 <div class="lg:col-span-4 flex flex-col gap-6">
+                    <div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-outline-variant">
+                        <h3 class="font-display text-h3 text-on-surface mb-6">Filter Log</h3>
+                        <form id="filterForm" method="GET" class="space-y-6">
+                            <div>
+                                <label class="text-label-xs font-bold uppercase tracking-wider text-on-surface-variant block mb-3">Action Type</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <?php 
+                                        $actions = [
+                                            null => 'All',
+                                            'additions' => 'Additions',
+                                            'edits' => 'Edits',
+                                            'removals' => 'Removals',
+                                            'rollbacks' => 'Rollbacks'
+                                        ];
+                                        foreach ($actions as $val => $label):
+                                            $isActive = ($filters['action'] ?? null) == $val;
+                                    ?>
+                                        <button type="button" onclick="setFilter('action', '<?= $val ?>')" 
+                                            class="cursor-pointer px-3 py-1 rounded-full border text-body-sm font-semibold transition-colors <?= $isActive ? 'bg-primary border-primary text-on-primary' : 'border-outline-variant hover:bg-surface-container text-on-surface-variant' ?>">
+                                            <?= $label ?>
+                                        </button>
+                                    <?php endforeach; ?>
+                                    <input type="hidden" name="action" id="filter-action" value="<?= htmlspecialchars($filters['action'] ?? '') ?>">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-label-xs font-bold uppercase tracking-wider text-on-surface-variant block mb-3">Entity Type</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <?php 
+                                        $entities = [null => 'All'];
+                                        foreach (EntityType::cases() as $case) {
+                                            $entities[$case->value] = $case->label();
+                                        }
+                                        foreach ($entities as $val => $label):
+                                            $isActive = ($filters['entityType'] ?? null) == $val;
+                                    ?>
+                                        <button type="button" onclick="setFilter('entityType', '<?= $val ?>')" 
+                                            class="cursor-pointer px-3 py-1 rounded-full border text-body-sm font-semibold transition-colors <?= $isActive ? 'bg-primary border-primary text-on-primary' : 'border-outline-variant hover:bg-surface-container text-on-surface-variant' ?>">
+                                            <?= $label ?>
+                                        </button>
+                                    <?php endforeach; ?>
+                                    <input type="hidden" name="entityType" id="filter-entityType" value="<?= htmlspecialchars($filters['entityType'] ?? '') ?>">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-label-xs font-bold uppercase tracking-wider text-on-surface-variant block mb-3">Modified By</label>
+                                <div class="relative">
+                                    <select name="memberId" onchange="this.form.submit()" 
+                                        class="cursor-pointer w-full bg-surface-container-lowest border border-outline-variant text-on-surface text-body-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 appearance-none outline-none">
+                                        <option value="">All Users</option>
+                                        <?php foreach ($allMembers as $m): ?>
+                                            <option value="<?= $m['memberId'] ?>" <?= ($filters['memberId'] ?? '') == $m['memberId'] ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars($m['firstName'] . ' ' . $m['lastName']) ?> 
+                                                <?= $m['deletedAt'] ? '(Former)' : '' ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                        <span class="material-symbols-outlined text-on-surface-variant">keyboard_arrow_down</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <?php if (array_filter($filters)): ?>
+                                <div class="pt-2">
+                                    <a href="/itinerary/<?= $itineraryId ?>/history" class="cursor-pointer text-body-sm font-bold text-primary hover:underline flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[18px]">close</span> Clear All Filters
+                                    </a>
+                                </div>
+                            <?php endif; ?>
+                        </form>
+                    </div>
+
+                    <script>
+                        function setFilter(name, value) {
+                            document.getElementById('filter-' + name).value = value;
+                            document.getElementById('filterForm').submit();
+                        }
+                    </script>
+
                     <div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-outline-variant">
                         <h3 class="font-display text-h3 text-on-surface mb-4">Log Summary</h3>
                         <div class="flex flex-col gap-2 font-body">
