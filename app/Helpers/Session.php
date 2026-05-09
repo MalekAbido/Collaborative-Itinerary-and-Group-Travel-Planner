@@ -67,6 +67,14 @@ class Session
     }
 
     /**
+     * Checks if a flash message exists.
+     */
+    public static function hasFlash($key)
+    {
+        return isset($_SESSION['flashMessages'][$key]);
+    }
+
+    /**
      * Gets and immediately deletes a flash message.
      */
     public static function getFlash($key)

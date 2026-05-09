@@ -6,6 +6,8 @@ use App\Models\TripMember;
 use App\Models\Itinerary;
 use App\Models\Invitation;
 use App\Helpers\Auth;
+use App\Helpers\Session;
+use App\Constants\Messages;
 use App\Helpers\Mailer;
 use App\Helpers\HistoryLogger;
 use App\Enums\TripMemberRole;
@@ -73,7 +75,11 @@ class TripMemberController extends Controller
             
             $userId = rand(100, 999);
 
-            if (!$token) { die("Failed to generate invitation token."); }
+            if (!$token) { 
+                Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+                header("Location: /itinerary/members/" . $id);
+                exit;
+            }
 
             $baseUrl = $_ENV['APP_URL'] ?? 'http://localhost:8080';
             $joinLink = $baseUrl . "/join/" . $token;
@@ -86,6 +92,7 @@ class TripMemberController extends Controller
 
             Mailer::send($email, $subject, $body);
 
+            Session::setFlash(Session::FLASH_SUCCESS, Messages::MEMBER_INVITED);
             header("Location: /itinerary/members/" . $id . "?status=invited");
             exit;
         }
@@ -105,7 +112,9 @@ class TripMemberController extends Controller
             
             if ($member->read($memberId)) {
                 $member->setRole($newRole);
-                $member->update();
+                if ($member->update()) {
+                    Session::setFlash(Session::FLASH_SUCCESS, Messages::ROLE_UPDATED);
+                }
             }
 
             header("Location: /itinerary/members/" . $id . "?status=role_updated");
@@ -148,10 +157,11 @@ class TripMemberController extends Controller
                     $invitationModel->invalidateByEmail($id, $user->getEmail());
                 }
 
-                $memberModel->delete(); // This is now a soft delete
-
-                // Log history
-                HistoryLogger::log($id, TransactionType::MEMBER_REMOVED, $memberModel, $currentMember->getId());
+                if ($memberModel->delete()) { // This is now a soft delete
+                    // Log history
+                    HistoryLogger::log($id, TransactionType::MEMBER_REMOVED, $memberModel, $currentMember->getId());
+                    Session::setFlash(Session::FLASH_SUCCESS, Messages::MEMBER_REMOVED);
+                }
             }
 
             header("Location: /itinerary/members/" . $id . "?status=removed");
@@ -178,7 +188,8 @@ class TripMemberController extends Controller
             // Log history
             HistoryLogger::log($itineraryId, TransactionType::MEMBER_LEFT, $currentMember, $memberId);
 
-            header("Location: /dashboard?status=left_trip");
+            Session::setFlash('info', Messages::MEMBER_LEFT);
+            header("Location: /dashboard");
             exit;
         }
     }
@@ -192,7 +203,9 @@ class TripMemberController extends Controller
         $invitation = $invitationModel->findByToken($token);
 
         if (!$invitation) {
-            die("This invitation link is invalid or has expired.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            header("Location: /dashboard");
+            exit;
         }
 
         $itineraryId = $invitation['itineraryId'];
@@ -239,7 +252,9 @@ class TripMemberController extends Controller
             header("Location: /itinerary/dashboard/" . $itineraryId . "?status=joined");
             exit;
         } else {
-            die("An error occurred while adding you to the trip.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            header("Location: /dashboard");
+            exit;
         }
     }
 }

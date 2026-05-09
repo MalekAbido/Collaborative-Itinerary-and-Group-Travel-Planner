@@ -20,19 +20,6 @@ use App\Enums\TransactionType;
                 </div>
             </div>
 
-            <?php if ($flash = \App\Helpers\Session::getFlash(\App\Helpers\Session::FLASH_SUCCESS)): ?>
-            <div class="mb-6 p-4 bg-primary-container text-on-primary rounded-xl border border-primary/20 flex items-center gap-3 hidden">
-                <span class="material-symbols-outlined">check_circle</span>
-                <span class="font-medium"><?php echo htmlspecialchars($flash); ?></span>
-            </div>
-            <?php endif; ?>
-            <?php if ($flash = \App\Helpers\Session::getFlash(\App\Helpers\Session::FLASH_ERROR)): ?>
-            <div class="mb-6 p-4 bg-error-container text-on-error-container rounded-xl border border-error/20 flex items-center gap-3 hidden">
-                <span class="material-symbols-outlined">error</span>
-                <span class="font-medium"><?php echo htmlspecialchars($flash); ?></span>
-            </div>
-            <?php endif; ?>
-
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div class="lg:col-span-8 flex flex-col gap-6">
                     <?php if (empty($groupedEntries)): ?>

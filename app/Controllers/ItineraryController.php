@@ -7,6 +7,7 @@ use App\Models\TripFinance;
 use App\Models\TripMember;
 use App\Helpers\Auth;
 use App\Helpers\Session;
+use App\Constants\Messages;
 use App\Models\Activity;
 use App\Enums\ActivityStatus;
 use App\Enums\TripMemberRole;
@@ -32,9 +33,9 @@ class ItineraryController extends Controller {
 
             // 2. Inline Validation Check (Dates)
             if (strtotime($endDate) < strtotime($startDate)) {
-                \App\Helpers\Session::setFlash('date_error', 'The end date cannot be before the start date.');
-                \App\Helpers\Session::setFlash('old_title', $_POST['title']);
-                \App\Helpers\Session::setFlash('old_description', $_POST['description']);
+                Session::setFlash(Session::FLASH_ERROR, Messages::ITIN_DATE_ERROR);
+                Session::setFlash('old_title', $_POST['title']);
+                Session::setFlash('old_description', $_POST['description']);
                 
                 header("Location: /itinerary/create");
                 exit;
@@ -118,6 +119,7 @@ class ItineraryController extends Controller {
             }
 
             // 7. Redirect to the new dashboard
+            Session::setFlash(Session::FLASH_SUCCESS, Messages::ITIN_CREATED);
             header("Location: /itinerary/dashboard/" . $stringTripId);
             exit;
         }
@@ -156,7 +158,7 @@ class ItineraryController extends Controller {
             $endDate = $_POST['endDate'];
             
             if (strtotime($endDate) < strtotime($startDate)) {
-                \App\Helpers\Session::setFlash('date_error', 'The end date cannot be before the start date.');
+                Session::setFlash(Session::FLASH_ERROR, Messages::ITIN_DATE_ERROR);
                 header("Location: " . $_SERVER['HTTP_REFERER']);
                 exit;
             }
@@ -186,14 +188,16 @@ class ItineraryController extends Controller {
             }
 
             // Update the database
-            $itineraryModel->update(
+            if ($itineraryModel->update(
                 $id,
                 $_POST['title'],
                 $_POST['description'],
                 $startDate,
                 $endDate,
                 $coverImagePath // This will be null if no new image, or the new path if uploaded!
-            );
+            )) {
+                Session::setFlash(Session::FLASH_SUCCESS, Messages::ITIN_UPDATED);
+            }
 
             // Redirect back to settings with the success flag
             header("Location: /itinerary/settings/" . $id . "?status=updated");
@@ -215,7 +219,9 @@ class ItineraryController extends Controller {
         Auth::requireRole(TripMemberRole::ORGANIZER->value, $role);
 
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
-            $itineraryModel->delete($id);
+            if ($itineraryModel->delete($id)) {
+                Session::setFlash(Session::FLASH_SUCCESS, Messages::ITIN_DELETED);
+            }
             header("Location: /dashboard");
             exit;
         }

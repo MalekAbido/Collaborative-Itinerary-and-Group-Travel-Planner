@@ -10,18 +10,6 @@ require __DIR__ . '/../layouts/header.php'; ?>
                     <p class="text-lg text-on-surface-variant max-w-2xl">Review draft submissions from group members. Approving a draft creates an active poll, while rejecting it removes it from consideration.</p>
                 </div>
                 
-                <!-- Flash Messages -->
-                <?php if ($flash = \App\Helpers\Session::getFlash(\App\Helpers\Session::FLASH_SUCCESS)): ?>
-                    <div class="mb-6 p-4 bg-green-100 text-green-800 rounded-lg border border-green-200 hidden">
-                        <?php echo htmlspecialchars($flash ?? ''); ?>
-                    </div>
-                <?php endif; ?>
-                <?php if ($flash = \App\Helpers\Session::getFlash(\App\Helpers\Session::FLASH_ERROR)): ?>
-                    <div class="mb-6 p-4 bg-red-100 text-red-800 rounded-lg border border-red-200 hidden">
-                        <?php echo htmlspecialchars($flash ?? ''); ?>
-                    </div>
-                <?php endif; ?>
-
                 <!-- Content Grid (Cards) -->
                 <?php if (!empty($draftActivities)): ?>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">

@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Helpers\Auth;
 use App\Helpers\Session;
+use App\Constants\Messages;
 use App\Helpers\TimeHelper;
 use App\Models\Activity;
 use App\Models\Poll;
@@ -26,7 +27,7 @@ class ProposalController extends Controller
         $tripMember = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
         if ($tripMember === null) {
-            Session::setFlash(Session::FLASH_ERROR, 'You do not have access to this itinerary.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::NOT_A_MEMBER);
             header('Location: /dashboard');
             exit;
         }
@@ -67,7 +68,7 @@ class ProposalController extends Controller
         $tripMember = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
         if ($tripMember === null) {
-            Session::setFlash(Session::FLASH_ERROR, 'You do not have access to this itinerary.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::NOT_A_MEMBER);
             header('Location: /dashboard');
             exit;
         }
@@ -77,7 +78,7 @@ class ProposalController extends Controller
         $activity = Activity::getByIdAndItinerary($activityId, $itineraryId);
 
         if ($activity === null || $activity->getActivityStatus() !== ActivityStatus::DRAFT->value) {
-            Session::setFlash(Session::FLASH_ERROR, 'Invalid activity or activity is not a draft.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
             header("Location: /itinerary/{$itineraryId}/proposals");
             exit;
         }
@@ -87,7 +88,7 @@ class ProposalController extends Controller
 
         if ($startTime <= $currentTime) {
             $activity->updateStatus(ActivityStatus::REJECTED);
-            Session::setFlash(Session::FLASH_ERROR, 'Activity start time has already passed. Proposal rejected.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
             header("Location: /itinerary/{$itineraryId}/proposals");
             exit;
         }
@@ -96,7 +97,7 @@ class ProposalController extends Controller
         $clientTimezoneStr = $_POST['timezone'] ?? 'UTC';
 
         if (empty($pollDeadlineRaw)) {
-            Session::setFlash(Session::FLASH_ERROR, 'Both date and time are required for the poll deadline.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
             header("Location: /itinerary/{$itineraryId}/proposals");
             exit;
         }
@@ -104,14 +105,14 @@ class ProposalController extends Controller
         $pollDeadline = TimeHelper::convertToUTC($pollDeadlineRaw, $clientTimezoneStr);
 
         if (!$pollDeadline) {
-            Session::setFlash(Session::FLASH_ERROR, 'Invalid datetime or timezone provided.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
             header("Location: /itinerary/{$itineraryId}/proposals");
             exit;
         }
 
         $pollDeadlineTime = strtotime($pollDeadline);
         if ($pollDeadlineTime > ($startTime - 86400)) {
-            Session::setFlash(Session::FLASH_ERROR, 'Poll deadline must be at least 24 hours before the activity starts.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
             header("Location: /itinerary/{$itineraryId}/proposals");
             exit;
         }
@@ -124,12 +125,12 @@ class ProposalController extends Controller
             $poll->setIsAnonymous($activity->getIsAnonymous());
             
             if ($poll->create()) {
-                Session::setFlash(Session::FLASH_SUCCESS, 'Proposal approved and poll created successfully.');
+                Session::setFlash(Session::FLASH_SUCCESS, Messages::PROPOSAL_APPROVED);
             } else {
-                Session::setFlash(Session::FLASH_ERROR, 'Activity status updated, but failed to create poll.');
+                Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
             }
         } else {
-            Session::setFlash(Session::FLASH_ERROR, 'Failed to update activity status.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
         }
 
         header("Location: /itinerary/{$itineraryId}/proposals");
@@ -142,7 +143,7 @@ class ProposalController extends Controller
         $tripMember = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
         if ($tripMember === null) {
-            Session::setFlash(Session::FLASH_ERROR, 'You do not have access to this itinerary.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::NOT_A_MEMBER);
             header('Location: /dashboard');
             exit;
         }
@@ -152,15 +153,15 @@ class ProposalController extends Controller
         $activity = Activity::getByIdAndItinerary($activityId, $itineraryId);
 
         if ($activity === null || $activity->getActivityStatus() !== ActivityStatus::DRAFT->value) {
-            Session::setFlash(Session::FLASH_ERROR, 'Invalid activity or activity is not a draft.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
             header("Location: /itinerary/{$itineraryId}/proposals");
             exit;
         }
 
         if ($activity->updateStatus(ActivityStatus::REJECTED)) {
-            Session::setFlash(Session::FLASH_SUCCESS, 'Proposal has been rejected.');
+            Session::setFlash(Session::FLASH_SUCCESS, Messages::PROPOSAL_REJECTED);
         } else {
-            Session::setFlash(Session::FLASH_ERROR, 'Failed to reject the proposal.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
         }
 
         header("Location: /itinerary/{$itineraryId}/proposals");

@@ -126,7 +126,7 @@ class FundContribution
         if ($success) {
             $itineraryId = $this->getItineraryId();
             // move this to fund contribution controller
-            HistoryLogger::log($itineraryId, \App\Models\TransactionType::DELETED_FUND_CONTRIBUTION, $this, $deletedByTripMemberId);
+            HistoryLogger::log($itineraryId, \App\Enums\TransactionType::DELETED_FUND_CONTRIBUTION, $this, $deletedByTripMemberId);
         }
 
         return $success;

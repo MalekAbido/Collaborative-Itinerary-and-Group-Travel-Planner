@@ -47,7 +47,7 @@
                 <span class="text-xl font-display font-extrabold text-on-surface tracking-tight">Itinerary</span>
             </div>
 
-            <h2 class="font-display text-3xl font-bold text-on-surface mb-2">Welcome back <?php echo \App\Helpers\Session::getFlash(\App\Helpers\Session::FLASH_SUCCESS); ?></h2>
+            <h2 class="font-display text-3xl font-bold text-on-surface mb-2">Welcome back</h2>
             <p class="font-body text-on-surface-variant mb-8">Please enter your details to login.</p>
 
             <form id="login-form" action="/login/process" method="POST" class="flex flex-col gap-5" novalidate>
@@ -123,5 +123,34 @@
 
 <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 <script src="/assets/js/main.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const notyf = new Notyf({
+            duration: 4000,
+            position: { x: 'right', y: 'bottom' },
+            dismissible: true
+        });
+
+        <?php use App\Helpers\Session; ?>
+
+        <?php if (Session::hasFlash('success')): ?>
+            notyf.success("<?= addslashes(Session::getFlash('success')) ?>");
+        <?php endif; ?>
+
+        <?php if (Session::hasFlash('error')): ?>
+            notyf.error("<?= addslashes(Session::getFlash('error')) ?>");
+        <?php endif; ?>
+
+        <?php if (Session::hasFlash('info')): ?>
+            notyf.open({
+                type: 'info',
+                message: "<?= addslashes(Session::getFlash('info')) ?>",
+                background: '#3b82f6',
+                icon: { className: 'material-symbols-outlined', tagName: 'i', text: 'info' }
+            });
+        <?php endif; ?>
+    });
+</script>
 
 </html>

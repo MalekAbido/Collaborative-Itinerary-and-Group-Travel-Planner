@@ -4,6 +4,7 @@ namespace App\Controllers;
 use App\Helpers\Auth;
 use App\Helpers\HistoryLogger;
 use App\Helpers\Session;
+use App\Constants\Messages;
 use App\Helpers\TimeHelper;
 use App\Models\Activity;
 use App\Models\AttendanceList;
@@ -32,7 +33,7 @@ class ActivityController extends Controller
         $tripMember = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
         if ($tripMember === null) {
-            Session::setFlash(Session::FLASH_ERROR, 'You do not have access to this itinerary.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::NOT_A_MEMBER);
             header('Location: /dashboard');
             exit;
         }
@@ -62,7 +63,7 @@ class ActivityController extends Controller
         $tripMember = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
         if ($tripMember === null) {
-            Session::setFlash(Session::FLASH_ERROR, 'You do not have access to this itinerary.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::NOT_A_MEMBER);
             header('Location: /dashboard');
             exit;
         }
@@ -74,7 +75,7 @@ class ActivityController extends Controller
         $clientTimezoneStr = $_POST['timezone'] ?? 'UTC';
 
         if (empty($name) || empty($startTimeRaw) || empty($endTimeRaw)) {
-            Session::setFlash(Session::FLASH_ERROR, 'Name, start time, and end time are required.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ACTIVITY_REQUIRED_FIELDS);
             header("Location: /itinerary/{$itineraryId}/activity/create");
             exit;
         }
@@ -83,13 +84,13 @@ class ActivityController extends Controller
         $endTime   = TimeHelper::convertToUTC($endTimeRaw, $clientTimezoneStr);
 
         if (! $startTime || ! $endTime) {
-            Session::setFlash(Session::FLASH_ERROR, 'Invalid datetime or timezone provided.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
             header("Location: /itinerary/{$itineraryId}/activity/create");
             exit;
         }
 
         if (strtotime($endTime) <= strtotime($startTime)) {
-            Session::setFlash(Session::FLASH_ERROR, 'End time must be after start time.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ACTIVITY_TIME_ERROR);
             header("Location: /itinerary/{$itineraryId}/activity/create");
             exit;
         }
@@ -97,7 +98,7 @@ class ActivityController extends Controller
         // Validation: Duration shouldn't exceed 24 hours
         $durationInSeconds = strtotime($endTime) - strtotime($startTime);
         if ($durationInSeconds > 86400) {
-            Session::setFlash(Session::FLASH_ERROR, 'Activity duration cannot exceed 24 hours.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ACTIVITY_DURATION_ERROR);
             header("Location: /itinerary/{$itineraryId}/activity/create");
             exit;
         }
@@ -120,13 +121,13 @@ class ActivityController extends Controller
             $itinEndTs   = strtotime($itinEnd);
 
             if ($activityStartNaive < $itinStartTs) {
-                Session::setFlash(Session::FLASH_ERROR, 'Activity cannot start before the trip begins (' . date('M j, Y', $itinStartTs) . ').');
+                Session::setFlash(Session::FLASH_ERROR, Messages::ACTIVITY_BOUND_ERROR);
                 header("Location: /itinerary/{$itineraryId}/activity/create");
                 exit;
             }
 
             if ($activityEndNaive > $itinEndTs) {
-                Session::setFlash(Session::FLASH_ERROR, 'Activity cannot end after the trip finishes (' . date('M j, Y', $itinEndTs) . ').');
+                Session::setFlash(Session::FLASH_ERROR, Messages::ACTIVITY_BOUND_ERROR);
                 header("Location: /itinerary/{$itineraryId}/activity/create");
                 exit;
             }
@@ -218,11 +219,11 @@ class ActivityController extends Controller
                 }
             }
 
-            Session::setFlash(Session::FLASH_SUCCESS, 'Activity created successfully as a Draft.');
+            Session::setFlash(Session::FLASH_SUCCESS, Messages::ACTIVITY_CREATED);
             header("Location: /itinerary/dashboard/{$itineraryId}");
             exit;
         } else {
-            Session::setFlash(Session::FLASH_ERROR, 'Failed to create activity.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
             header("Location: /itinerary/{$itineraryId}/activity/create");
             exit;
         }
@@ -234,7 +235,7 @@ class ActivityController extends Controller
         $tripMember = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
         if ($tripMember === null) {
-            Session::setFlash(Session::FLASH_ERROR, 'You do not have access to this itinerary.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::NOT_A_MEMBER);
             header('Location: /dashboard');
             exit;
         }
@@ -242,7 +243,7 @@ class ActivityController extends Controller
         $activity = Activity::getByIdAndItinerary($activityId, $itineraryId);
 
         if ($activity === null || $activity->getActivityStatus() === ActivityStatus::REMOVED->value) {
-            Session::setFlash(Session::FLASH_ERROR, 'Activity not found or does not belong to this trip.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ACTIVITY_NOT_FOUND);
             header("Location: /itinerary/dashboard/{$itineraryId}");
             exit;
         }
@@ -284,7 +285,7 @@ class ActivityController extends Controller
         $tripMember = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
         if ($tripMember === null) {
-            Session::setFlash(Session::FLASH_ERROR, 'You do not have access to this itinerary.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::NOT_A_MEMBER);
             header('Location: /dashboard');
             exit;
         }
@@ -292,7 +293,7 @@ class ActivityController extends Controller
         $activity = Activity::getByIdAndItinerary($activityId, $itineraryId);
 
         if ($activity === null) {
-            Session::setFlash(Session::FLASH_ERROR, 'Activity not found.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_NOT_FOUND);
             header("Location: /itinerary/dashboard/{$itineraryId}");
             exit;
         }
@@ -302,9 +303,9 @@ class ActivityController extends Controller
 
         if ($attendanceList) {
             $attendanceList->updateStatus($tripMember->getId(), $newStatus, null);
-            Session::setFlash(Session::FLASH_SUCCESS, 'Your attendance status for the activity has been updated.');
+            Session::setFlash(Session::FLASH_SUCCESS, Messages::ATTENDANCE_UPDATED);
         } else {
-            Session::setFlash(Session::FLASH_ERROR, 'Attendance tracking is not set up for this activity.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ATTENDANCE_ERROR);
         }
 
         header("Location: /itinerary/{$itineraryId}/activity/{$activityId}");
@@ -318,7 +319,7 @@ class ActivityController extends Controller
         $tripMember = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
         if ($tripMember === null) {
-            Session::setFlash(Session::FLASH_ERROR, 'You do not have access to this itinerary.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::NOT_A_MEMBER);
             header('Location: /dashboard');
             exit;
         }
@@ -328,16 +329,16 @@ class ActivityController extends Controller
         $activity = Activity::getByIdAndItinerary($activityId, $itineraryId);
 
         if ($activity === null) {
-            Session::setFlash(Session::FLASH_ERROR, 'Activity not found or does not belong to this trip.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ACTIVITY_NOT_FOUND);
             header("Location: /itinerary/dashboard/{$itineraryId}");
             exit;
         }
 
         if ($activity->delete()) {
             HistoryLogger::log($itineraryId, TransactionType::REMOVED_ACTIVITY, $activity, $tripMember->getId());
-            Session::setFlash(Session::FLASH_SUCCESS, 'Activity removed successfully.');
+            Session::setFlash(Session::FLASH_SUCCESS, Messages::ACTIVITY_REMOVED);
         } else {
-            Session::setFlash(Session::FLASH_ERROR, 'Failed to remove the activity.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
         }
 
         header("Location: /itinerary/dashboard/{$itineraryId}");

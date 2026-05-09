@@ -7,6 +7,7 @@ use App\Models\FundContribution;
 use App\Models\TripMember;
 use App\Enums\TripMemberRole;
 use App\Helpers\Session;
+use App\Constants\Messages;
 use Core\Controller;
 
 class CommonPoolController extends Controller
@@ -22,7 +23,13 @@ class CommonPoolController extends Controller
         if ($amount > 0) {
             $pool = new GroupFund();
             $pool->setFundId($fundId);
-            $pool->addFunds($member->getId(), $amount);
+            if ($pool->addFunds($member->getId(), $amount)) {
+                Session::setFlash(Session::FLASH_SUCCESS, Messages::CONTRIBUTION_ADDED);
+            } else {
+                Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            }
+        } else {
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
         }
 
         header("Location: /finance/dashboard/" . $itineraryId);
@@ -36,7 +43,7 @@ class CommonPoolController extends Controller
 
         $contribution = new FundContribution();
         if (!$contribution->read($id)) {
-            Session::setFlash(Session::FLASH_ERROR, 'Contribution not found.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_NOT_FOUND);
             header("Location: /dashboard");
             exit;
         }
@@ -45,7 +52,7 @@ class CommonPoolController extends Controller
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
         if (!$member) {
-            Session::setFlash(Session::FLASH_ERROR, 'You are not a member of this trip.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::NOT_A_MEMBER);
             header("Location: /dashboard");
             exit;
         }
@@ -55,7 +62,7 @@ class CommonPoolController extends Controller
         $isEditor  = Auth::hasRole(TripMemberRole::EDITOR->value, $member->getRole());
 
         if (!$isCreator && !$isEditor) {
-            Session::setFlash(Session::FLASH_ERROR, 'You do not have permission to delete this contribution.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ACCESS_DENIED);
             header("Location: /finance/dashboard/" . $itineraryId);
             exit;
         }
@@ -67,9 +74,9 @@ class CommonPoolController extends Controller
             $stmt = $db->prepare($sql);
             $stmt->execute([':amount' => $contribution->getAmount(), ':id' => $contribution->getGroupFundId()]);
             
-            Session::setFlash(Session::FLASH_SUCCESS, 'Contribution deleted successfully.');
+            Session::setFlash(Session::FLASH_SUCCESS, Messages::CONTRIBUTION_DELETED);
         } else {
-            Session::setFlash(Session::FLASH_ERROR, 'Failed to delete contribution.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
         }
 
         header("Location: /finance/dashboard/" . $itineraryId);

@@ -12,6 +12,7 @@ use App\Helpers\Auth;
 use App\Helpers\HistoryLogger;
 use App\Models\TripMember;
 use App\Helpers\Session;
+use App\Constants\Messages;
 use App\Services\FinanceService;
 
 class FinanceController extends Controller
@@ -23,7 +24,7 @@ class FinanceController extends Controller
 
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
         if (!$member) {
-            Session::setFlash(Session::FLASH_ERROR, 'You must be a member of this itinerary to view its finances.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::FINANCE_ACCESS_DENIED);
             header("Location: /dashboard");
             exit;
         }
@@ -92,7 +93,7 @@ class FinanceController extends Controller
 
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
         if (!$member) {
-            Session::setFlash(Session::FLASH_ERROR, 'You must be a member of this itinerary to update its settings.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ITIN_MEMBER_ACCESS);
             header("Location: /dashboard");
             exit;
         }
@@ -102,7 +103,9 @@ class FinanceController extends Controller
         $budget = floatval($_POST['budgetLimit'] ?? 0);
 
         $finance = new TripFinance();
-        $finance->updateBudgetByItineraryId($itineraryId, $budget);
+        if ($finance->updateBudgetByItineraryId($itineraryId, $budget)) {
+            Session::setFlash(Session::FLASH_SUCCESS, Messages::BUDGET_UPDATED);
+        }
 
         header("Location: /finance/dashboard/" . $itineraryId);
         exit;
@@ -115,7 +118,7 @@ class FinanceController extends Controller
 
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
         if (!$member) {
-            Session::setFlash(Session::FLASH_ERROR, 'You must be a member of this itinerary to create a group fund.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ITIN_MEMBER_ACCESS);
             header("Location: /dashboard");
             exit;
         }
@@ -126,7 +129,9 @@ class FinanceController extends Controller
         if ($finance->readByItinerary($itineraryId)) {
             $groupFund = new GroupFund();
             if (!$groupFund->readByTripFinanceId($finance->getId())) {
-                $groupFund->create($finance->getId());
+                if ($groupFund->create($finance->getId())) {
+                    Session::setFlash(Session::FLASH_SUCCESS, Messages::GROUP_FUND_CREATED);
+                }
             }
         }
         header("Location: /finance/dashboard/" . $itineraryId);
@@ -140,7 +145,7 @@ class FinanceController extends Controller
 
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
         if (! $member) {
-            Session::setFlash(Session::FLASH_ERROR, 'You must be a member of this itinerary to settle payments.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ITIN_MEMBER_ACCESS);
             header("Location: /dashboard");
             exit;
         }
@@ -150,13 +155,13 @@ class FinanceController extends Controller
         $amount = round((float) ($_POST['amount'] ?? 0), 2);
 
         if ($fromMemberId !== $member->getId()) {
-            Session::setFlash(Session::FLASH_ERROR, 'Only the payer can confirm this settlement.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ACCESS_DENIED);
             header("Location: /finance/dashboard/" . $itineraryId);
             exit;
         }
 
         if ($amount <= 0 || $toMemberId <= 0) {
-            Session::setFlash(Session::FLASH_ERROR, 'Invalid settlement payment information.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
             header("Location: /finance/dashboard/" . $itineraryId);
             exit;
         }
@@ -166,9 +171,9 @@ class FinanceController extends Controller
 
         if ($settlementId) {
             HistoryLogger::log($itineraryId, TransactionType::SETTLEMENT_PAID, $settlement, $member->getId());
-            Session::setFlash(Session::FLASH_SUCCESS, 'Settlement marked as paid.');
+            Session::setFlash(Session::FLASH_SUCCESS, Messages::SETTLEMENT_PAID);
         } else {
-            Session::setFlash(Session::FLASH_ERROR, 'Unable to record the settlement payment.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
         }
 
         header("Location: /finance/dashboard/" . $itineraryId);

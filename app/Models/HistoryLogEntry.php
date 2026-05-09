@@ -185,6 +185,9 @@ class HistoryLogEntry
             case EntityType::TRIP_MEMBER:
                 $item = new TripMember();
                 return ($item->read($id)) ? $item->getDisplayName() : 'Unknown Member';
+            case EntityType::SETTLEMENT_PAYMENT:
+                $item = new SettlementPayment();
+                return ($item->read($id)) ? 'Settlement of ' . $item->getAmount() : 'Unknown Settlement';
         }
 
         return 'Unknown Entity';

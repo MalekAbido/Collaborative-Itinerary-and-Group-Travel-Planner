@@ -10,10 +10,6 @@ require __DIR__ . '/../layouts/header.php'; ?>
                         <p class="text-body-lg text-on-surface-variant max-w-[640px]">
                             Manage your upcoming itineraries and past adventures.
                         </p>
-                        <br>
-                        <p>
-                            <?php echo Session::getFlash(Session::FLASH_ERROR); ?>
-                        </p>
                     </div>
                     <a class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-md px-8 py-4 shadow-sm hover:bg-on-primary-fixed-variant transition shrink-0 cursor-pointer"    href="/itinerary/create"
                         >

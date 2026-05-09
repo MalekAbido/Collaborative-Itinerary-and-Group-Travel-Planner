@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use Core\Controller;
 use App\Helpers\Auth;
+use App\Constants\Messages;
 use App\Helpers\HistoryLogger;
 use App\Helpers\Session;
 use App\Models\Activity;
@@ -27,14 +28,18 @@ class InventoryController extends Controller
         $itinerary = $itineraryModel->findByIdNumeric($itineraryId);
 
         if (!$itinerary) {
-            die("Itinerary not found.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_NOT_FOUND);
+            header("Location: /dashboard");
+            exit;
         }
 
         $userId = Auth::id();
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
         if (!$member) {
-            die("You are not a member of this trip.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::NOT_A_MEMBER);
+            header("Location: /dashboard");
+            exit;
         }
 
         $allItems = InventoryItem::getByItineraryId($itineraryId);
@@ -87,17 +92,21 @@ class InventoryController extends Controller
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
         if (!$member) {
-            die("Member not found.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::NOT_A_MEMBER);
+            header("Location: /dashboard");
+            exit;
         }
 
         // Validate Activity: Must be CONFIRMED and start time after Now
         $activity = Activity::getByActivityId($activityId);
         if (!$activity || $activity->getItineraryId() != $itineraryId) {
-            die("Invalid activity selected.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            header("Location: /itinerary/inventory/" . $itineraryId);
+            exit;
         }
 
         if ($activity->getActivityStatus() !== ActivityStatus::CONFIRMED->value || strtotime($activity->getStartTime()) <= time()) {
-            Session::setFlash(Session::FLASH_ERROR, "Inventory items can only be linked to future confirmed activities.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::INV_FUTURE_CONFIRMED_ONLY);
             header("Location: /itinerary/inventory/" . $itineraryId);
             exit();
         }
@@ -113,7 +122,9 @@ class InventoryController extends Controller
         if ($item->create()) {
             header("Location: /itinerary/inventory/" . $itineraryId);
         } else {
-            die("Failed to add inventory item.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            header("Location: /itinerary/inventory/" . $itineraryId);
+            exit;
         }
     }
 
@@ -131,7 +142,9 @@ class InventoryController extends Controller
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
         if (!$member) {
-            die("Unauthorized.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ACCESS_DENIED);
+            header("Location: /dashboard");
+            exit;
         }
 
         $item = new InventoryItem();
@@ -143,12 +156,12 @@ class InventoryController extends Controller
             if ($isCreator || $isManager) {
                 if ($item->delete()) {
                     HistoryLogger::log($itineraryId, TransactionType::REMOVED_INVENTORY_ITEM, $item, $member->getId());
-                    Session::setFlash(Session::FLASH_SUCCESS, "Item removed from inventory.");
+                    Session::setFlash(Session::FLASH_SUCCESS, Messages::INVENTORY_REMOVED);
                 } else {
-                    Session::setFlash(Session::FLASH_ERROR, "Failed to remove item.");
+                    Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
                 }
             } else {
-                Session::setFlash(Session::FLASH_ERROR, "You don't have permission to remove this item.");
+                Session::setFlash(Session::FLASH_ERROR, Messages::INVENTORY_ACCESS_DENIED);
             }
         }
 
@@ -169,7 +182,9 @@ class InventoryController extends Controller
 
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
         if (!$member) {
-            die("Member not found.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::NOT_A_MEMBER);
+            header("Location: /dashboard");
+            exit;
         }
 
         $item = new InventoryItem();
@@ -178,6 +193,7 @@ class InventoryController extends Controller
                 $item->setTripMemberId($member->getId());
                 if ($item->update()) {
                     HistoryLogger::log($itineraryId, TransactionType::VOLUNTEERED_FOR_ITEM, $item, $member->getId());
+                    Session::setFlash(Session::FLASH_SUCCESS, Messages::INVENTORY_VOLUNTEERED);
                 }
             }
         }
@@ -199,7 +215,9 @@ class InventoryController extends Controller
 
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
         if (!$member) {
-            die("Member not found.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::NOT_A_MEMBER);
+            header("Location: /dashboard");
+            exit;
         }
 
         $item = new InventoryItem();
@@ -208,6 +226,7 @@ class InventoryController extends Controller
                 $item->setTripMemberId(null);
                 if ($item->update()) {
                     HistoryLogger::log($itineraryId, TransactionType::UNVOLUNTEERED_FOR_ITEM, $item, $member->getId());
+                    Session::setFlash(Session::FLASH_INFO, Messages::INVENTORY_UNVOLUNTEERED);
                 }
             }
         }

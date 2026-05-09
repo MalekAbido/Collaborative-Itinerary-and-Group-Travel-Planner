@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use App\Helpers\Auth;
+use App\Helpers\Session;
+use App\Constants\Messages;
 use App\Models\EmergencyContact;
 use Core\Controller;
 use App\Models\User;
@@ -23,18 +25,23 @@ class EmergencyController extends Controller
         $contactData = $_POST;
 
         if (!$this->validateEmergencyInput($contactData)) {
-            die("Invalid contact data.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            header("Location: /profile");
+            exit;
         }
 
         $contactData['userId'] = $this->userId;
         
         $contact = new EmergencyContact();
         if ($contact->create($contactData)) {
+            Session::setFlash(Session::FLASH_SUCCESS, Messages::EMERGENCY_CONTACT_ADDED);
             header("Location: /profile");
             exit;
         }
 
-        die("Database error while saving emergency contact.");
+        Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+        header("Location: /profile");
+        exit;
     }
 
     public function removeEmergencyContact()
@@ -42,19 +49,24 @@ class EmergencyController extends Controller
         $contactId = $_POST['contactId'] ?? null;
 
         if (!$contactId) {
-            die("No contact ID provided.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_NOT_FOUND);
+            header("Location: /profile");
+            exit;
         }
 
         $contact = new EmergencyContact();
 
         if ($contact->read($contactId) && $contact->getUserId() == $this->userId) {
             if ($contact->delete()) {
+                Session::setFlash(Session::FLASH_SUCCESS, Messages::EMERGENCY_CONTACT_REMOVED);
                 header("Location: /profile");
                 exit;
             }
         }
 
-        die("Failed to remove contact or unauthorized.");
+        Session::setFlash(Session::FLASH_ERROR, Messages::ACCESS_DENIED);
+        header("Location: /profile");
+        exit;
     }
 
     public function updateEmergencyContact()
@@ -63,7 +75,9 @@ class EmergencyController extends Controller
         $contactId = $contactData['contactId'] ?? null;
 
         if (!$contactId || !$this->validateEmergencyInput($contactData)) {
-            die("Invalid contact data.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            header("Location: /profile");
+            exit;
         }
 
         $contact = new EmergencyContact();
@@ -75,12 +89,15 @@ class EmergencyController extends Controller
             $contact->setRelationship($contactData['relationship']);
 
             if ($contact->update()) {
+                Session::setFlash(Session::FLASH_SUCCESS, Messages::EMERGENCY_CONTACT_UPDATED);
                 header("Location: /profile");
                 exit;
             }
         }
 
-        die("Failed to update contact or unauthorized.");
+        Session::setFlash(Session::FLASH_ERROR, Messages::ACCESS_DENIED);
+        header("Location: /profile");
+        exit;
     }
 
     public function triggerSOS()

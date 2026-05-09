@@ -6,8 +6,9 @@ use App\Enums\EntityType;
 use App\Enums\TransactionType;
 use App\Enums\TripMemberRole;
 use App\Helpers\Auth;
-use App\Helpers\HistoryLogger;
 use App\Helpers\Session;
+use App\Constants\Messages;
+use App\Helpers\HistoryLogger;
 use App\Models\Activity;
 use App\Models\Expense;
 use App\Models\FundContribution;
@@ -92,7 +93,7 @@ class HistoryController extends Controller
         $entry = HistoryLogEntry::findByEntryId($entryId);
 
         if (! $entry) {
-            Session::setFlash(Session::FLASH_ERROR, 'Log entry not found.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::HISTORY_NOT_FOUND);
             header("Location: /itinerary/{$itineraryId}/history");
             exit;
         }
@@ -100,13 +101,12 @@ class HistoryController extends Controller
         $latest = HistoryLogEntry::findLatestForEntity($entry->getChangedEntityId(), $entry->getChangedEntityType());
 
         if ($latest->getId() !== $entry->getId()) {
-            Session::setFlash(Session::FLASH_ERROR, 'Only the most recent action for this entity can be undone.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::HISTORY_UNDO_ERROR);
             header("Location: /itinerary/{$itineraryId}/history");
             exit;
         }
 
         $success = false;
-        $message = "Action reverted successfully.";
 
         switch (TransactionType::tryFrom($entry->getTransactionType())) {
             case TransactionType::REMOVED_ACTIVITY:
@@ -115,7 +115,7 @@ class HistoryController extends Controller
                 if ($activity) {
 // if ($activity->hasOverlap($itineraryId, $activity->getStartTime(), $activity->getEndTime())) {
                     if (false) {
-                        Session::setFlash(Session::FLASH_ERROR, 'Cannot restore activity: It overlaps with another existing activity.');
+                        Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
                         header("Location: /itinerary/{$itineraryId}/history");
                         exit;
                     }
@@ -170,15 +170,15 @@ class HistoryController extends Controller
                 break;
 
             default:
-                Session::setFlash(Session::FLASH_ERROR, 'This action cannot be undone.');
+                Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
                 header("Location: /itinerary/{$itineraryId}/history");
                 exit;
         }
 
         if ($success) {
-            Session::setFlash(Session::FLASH_SUCCESS, $message);
+            Session::setFlash(Session::FLASH_SUCCESS, Messages::REVERT_SUCCESS);
         } else {
-            Session::setFlash(Session::FLASH_ERROR, 'Failed to revert the action.');
+            Session::setFlash(Session::FLASH_ERROR, Messages::REVERT_ERROR);
         }
 
         header("Location: /itinerary/{$itineraryId}/history");

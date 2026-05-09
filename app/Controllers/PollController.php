@@ -2,6 +2,8 @@
 namespace App\Controllers;
 
 use App\Helpers\Auth;
+use App\Helpers\Session;
+use App\Constants\Messages;
 use App\Helpers\HistoryLogger;
 use App\Helpers\TimeHelper;
 use App\Models\Activity;
@@ -38,7 +40,9 @@ class PollController extends Controller
         $formattedDeadline = TimeHelper::convertToUTC($deadlineRaw, $clientTimezoneStr);
 
         if (! $formattedDeadline) {
-            die("Invalid datetime or timezone provided.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+            exit;
         }
 
         $activity = Activity::getByActivityId($activityId);
@@ -46,7 +50,9 @@ class PollController extends Controller
             $startTime = strtotime($activity->getStartTime());
             $deadlineTime = strtotime($formattedDeadline);
             if ($deadlineTime > ($startTime - 86400)) {
-                die("Poll deadline must be at least 24 hours before the activity starts.");
+                Session::setFlash(Session::FLASH_ERROR, Messages::POLL_DEADLINE_ERROR);
+                header("Location: " . $_SERVER['HTTP_REFERER']);
+                exit;
             }
         }
 
@@ -58,10 +64,13 @@ class PollController extends Controller
         $poll->setWeightedTotal(0.0);
 
         if ($poll->create()) {
+            Session::setFlash(Session::FLASH_SUCCESS, Messages::POLL_CREATED);
             header("Location: " . $_SERVER['HTTP_REFERER']);
             exit();
         } else {
-            die("Failed to create poll.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+            exit;
         }
     }
 
@@ -80,7 +89,9 @@ class PollController extends Controller
         $poll = new Poll();
 
         if (! $poll->read($pollId)) {
-            die("Poll not found.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_NOT_FOUND);
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+            exit;
         }
 
         if ($poll->getStatus() === PollStatus::CLOSED || strtotime($poll->getDeadline()) <= time()) {
@@ -95,7 +106,9 @@ class PollController extends Controller
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
         if (! $member) {
-            die("You are not a member of this trip.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::NOT_A_MEMBER);
+            header("Location: /dashboard");
+            exit;
         }
 
         $tripMemberId = $member->getId();
@@ -104,13 +117,17 @@ class PollController extends Controller
 
         if ($vote) {
             $vote->setRatingChoice($ratingChoice);
-            $vote->update();
+            if ($vote->update()) {
+                Session::setFlash(Session::FLASH_SUCCESS, Messages::VOTE_UPDATED);
+            }
         } else {
             $vote = new Vote();
             $vote->setPollId($pollId);
             $vote->setTripMemberId($tripMemberId);
             $vote->setRatingChoice($ratingChoice);
-            $vote->create();
+            if ($vote->create()) {
+                Session::setFlash(Session::FLASH_SUCCESS, Messages::VOTE_SUCCESS);
+            }
         }
 
         $poll->calculateTotalPoints();
@@ -135,6 +152,7 @@ class PollController extends Controller
 
         if ($poll->read($pollId)) {
             $this->closePoll($itineraryId, $poll);
+            Session::setFlash(Session::FLASH_SUCCESS, Messages::POLL_CLOSED);
         }
 
         header("Location: " . $_SERVER['HTTP_REFERER']);
@@ -167,13 +185,18 @@ class PollController extends Controller
                     $startTime = strtotime($activity->getStartTime());
                     $deadlineTime = strtotime($formattedDeadline);
                     if ($deadlineTime > ($startTime - 86400)) {
-                        die("Poll deadline must be at least 24 hours before the activity starts.");
+                        Session::setFlash(Session::FLASH_ERROR, Messages::POLL_DEADLINE_ERROR);
+                        header("Location: " . $_SERVER['HTTP_REFERER']);
+                        exit;
                     }
                 }
                 $poll->setDeadline($formattedDeadline);
                 $this->openPoll($itineraryId, $poll);
+                Session::setFlash(Session::FLASH_SUCCESS, Messages::POLL_REOPENED);
             } else {
-                die("Invalid datetime or timezone provided.");
+                Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+                header("Location: " . $_SERVER['HTTP_REFERER']);
+                exit;
             }
         }
 
@@ -203,7 +226,9 @@ class PollController extends Controller
         $itinerary      = $itineraryModel->findByIdNumeric($itineraryId);
 
         if (! $itinerary) {
-            die("Itinerary not found.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_NOT_FOUND);
+            header("Location: /dashboard");
+            exit;
         }
 
         $userId = Auth::id() ?? 1;

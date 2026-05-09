@@ -7,7 +7,6 @@
     $pendingActivity = $data['pendingActivity'] ?? [];
     $conflictingActivities = $data['conflictingActivities'] ?? [];
 ?>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
 
     <!-- <div class="max-w-2xl mx-auto py-10 px-6"> -->
         <?php if (!empty($conflictingActivities)): ?>
@@ -47,14 +46,6 @@
                 <span class="material-symbols-outlined text-primary text-3xl">add_box</span> Add Activity
             </h1>
         </div>
-
-        <?php $flashError = \App\Helpers\Session::getFlash(\App\Helpers\Session::FLASH_ERROR); ?>
-        <?php if ($flashError): ?>
-            <div class="mb-6 rounded-xl border border-error/30 bg-error-container px-4 py-3 text-on-error-container flex items-start gap-3">
-                <span class="material-symbols-outlined text-error">error</span>
-                <p class="font-medium"><?= htmlspecialchars($flashError) ?></p>
-            </div>
-        <?php endif; ?>
 
         <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6">
             <form id="activity-form" action="/itinerary/<?= htmlspecialchars($itineraryId) ?>/activity/store" method="POST" enctype="multipart/form-data" class="space-y-6" onsubmit="return validateActivityForm()">
@@ -154,14 +145,7 @@
             </form>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
     <script>
-        const notyf = new Notyf({
-            duration: 4000,
-            position: { x: "right", y: "bottom" },
-            dismissible: true,
-        });
-
         const itinStart = "<?= $itineraryStartDate ?>";
         const itinEnd = "<?= $itineraryEndDate ?>";
 
@@ -178,14 +162,22 @@
             const endDate = new Date(endInput.value);
 
             if (endDate <= startDate) {
-                notyf.error("End time must be after start time.");
+                if (typeof notyf !== 'undefined') {
+                    notyf.error("End time must be after start time.");
+                } else {
+                    alert("End time must be after start time.");
+                }
                 return false;
             }
 
             // Duration check (24 hours = 86,400,000 milliseconds)
             const duration = endDate - startDate;
             if (duration > 86400000) {
-                notyf.error("Activity duration cannot exceed 24 hours.");
+                if (typeof notyf !== 'undefined') {
+                    notyf.error("Activity duration cannot exceed 24 hours.");
+                } else {
+                    alert("Activity duration cannot exceed 24 hours.");
+                }
                 return false;
             }
 
@@ -197,11 +189,21 @@
                 const endStr = endInput.value.substring(0, 10);
 
                 if (startStr < itinStart) {
-                    notyf.error(`Activity cannot start before the trip begins (${itinStart}).`);
+                    const msg = `Activity cannot start before the trip begins (${itinStart}).`;
+                    if (typeof notyf !== 'undefined') {
+                        notyf.error(msg);
+                    } else {
+                        alert(msg);
+                    }
                     return false;
                 }
                 if (endStr > itinEnd) {
-                    notyf.error(`Activity cannot end after the trip finishes (${itinEnd}).`);
+                    const msg = `Activity cannot end after the trip finishes (${itinEnd}).`;
+                    if (typeof notyf !== 'undefined') {
+                        notyf.error(msg);
+                    } else {
+                        alert(msg);
+                    }
                     return false;
                 }
             }
@@ -210,5 +212,4 @@
         }
     </script>
     <script src="/assets/js/timezone.js"></script>
-</body>
-</html>
+<?php require __DIR__ . '/../layouts/footer.php'; ?>

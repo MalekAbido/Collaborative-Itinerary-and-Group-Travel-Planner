@@ -3,6 +3,7 @@ namespace App\Controllers;
 
 use App\Helpers\Auth;
 use App\Helpers\Session;
+use App\Constants\Messages;
 use App\Models\User;
 use App\Enums\TripMemberRole;
 use Core\Controller;
@@ -12,8 +13,9 @@ class AuthController extends Controller
     public function login()
     {
         if (Auth::check()) {
-            Session::setFlash(Session::FLASH_ERROR, 'You are already logged in!');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ALREADY_LOGGED_IN);
             header("Location: /dashboard");
+            exit;
         } else {
             $this->view("auth/login");
         }
@@ -88,8 +90,9 @@ class AuthController extends Controller
     public function register()
     {
         if (Auth::check()) {
-            Session::setFlash(Session::FLASH_ERROR, 'You are already logged in!');
+            Session::setFlash(Session::FLASH_ERROR, Messages::ALREADY_LOGGED_IN);
             header("Location: /dashboard");
+            exit;
         } else {
             $this->view("auth/register");
         }

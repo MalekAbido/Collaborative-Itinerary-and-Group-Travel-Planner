@@ -2,6 +2,8 @@
 namespace App\Controllers;
 
 use App\Helpers\Auth;
+use App\Helpers\Session;
+use App\Constants\Messages;
 use App\Helpers\Validator;
 use App\Models\User;
 use Core\Controller;
@@ -31,7 +33,10 @@ class UserController extends Controller
                 'activeTab' => 'userSettings'
             ]);
         }
-        die('User profile not found.');
+        
+        Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_NOT_FOUND);
+        header("Location: /dashboard");
+        exit;
     }
 
     public function showUserTripsDashboard()
@@ -46,7 +51,10 @@ class UserController extends Controller
                 'activeTab' => 'dashboard'
             ]);
         }
-        die('User profile not found.');
+        
+        Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_NOT_FOUND);
+        header("Location: /login");
+        exit;
     }
 
     public function updateUserProfile()
@@ -54,7 +62,9 @@ class UserController extends Controller
         $data = $_POST;
 
         if (!$this->validateProfileData($data)) {
-            die("Invalid profile data provided. Please check your inputs.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            header("Location: /profile");
+            exit;
         }
 
         $user = new User();
@@ -87,13 +97,17 @@ class UserController extends Controller
                 }
             }
 
-            $user->updateProfile($data);
+            if ($user->updateProfile($data)) {
+                Session::setFlash(Session::FLASH_SUCCESS, Messages::SUCCESS_GENERIC);
+            }
             
             header("Location: /profile");
             exit;
         }
 
-        die('User not found.');
+        Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_NOT_FOUND);
+        header("Location: /dashboard");
+        exit;
     }
 
     public function validateProfileData($data)

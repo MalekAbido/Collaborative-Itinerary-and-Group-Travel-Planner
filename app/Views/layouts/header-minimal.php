@@ -21,6 +21,8 @@
         rel="stylesheet" />
 
     <link rel="stylesheet" href="/assets/css/tailwind.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
     
     <style type="text/tailwindcss">
         @layer base {

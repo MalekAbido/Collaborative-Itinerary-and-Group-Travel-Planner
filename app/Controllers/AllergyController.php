@@ -2,6 +2,8 @@
 namespace App\Controllers;
 
 use App\Helpers\Auth;
+use App\Helpers\Session;
+use App\Constants\Messages;
 use App\Models\Allergy;
 use Core\Controller;
 
@@ -19,19 +21,23 @@ class AllergyController extends Controller
         $allergyData = $_POST;
 
         if (!$this->validateAllergyInput($allergyData)) {
-            // In a real app, you might redirect back with an error flash message in the session
-            die("Invalid allergy data.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            header("Location:" . $_SERVER['HTTP_REFERER']);
+            exit;
         }
 
         $allergyData['userId'] = $this->userId;
 
         $allergy = new Allergy();
         if ($allergy->create($allergyData)) {
+            Session::setFlash(Session::FLASH_SUCCESS, Messages::ALLERGY_ADDED);
             header("Location:" . $_SERVER['HTTP_REFERER']);
             exit;
         }
 
-        die("Database error while saving allergy.");
+        Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+        header("Location:" . $_SERVER['HTTP_REFERER']);
+        exit;
     }
 
     public function removeAllergy()
@@ -40,19 +46,24 @@ class AllergyController extends Controller
         $allergyId = $_POST['allergyId'] ?? null;
         
         if (!$allergyId) {
-            die("No allergy ID provided.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_NOT_FOUND);
+            header("Location: /profile");
+            exit;
         }
 
         $allergy = new Allergy();
         
         if ($allergy->read($allergyId) && $allergy->getUserId() == $this->userId) {
             if ($allergy->delete()) {
+                Session::setFlash(Session::FLASH_SUCCESS, Messages::ALLERGY_REMOVED);
                 header("Location: /profile");
                 exit;
             }
         }
         
-        die("Failed to remove allergy or unauthorized.");
+        Session::setFlash(Session::FLASH_ERROR, Messages::ACCESS_DENIED);
+        header("Location: /profile");
+        exit;
     }
 
     public function updateAllergy()
@@ -61,7 +72,9 @@ class AllergyController extends Controller
         $allergyId = $allergyData['allergyId'] ?? null;
 
         if (!$allergyId || !$this->validateAllergyInput($allergyData)) {
-            die("Invalid allergy data.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            header("Location: /profile");
+            exit;
         }
 
         $allergy = new Allergy();
@@ -72,12 +85,15 @@ class AllergyController extends Controller
             $allergy->setReaction($allergyData['reaction'] ?? '');
             
             if ($allergy->update()) {
+                Session::setFlash(Session::FLASH_SUCCESS, Messages::ALLERGY_UPDATED);
                 header("Location: /profile");
                 exit;
             }
         }
         
-        die("Failed to update allergy or unauthorized.");
+        Session::setFlash(Session::FLASH_ERROR, Messages::ACCESS_DENIED);
+        header("Location: /profile");
+        exit;
     }
 
     public function getTripAllergies($tripId)

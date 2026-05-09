@@ -144,25 +144,4 @@
         </section>
     </main>
 
-    <footer
-        class="w-full py-8 px-8 lg:px-8 flex flex-col md:flex-row justify-between items-center max-w-content mx-auto border-t border-outline-variant bg-surface-container-lowest mt-auto gap-4">
-        <div class="text-body-sm font-semibold font-display text-primary">
-            Itinerary
-        </div>
-        <div class="flex flex-wrap justify-center gap-6">
-            <a class="font-body text-body-xs font-medium text-outline hover:text-primary transition-all duration-200 cursor-pointer"    
-                href="#">Privacy Policy</a>
-            <a class="font-body text-body-xs font-medium text-outline hover:text-primary transition-all duration-200 cursor-pointer"    
-                href="#">Terms of Service</a>
-            <a class="font-body text-body-xs font-medium text-outline hover:text-primary transition-all duration-200 cursor-pointer"    
-                href="#">Help Center</a>
-            <a class="font-body text-body-xs font-medium text-outline hover:text-primary transition-all duration-200 cursor-pointer"    
-                href="#">Emergency Contact</a>
-        </div>
-        <div class="font-body text-body-xs text-outline">
-            © <?= date('Y') ?> Itinerary. All rights reserved.
-        </div>
-    </footer>
-</body>
-
-</html>
+<?php require __DIR__ . '/../layouts/footer.php'; ?>

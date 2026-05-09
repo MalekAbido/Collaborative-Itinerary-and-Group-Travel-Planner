@@ -37,14 +37,6 @@
                     <label for="endDate" class="block text-label-caps uppercase text-on-surface-variant mb-2">End Date</label>
                     <input type="date" name="endDate" id="endDate" required 
                         class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-body-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/30 outline-none transition">
-                    
-                    <?php $dateError = \App\Helpers\Session::getFlash('date_error'); ?>
-                    <?php if ($dateError): ?>
-                        <p class="text-error text-[11px] font-medium mt-1.5 flex items-center gap-1 animate-pulse">
-                            <span class="material-symbols-outlined text-[16px] !font-variation-[FILL_1]">error</span>
-                            <?= htmlspecialchars($dateError) ?>
-                        </p>
-                    <?php endif; ?>
                 </div>
             </div>
 

@@ -2,6 +2,8 @@
 namespace App\Controllers;
 
 use App\Helpers\Auth;
+use App\Helpers\Session;
+use App\Constants\Messages;
 use App\Helpers\HistoryLogger;
 use App\Models\Expense;
 use App\Models\ExpenseShare;
@@ -62,7 +64,9 @@ class ExpenseController extends Controller
         $financeModel = new \App\Models\TripFinance();
 
         if (! $financeModel->read($financeId)) {
-            die("Error: Invalid finance record.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            header("Location: /dashboard");
+            exit;
         }
 
         if ($paidByKitty === 1) {
@@ -74,7 +78,9 @@ class ExpenseController extends Controller
             $fundExists     = $groupFundModel->readByTripFinanceId($financeId);
 
             if (! $fundExists) {
-                die("Error: There is no Group Fund set up for this trip yet.");
+                Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+                header("Location: /finance/dashboard/" . $itineraryId);
+                exit;
             }
 
             if ($groupFundModel->getCurrentBalance() < $totalAmount) {
@@ -100,7 +106,9 @@ class ExpenseController extends Controller
         $isValid = $this->validateExpenseData($splitMethod, $totalAmount, $details['shares'], $paidByKitty);
 
         if (! $isValid) {
-            die("Error: Invalid expense data or shares do not equal the total amount.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+            exit;
         }
 
         $expenseModel = new Expense();
@@ -150,7 +158,8 @@ class ExpenseController extends Controller
         $financeModel->read($financeId);
         $itineraryId = $financeModel->getItineraryId();
 
-        header("Location: /finance/dashboard/" . $itineraryId . "?success=ADDED_EXPENSE");
+        Session::setFlash(Session::FLASH_SUCCESS, Messages::EXPENSE_ADDED);
+        header("Location: /finance/dashboard/" . $itineraryId);
         exit();
     }
 
@@ -160,13 +169,17 @@ class ExpenseController extends Controller
 
         $expenseId = $_POST['expenseId'] ?? null;
         if (! $expenseId) {
-            die("Error: No Expense ID provided.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            header("Location: /dashboard");
+            exit;
         }
 
         $expenseModel = new Expense();
         $expense = $expenseModel->findById($expenseId);
         if (! $expense) {
-            die("Error: Expense not found.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_NOT_FOUND);
+            header("Location: /dashboard");
+            exit;
         }
 
         $itineraryData = $expense->getItinerary();
@@ -180,7 +193,8 @@ class ExpenseController extends Controller
             HistoryLogger::log($itineraryId, TransactionType::DELETED_EXPENSE, $expense, $tripMember->getId());
         }
 
-        header("Location: /finance/dashboard/" . $itineraryId . "?success=DELETED_EXPENSE");
+        Session::setFlash(Session::FLASH_SUCCESS, Messages::EXPENSE_DELETED);
+        header("Location: /finance/dashboard/" . $itineraryId);
         exit();
     }
 
@@ -189,7 +203,9 @@ class ExpenseController extends Controller
         $expenseId = $_GET['id'] ?? null;
 
         if (! $expenseId) {
-            die("Expense ID is required to view details.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            header("Location: /dashboard");
+            exit;
         }
 
         $expenseModel = new Expense();
@@ -198,7 +214,9 @@ class ExpenseController extends Controller
         $expense = $expenseModel->findById($expenseId);
 
         if (! $expense) {
-            die("Expense not found.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_NOT_FOUND);
+            header("Location: /dashboard");
+            exit;
         }
 
         $expense->loadShares($expenseId);
@@ -231,18 +249,24 @@ class ExpenseController extends Controller
         $newRefundInput = (float) ($_POST['refundAmount'] ?? 0);
 
         if (! $expenseId) {
-            die("Error: No Expense ID provided.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            header("Location: /dashboard");
+            exit;
         }
 
         $expenseModel = new Expense();
         $expense      = $expenseModel->findById($expenseId);
 
         if (! $expense) {
-            die("Error: Expense not found.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_NOT_FOUND);
+            header("Location: /dashboard");
+            exit;
         }
 
         if ($newRefundInput <= 0 || $newRefundInput > $expense->getAmount()) {
-            die("Error: Invalid refund amount. It must be greater than 0 and cannot exceed the current expense amount.");
+            Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+            exit;
         }
 
         $expense->updateRefundedAmount($newRefundInput);
@@ -250,7 +274,8 @@ class ExpenseController extends Controller
         $itineraryData = $expense->getItinerary();
         $itineraryId   = $itineraryData['itineraryId'] ?? null;
 
-        header("Location: /finance/dashboard/" . $itineraryId . "?success=refund_applied");
+        Session::setFlash(Session::FLASH_SUCCESS, Messages::SUCCESS_GENERIC);
+        header("Location: /finance/dashboard/" . $itineraryId);
         exit();
     }
 
