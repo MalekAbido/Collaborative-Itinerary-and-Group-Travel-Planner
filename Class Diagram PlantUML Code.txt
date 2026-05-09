@@ -48,6 +48,8 @@ class TripMember {
     + getItinerary(): Itinerary
 }
 
+
+
 class Invitation {
     - int id
     - String secureToken
@@ -207,6 +209,21 @@ class AttendanceList {
     + getByActivityId(activityId: int): AttendanceList
 }
 
+class AttendanceMember {
+    - PDO db
+    - int id
+    - string status
+    - string note
+    - int attendanceListId
+    - int tripMemberId
+    - TripMember tripMemberObject
+    + fill(row: array): void
+    + getTripMember(): TripMember
+    + {static} getAllByListId(listId: int): array
+    + {static} getByTripMemberAndAttendanceList(attendanceListId: int, tripMemberId: int): AttendanceMember
+    + update(): boolean
+}
+
 class HistoryLog {
     - int id
     - DateTime createdAt
@@ -215,6 +232,8 @@ class HistoryLog {
     + read(itineraryId): HistoryLog
     + fill(data: array): void
 }
+
+
 
 class HistoryLogEntry {
     - int id
@@ -252,7 +271,7 @@ class GroupFund {
     - String fundId
     - double currentBalance
     + create(tripFinanceId: int, targetBalance: Double): boolean
-    + addFunds(contributionId: int, amount: double): boolean
+    + addFunds(contributorId: int, amount: double): boolean
     + deductExpense(amount: double): boolean
     + processRefund(refundAmount: Double): boolean
     + readByTripFinanceId(tripFinanceId: int): boolean
@@ -279,8 +298,10 @@ class TripSettlementManager <<service>> {
 }
 
 class FinanceService <<service>> {
-    + debtMinimizer(settlements: List<Settlement>): Double
-    + calculateRefunds(expenseId: String, refundAmount: Double): Map
+    - float tolerance
+    + getTripSettlementLedger(itineraryId: int): array
+    - calculateBalances(expenses: array): array
+    + computeMinimalTransactions(balances: array): array
 }
 
 enum SplitMethod {
@@ -290,204 +311,310 @@ enum SplitMethod {
 }
 
 class Expense {
-    - String expenseId
-    - String financeId
-    - Double amount
-    - String currencyType
-    - String description
-    - String category
+    - PDO pdo
+    - int id
+    - double amount 
+    - int expenseId
+    - int tripFinanceId
+    - int tripMemberId
+    - double refundedAmount
+    - string currencyType
+    - string description
+    - string category
     - boolean isNonCash
     - boolean paidByKitty
-    - SplitMethod splitMethod
-    + expenseSplitter(): Double
+    - string deletedAt
+    + array expenseShares
+    + getItinerary(): array
+    + create(data: array): int
+    + findById(id: int): Expense
+    + delete(deletedByTripMemberId: int): boolean
+    + update(): boolean
+    + updateRefundedAmount(newRefundInput: double): boolean
+    + loadShares(expenseId: int): array
 }
 
 class ExpenseShare <<AssociativeEntity>> {
-    - String shareId
-    - String expenseId
-    - String memberId
-    - Double amount
+    - int id
+    - string shareId
+    - double amount
     - boolean isPayer
+    + create(expenseId: int, tripMemberId: int, amount: double, isPayer: boolean): void
+    + update(): boolean
+    + findByExpenseId(expenseId: int): array
+    + deleteByExpenseId(expenseId: int): void
 }
 
-class Settlement {
-    - String debtorId
-    - String creditorId
-    - Double amount
-    + markAsPaid(): void
-}
-
-class CurrencyConverterAPIWrapper <<Service>> {
-    + convert(amount: Double, fromCurrency: String, toCurrency: String): Double
-}
-
-abstract class Alert {
-    - String alertId
-    - String message
-    - DateTime timestamp
-    - boolean isRead
-    {abstract} + trigger(): void
-    + dismiss(): void
-}
-
-class BudgetAlert {
-    - Double threshold
-    - Double currentSpend
-    + trigger(): void
-}
-
-class DeadlineAlert {
-    - String pollId
-    + triggerAlert(): void
-    + closeAssociatedPoll(): void
+class SettlementPayment {
+    - PDO db
+    - int id
+    - string settlementId
+    - int fromTripMemberId
+    - int toTripMemberId
+    - int itineraryId
+    - double amount
+    - string status
+    - string createdAt
+    - string paidAt
+    - string deletedAt
+    + fill(data: array): void
+    + create(fromTripMemberId: int, toTripMemberId: int, itineraryId: int, amount: double): int
+    {static} + getPaidByItinerary(itineraryId: int): array
+    + read(id: int): boolean
+    + markPaid(): boolean
 }
 
 class EmergencyContact {
-    - String id
-    - String name
-    - String phone
-    - String email
-    - String relationship
+    - PDO db
+    - int id
+    - string contactId
+    - string name
+    - string phone
+    - string email
+    - string relationship
+    - int userId
+    + create(data: array): boolean
+    + read(id: int): boolean
+    + update(): boolean
+    + delete(): boolean
 }
 
 class Allergy {
-    - String id
-    - String allergen
-    - String severity
-    - String reaction
+    - PDO db
+    - int id
+    - string allergenId
+    - string allergen
+    - string severity
+    - string reaction
+    - int userId
+    + create(data: array): boolean
+    + read(id: int): boolean
+    + update(): boolean
+    + delete(): boolean
 }
 
 class InventoryItem {
-    - String id
-    - String name
+    - PDO db
+    - int id
+    - string itemId
+    - string name
     - int quantity
-    - String category
+    - string description
     - boolean isPacked
-    + markAsPacked(): void
-    + updateQuantity(qty: int): void
+    - int activityId
+    - int tripMemberId
+    + fill(row: array): void
+    + create(): boolean
+    + read(id: int): boolean
+    + update(): boolean
+    + delete(): boolean
+    + {static} getByItineraryId(itineraryId: int): array
+    + {static} getByActivityId(activityId: int): array
 }
 
-class TransportCalculator <<Service>> {
-    + calculateDistance(origin: Location, dest: Location): float
-    + estimateDuration(mode: TransportMode, origin: Location, dest: Location): int
-    + estimateCost(mode: TransportMode, distance: float): float
-    + getAvailableModes(): array
+class Auth <<service>> {
+    - {static} array roles
+    + {static} check(): boolean
+    + {static} id(): int|null
+    + {static} user(): User|null
+    + {static} login(userId: int): void
+    + {static} logout(): void
+    + {static} hasRole(requiredRole: string, currentRole: string): boolean
+    + {static} requireRole(requiredRole: string, currentRole: string): void
+    + {static} requireLogin(): void
+    + {static} requireMembership(itineraryId: int): TripMember|null
 }
 
-class EmergencyBroadcaster <<service>> {
-    + dispatchAlerts(user: User, currentLocation: Location): void
+class HistoryLogger <<service>> {
+    + {static} log(itineraryId: int, transactionType: TransactionType, entity: object, tripMemberId: int): boolean
 }
 
-class ConflictDetectorService <<service>> {
-    + checkConflict(a1: Activity, a2: Activity): boolean
-    + checkOverlap(s1: Subtrip, s2: Subtrip): boolean
-    + validateActivityFit(activity: Activity, subtrip: Subtrip): boolean
+class Mailer <<service>> {
+    + {static} send(toEmail: string, subject: string, htmlBody: string): boolean
 }
 
-class TimeZoneService <<Service>> {
-    + convertToLocalTime(baseTime: Date, loc: Location): Date
-    + calculateTimeDifference(l1: Location, l2: Location): int
+class Session <<service>> {
+    - {static} string sessionName
+    - {static} string cookieName
+    + {const} string FLASH_SUCCESS
+    + {const} string FLASH_ERROR
+    + {const} string FLASH_INFO
+    + {static} start(): void
+    + {static} set(key: string, value: mixed): void
+    + {static} get(key: string, default: mixed = null): mixed
+    + {static} destroy(): void
+    + {static} setFlash(key: string, message: string): void
+    + {static} getFlash(key: string): string
+    + {static} getSessionName(): string
+    + {static} getCookieName(): string
+}
+
+class TimeHelper <<service>> {
+    + {static} convertToUTC(localDatetime: string, clientTimezone: string = 'UTC'): string|null
+    + {static} formatLocal(utcDatetime: string, targetTimezone: string = 'Africa/Cairo'): string
+}
+
+class Validator {.
+    + array errors
+    + required(field: string, value: string, message: string = null): void
+    + email(field: string, value: string, message: string = null): void
+    + minLength(field: string, value: string, min: int, message: string = null): void
+    + maxLength(field: string, value: string, max: int, message: string = null): void
+    + passes(): boolean
+    + getErrors(): array
 }
 
 ' ========================================================
 ' CONTROLLERS LAYER 
 ' ========================================================
 class Router {
-    - routes: array
-    + add(route: String, controller: String, action: String): void
-    + dispatch(url: String): void
-    - match(url: String): boolean
+    - array routes
+    + get(url: string, controller: string, method: string): void
+    + post(url: string, controller: string, method: string): void
+    - registerRoute(httpMethod: string, url: string, controller: string, method: string): void
+    + dispatch(url: string, httpMethod: string): void
+    - callController(controllerName: string, method: string, params: array = []): void
+    - handleNotFound(url: string): void
+    - parseUrl(): string
 }
 
-abstract class Controller {
-    # route_params: array
-    + __construct(route_params: array)
-    # view(viewName: String, data: array): String
+class Controller {
+    + view(view: string, data: array = []): void
+}
+
+class Database <<Singleton>> {
+    - {static} Database instance
+    - PDO pdo
+    - string host
+    - string username
+    - string password
+    - string dbname
+    + {static} getInstance(): Database
+    + getConnection(): PDO
+}
+
+class LoadEnv <<Helper>> {
+    + {static} load(path: string): void
+}
+
+class FinanceController extends Controller {
+    + dashboard(itineraryId: int): void
+    + updateSettings(itineraryId: int): void
+    + createGroupFund(itineraryId: int): void
+    + markSettlementPaid(itineraryId: int): void
 }
 
 class ItineraryController extends Controller {
-    + getDashboard(itineraryId: String, userId: String): String
-    + getMembersList(itineraryId: String, userId: String): String
-    + updateMemberRole(itineraryId: String, memberId: String, role: TripRole): String
-    + validateItineraryAccess(itineraryId: String, userId: String): boolean
+    + create(): void
+    + store(): void
+    + settings(id: string|int): void
+    + update(id: string|int): void
+    + destroy(id: string|int): void
+    + getDashboard(id: string|int): void
 }
 
-class InvitationController extends Controller {
-    + createInvitation(itineraryId: String, email: String, inviterId: String): String
-    + acceptInvitation(token: String, userId: String): String
-    + validateInvitationEmail(email: String): boolean
+class HomeController extends Controller {
+    + index(): void
+    + styleguide(): void
 }
 
 class ActivityController extends Controller {
-    + createActivityDraft(itineraryId: String, proposerId: String, details: array): String
-    + getDraftActivities(itineraryId: String): String
-    + getActivityDetails(activityId: String): String
-    + updateActivityDecision(activityId: String, decision: ActivityStatus, reviewerId: String): String
-    + deleteActivity(activityId: String, userId: String): String
-    + getTransportOptions(activityAId: String, activityBId: String): String
-    + validateActivityTimes(start: Date, end: Date): boolean
+    - User user
+    - TripMember tripMember
+    + create(itineraryId: int): void
+    + store(itineraryId: int): void
+    + show(itineraryId: int, activityId: int): void
+    + updateAttendance(itineraryId: int, activityId: int): void
+    + delete(itineraryId: int, activityId: int): void
 }
 
 class ExpenseController extends Controller {
-    + createExpense(financeId: String, details: array, payerId: String, splitMethod: String): String
-    + deleteExpense(expenseId: String, userId: String): String
-    + getExpenseDetails(expenseId: String): String
-    + validateExpenseData(details: array): boolean
+    + showAddForm(id: int): void
+    + createExpense(): void
+    + deleteExpense(): void
+    + getExpenseDetails(): void
+    + refundExpense(): void
+    - validateExpenseData(splitMethod: string, totalAmount: float, shares: array, paidByKitty: int = 0): boolean
 }
 
-class SettlementController extends Controller {
-    + getBalances(financeId: String): String
-    + processSettlement(debtId: String, amount: Double, payerId: String): String
-    + applyLedgerFilters(criteria: String): String
-    + validateSettlementAmount(amount: Double, maxAllowed: Double): boolean
+class PollController extends Controller {
+    + store(): void
+    + vote(): void
+    + closeEarly(): void
+    + reopen(): void
+    - enforceEditorRole(itineraryId: int): void
+    + index(itineraryId: int): void
+    + closePoll(itineraryId: int, poll: Poll): void
+    + openPoll(itineraryId: int, poll: Poll): void
 }
 
 class CommonPoolController extends Controller {
-    + getPoolDashboard(financeId: String): String
-    + addContribution(financeId: String, contributorId: String, amount: Double): String
-    + validateContributionAmount(amount: Double): boolean
+    + contribute(fundId: int): void
+    + removeContribution(id: int): void
 }
 
-class HistoryLogController extends Controller {
-    + logChange(tripId: String, changeType: String, oldVal: String, newVal: String, userId: String): String
-    + rollbackVersion(snapshotId: String, userId: String): String
-    + validateRollbackRequest(snapshotId: String): boolean
+class HistoryController extends Controller {
+    + index(itineraryId: int): void
+    + revert(itineraryId: int, entryId: int): void
 }
 
-class ComplianceController extends Controller {
-    + checkTripCompliance(tripId: String): String
-    + validateMemberCompliance(memberId: String): boolean
+class TripMemberController extends Controller {
+    + index(id: string|int): void
+    + store(id: string|int): void
+    + updateRole(id: string|int): void
+    + destroy(id: string|int): void
+    + joinTrip(token: string): void
 }
 
 class AllergyController extends Controller {
-    + addAllergy(memberId: String, allergyData: array): String
-    + getTripAllergies(tripId: String): String
+    - int userId
+    + addAllergy(): void
+    + removeAllergy(): void
+    + updateAllergy(): void
+    + getTripAllergies(tripId: int): void
     + validateAllergyInput(allergyData: array): boolean
 }
 
 class InventoryController extends Controller {
-    + declareInventoryItem(activityId: String, memberId: String, itemDetails: array): String
-    + getInventoryList(activityId: String): String
-    + volunteerForBringingItem(itemId: String, memberId: String): String
-    + validateItemDeclaration(itemDetails: array): boolean
+    + showInventory(itineraryId: int): void
+    + addInventoryItem(): void
+    + volunteerToBringItem(): void
+    + unvolunteer(): void
 }
 
 class AuthController extends Controller {
-    + registerUser(registrationData: array): String
-    + loginUser(credentials: array): String
-    + validateRegistrationData(registrationData: array): boolean
-    + validateLoginCredentials(credentials: array): boolean
+    + login(): void
+    + processLogin(): void
+    + testLogin(): void
+    + register(): void
+    + processRegister(): void
+    + logout(): void
+}
+
+class ProposalController extends Controller {
+    + __construct()
+    + index(itineraryId: int): void
+    + approve(itineraryId: int, activityId: int): void
+    + reject(itineraryId: int, activityId: int): void
 }
 
 class UserController extends Controller {
-    + getUserProfile(userId: String): String
-    + updateProfile(userId: String, standardData: array, optionalData: array): String
+    - int userId
+    + showUserProfile(): void
+    + showUserTripsDashboard(): void
+    + updateUserProfile(): void
     + validateProfileData(data: array): boolean
 }
 
 class EmergencyController extends Controller {
-    + triggerEmergencyAlert(userId: String, location: Location): String
-    + validateEmergencyRequest(userId: String): boolean
+    - int userId
+    + addEmergencyContact(): void
+    + removeEmergencyContact(): void
+    + updateEmergencyContact(): void
+    + triggerSOS(): void
+    + triggerEmergencyAlert(location: string): void
+    + validateEmergencyRequest(): void
+    + validateEmergencyInput(contactData: array): boolean
 }
 
 ' ========================================================
