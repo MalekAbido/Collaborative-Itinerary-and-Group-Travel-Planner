@@ -8,6 +8,8 @@ use App\Models\TripMember;
 use App\Helpers\Auth;
 use App\Helpers\Session;
 use App\Models\Activity;
+use App\Enums\ActivityStatus;
+use App\Enums\TripMemberRole;
 
 class ItineraryController extends Controller {
 
@@ -78,7 +80,7 @@ class ItineraryController extends Controller {
             $tripMember = new TripMember();
             $tripMember->setItineraryId($numericTripId);
             $tripMember->setUserId(Auth::id());
-            $tripMember->setRole('Organizer');
+            $tripMember->setRole(TripMemberRole::ORGANIZER->value);
             $tripMember->setJoinedAt(date('Y-m-d H:i:s'));
             $tripMember->create();
             
@@ -99,7 +101,7 @@ class ItineraryController extends Controller {
                     $email = trim($rawEmail);
                     
                     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                        $token = $invitationModel->createToken($numericTripId, $email, 'Member');
+                        $token = $invitationModel->createToken($numericTripId, $email, TripMemberRole::MEMBER->value);
                         
                         if ($token) {
                             $joinLink = $baseUrl . "/join/" . $token;
@@ -125,7 +127,7 @@ class ItineraryController extends Controller {
         Auth::requireLogin();
         $member = Auth::requireMembership($id);
         $role = $member->getRole();
-        Auth::requireRole('Organizer', $role);
+        Auth::requireRole(TripMemberRole::ORGANIZER->value, $role);
 
         $itineraryModel = new Itinerary();
         $tripData = $itineraryModel->findByIdNumeric($id);
@@ -162,7 +164,7 @@ class ItineraryController extends Controller {
             // Require Organizer permissions
             $member = Auth::requireMembership($tripData['id']); // uses numeric ID
             $role = $member->getRole();
-            Auth::requireRole('Organizer', $role);
+            Auth::requireRole(TripMemberRole::ORGANIZER->value, $role);
 
             // --- NEW: HANDLE IMAGE UPLOAD ON UPDATE ---
             $coverImagePath = null; // Stays null unless they actually uploaded a new file
@@ -210,7 +212,7 @@ class ItineraryController extends Controller {
 
         $member = Auth::requireMembership($tripData['id']); 
         $role = $member->getRole();
-        Auth::requireRole('Organizer', $role);
+        Auth::requireRole(TripMemberRole::ORGANIZER->value, $role);
 
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $itineraryModel->delete($id);
@@ -236,7 +238,7 @@ class ItineraryController extends Controller {
     
     // --- NEW CODE: Fetch and sort the timeline activities ---
     // This uses your existing method which already has ORDER BY startTime ASC
-    $timelineActivities = Activity::getAllByStatusAndItinerary('Confirmed', $tripData['id']);
+    $timelineActivities = Activity::getAllByStatusAndItinerary(ActivityStatus::CONFIRMED, $tripData['id']);
 
     $this->view("itinerary/dashboard", [
         'trip' => $tripData, 

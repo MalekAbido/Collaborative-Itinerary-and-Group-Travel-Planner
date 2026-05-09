@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Enums\TripMemberRole;
 use Core\Database;
 use PDO;
 
@@ -83,13 +84,14 @@ class Invitation
         $invitationId = uniqid('inv_');
 
         $sqlInsert = "INSERT INTO Invitation (invitationId, secureToken, isActive, itineraryId, email, role) 
-                      VALUES (:invitationId, :secureToken, 1, :itineraryId, NULL, 'Member')";
+                      VALUES (:invitationId, :secureToken, 1, :itineraryId, NULL, :role)";
         
         $stmtInsert = $this->db->prepare($sqlInsert);
         $stmtInsert->execute([
             ':invitationId' => $invitationId,
             ':secureToken'  => $secureToken,
-            ':itineraryId'  => $itineraryId
+            ':itineraryId'  => $itineraryId,
+            ':role'         => TripMemberRole::MEMBER->value
         ]);
 
         return $secureToken;

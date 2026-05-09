@@ -1,6 +1,9 @@
 <?php
 
     use App\Helpers\Auth;
+    use App\Enums\ActivityStatus;
+    use App\Enums\AttendanceStatus;
+    use App\Enums\TripMemberRole;
     require __DIR__ . '/../layouts/header.php';
     
     // FIX 1: Safely count members only if the attendance list exists
@@ -43,30 +46,19 @@
                                         </div>
                                     </div>
                                 </div>
-                                <?php if (strtolower($activity->getActivityStatus()) == 'confirmed'): ?>
+                                <?php if ($activity->getActivityStatus() === ActivityStatus::CONFIRMED->value): ?>
                                 <div class="relative">
                                     <form
                                         action="/itinerary/<?php echo $itineraryId ?>/activity/<?php echo $activity->getId() ?>/updateAttendance"
                                         method="POST">
                                         <select name="status" onchange="this.form.submit()"
                                             class="bg-none appearance-none bg-surface-container border border-outline-variant text-on-surface font-button text-button py-2 pl-4 pr-10 rounded-full focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary cursor-pointer shadow-sm">
-
-                                            <option value="PENDING"
-                                                <?php
-                                                echo ($currentMemberStatus && $currentMemberStatus->getStatus() === 'PENDING') ? 'selected' : '' ?>>
-                                                Pending
-                                            </option>
-                                            <option value="GOING"
-                                                <?php
-                                                echo ($currentMemberStatus && $currentMemberStatus->getStatus() === 'GOING') ? 'selected' : '' ?>>Going
-                                            </option>
-                                            <option value="NOT_GOING"
-                                                <?php
-                                                echo ($currentMemberStatus && $currentMemberStatus->getStatus() === 'NOT_GOING') ? 'selected' : '' ?>>
-                                                Not
-                                                Going
-                                            </option>
-
+                                            <?php foreach (AttendanceStatus::cases() as $status): ?>
+                                                <option value="<?= $status->value ?>"
+                                                    <?= ($currentMemberStatus && $currentMemberStatus->getStatus() === $status->value) ? 'selected' : '' ?>>
+                                                    <?= $status->value ?>
+                                                </option>
+                                            <?php endforeach; ?>
                                         </select>
                                         <span
                                             class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
@@ -80,7 +72,7 @@
                             </div>
                         </div>
                     </div>
-                    <?php if (strtolower($activity->getActivityStatus()) == 'confirmed'): ?>
+                    <?php if ($activity->getActivityStatus() === ActivityStatus::CONFIRMED->value): ?>
                     <div class="bg-surface rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)]  border border-surface-variant p-6">
                         <div class="flex items-center justify-between mb-4">
                             <h2 class="font-h3 text-h3 text-on-surface flex items-center gap-2">
@@ -133,16 +125,14 @@
                                         </td>
 
                                         <td class="py-3 px-4">
-                                            <?php
-
-                                            if ($memberStatus->getStatus() === 'GOING'): ?>
+                                            <?php if ($memberStatus->getStatus() === AttendanceStatus::GOING->value): ?>
                                             <span
                                                 class="inline-flex items-center gap-1 bg-tertiary/10 text-tertiary px-3 py-1 rounded-full text-xs font-semibold">
                                                 <span class="material-symbols-outlined text-[14px]">check_circle</span>
                                                 Going
                                             </span>
 
-                                            <?php elseif ($memberStatus->getStatus() === 'PENDING'): ?>
+                                            <?php elseif ($memberStatus->getStatus() === AttendanceStatus::PENDING->value): ?>
                                             <span
                                                 class="inline-flex items-center gap-1 bg-surface-container text-on-surface-variant px-3 py-1 rounded-full text-xs font-semibold">
                                                 <span class="material-symbols-outlined text-[14px]">help</span>
@@ -170,7 +160,7 @@
                         </div>
                     </div>
                     <?php endif; ?>
-                    <?php if (Auth::hasRole("Editor", $userRole) && strtolower($activity->getActivityStatus()) == 'confirmed'): ?>
+                    <?php if (Auth::hasRole(TripMemberRole::EDITOR->value, $userRole) && $activity->getActivityStatus() === ActivityStatus::CONFIRMED->value): ?>
                         <div class="mt-auto pt-6 flex justify-end border-surface-variant">
                             <form
                                 action="/itinerary/<?php echo $itineraryId ?>/activity/<?php echo $activity->getId() ?>/delete"

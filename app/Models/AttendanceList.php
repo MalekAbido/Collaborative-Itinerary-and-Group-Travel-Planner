@@ -3,6 +3,7 @@ namespace App\Models;
 
 use Core\Database;
 use PDO;
+use App\Enums\AttendanceStatus;
 
 class AttendanceList
 {
@@ -90,7 +91,7 @@ class AttendanceList
             $insertSql  = "INSERT INTO AttendanceMember (status, note, attendanceListId, tripMemberId) VALUES (:status, :note, :listId, :memberId)";
             $insertStmt = $db->prepare($insertSql);
             $insertStmt->execute([
-                ':status'   => $newStatus,
+                ':status'   => ($newStatus instanceof AttendanceStatus ? $newStatus->value : $newStatus),
                 ':note'     => $note,
                 ':listId'   => $this->id,
                 ':memberId' => $tripMemberId,
@@ -105,9 +106,10 @@ class AttendanceList
     public function getMembersByStatus($status)
     {
         $members = [];
+        $statusValue = ($status instanceof AttendanceStatus ? $status->value : $status);
 
         foreach ($this->getMembers() as $member) {
-            if ($member->getStatus() === $status) {
+            if ($member->getStatus() === $statusValue) {
                 $members[] = $member->getTripMember();
             }
         }
@@ -119,7 +121,7 @@ class AttendanceList
     {
         $db = Database::getInstance()->getConnection();
 
-        $status = 'GOING';
+        $status = AttendanceStatus::GOING->value;
         $sql    = "SELECT COUNT(*) FROM AttendanceMember WHERE attendanceListId = :listId AND status = :status";
         $stmt   = $db->prepare($sql);
         $stmt->execute([':listId' => $this->id, ':status' => $status]);

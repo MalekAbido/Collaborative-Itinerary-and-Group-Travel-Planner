@@ -10,6 +10,8 @@ use App\Models\FundContribution;
 use App\Models\HistoryLogEntry;
 use App\Models\Subtrip;
 use App\Enums\TransactionType;
+use App\Enums\ActivityStatus;
+use App\Enums\TripMemberRole;
 use Core\Controller;
 
 class HistoryController extends Controller
@@ -18,7 +20,6 @@ class HistoryController extends Controller
     public function index($itineraryId)
     {
         $member = Auth::requireMembership($itineraryId);
-        // Auth::requireRole('Editor', $member->getRole());
 
         $entries = HistoryLogEntry::getAllByItineraryId($itineraryId);
 
@@ -71,7 +72,7 @@ class HistoryController extends Controller
     public function revert($itineraryId, $entryId)
     {
         $member = Auth::requireMembership($itineraryId);
-        Auth::requireRole('Editor', $member->getRole());
+        Auth::requireRole(TripMemberRole::EDITOR->value, $member->getRole());
 
         $entry = HistoryLogEntry::findByEntryId($entryId);
 
@@ -104,7 +105,7 @@ class HistoryController extends Controller
                         exit;
                     }
 
-                    $success = $activity->updateStatus('Confirmed');
+                    $success = $activity->updateStatus(ActivityStatus::CONFIRMED);
                     if ($success) {
                         HistoryLogger::log($itineraryId, TransactionType::RESTORED_ACTIVITY, $activity, $member->getId());
                     }

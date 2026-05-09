@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Itinerary;
 use App\Models\User;
+use App\Enums\TripMemberRole;
 use Core\Database;
 use PDO;
 
@@ -12,6 +13,7 @@ class TripMember
     private $db;
     private $id;
     private $membershipId;
+    /** @var TripMemberRole|null */
     private $role;
     private $joinedAt;
     private $userId;
@@ -46,14 +48,19 @@ class TripMember
         $this->membershipId = $membershipId;
     }
 
+    /** @return string|null */
     public function getRole()
     {
-        return $this->role;
+        return $this->role instanceof TripMemberRole ? $this->role->value : $this->role;
     }
 
     public function setRole($role)
     {
-        $this->role = $role;
+        if (is_string($role)) {
+            $this->role = TripMemberRole::tryFrom($role);
+        } else {
+            $this->role = $role;
+        }
     }
 
     public function getJoinedAt()
@@ -103,7 +110,7 @@ class TripMember
         $stmt               = $this->db->prepare($sql);
         $success            = $stmt->execute([
             ':membershipId' => $this->membershipId,
-            ':role'         => $this->role,
+            ':role'         => $this->role instanceof TripMemberRole ? $this->role->value : ($this->role ?? TripMemberRole::MEMBER->value),
             ':joinedAt'     => $this->joinedAt,
             ':userId'       => $this->userId,
             ':itineraryId'  => $this->itineraryId,
@@ -126,7 +133,7 @@ class TripMember
         if ($data) {
             $this->id           = $data['id'];
             $this->membershipId = $data['membershipId'];
-            $this->role         = $data['role'];
+            $this->role         = TripMemberRole::tryFrom($data['role']);
             $this->joinedAt     = $data['joinedAt'];
             $this->userId       = $data['userId'];
             $this->itineraryId  = $data['itineraryId'];
@@ -142,7 +149,7 @@ class TripMember
         $sql  = "UPDATE TripMember SET role = :role WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
-            ':role' => $this->role,
+            ':role' => $this->role instanceof TripMemberRole ? $this->role->value : $this->role,
             ':id'   => $this->id,
         ]);
     }
@@ -176,14 +183,14 @@ class TripMember
     {
         $this->deletedAt = null;
         if ($role) {
-            $this->role = $role;
+            $this->setRole($role);
         }
         
         $sql  = "UPDATE TripMember SET deletedAt = NULL, role = :role WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         
         return $stmt->execute([
-            ':role' => $this->role,
+            ':role' => $this->role instanceof TripMemberRole ? $this->role->value : $this->role,
             ':id'   => $this->id
         ]);
     }
@@ -203,9 +210,9 @@ class TripMember
 
         $sql .= " ORDER BY 
                     CASE m.role 
-                        WHEN 'Organizer' THEN 1 
-                        WHEN 'Editor' THEN 2 
-                        WHEN 'Member' THEN 3 
+                        WHEN '" . TripMemberRole::ORGANIZER->value . "' THEN 1 
+                        WHEN '" . TripMemberRole::EDITOR->value . "' THEN 2 
+                        WHEN '" . TripMemberRole::MEMBER->value . "' THEN 3 
                         ELSE 4 
                     END, 
                     m.joinedAt ASC";
@@ -238,7 +245,7 @@ class TripMember
             $member = new self();
             $member->setId($row['id']);
             $member->setMembershipId($row['membershipId']);
-            $member->setRole($row['role']);
+            $member->setRole(TripMemberRole::tryFrom($row['role']));
             $member->setJoinedAt($row['joinedAt']);
             $member->setUserId($row['userId']);
             $member->setItineraryId($row['itineraryId']);

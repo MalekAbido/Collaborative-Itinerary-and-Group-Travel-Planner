@@ -5,6 +5,7 @@ use Core\Database;
 use PDO;
 use \App\Models\AttendanceList;
 use \App\Models\Location;
+use App\Enums\ActivityStatus;
 
 class Activity
 {
@@ -18,6 +19,7 @@ class Activity
     private $itineraryId;
     private $tripMemberId;
     private $category;
+    /** @var ActivityStatus|null */
     private $activityStatus;
     private $locationId;
     private $isAnonymous = false;
@@ -134,12 +136,16 @@ class Activity
 
     public function getActivityStatus()
     {
-        return $this->activityStatus;
+        return $this->activityStatus instanceof ActivityStatus ? $this->activityStatus->value : $this->activityStatus;
     }
 
     public function setActivityStatus($activityStatus)
     {
-        $this->activityStatus = $activityStatus;
+        if (is_string($activityStatus)) {
+            $this->activityStatus = ActivityStatus::tryFrom($activityStatus);
+        } else {
+            $this->activityStatus = $activityStatus;
+        }
     }
 
     public function getLocationId()
@@ -171,7 +177,7 @@ class Activity
         $this->setStartTime($row['startTime']);
         $this->setEndTime($row['endTime']);
         $this->setCategory($row['category']);
-        $this->setActivityStatus($row['status']);
+        $this->setActivityStatus(ActivityStatus::tryFrom($row['status']));
         $this->setItineraryId($row['itineraryId']);
         $this->setTripMemberId($row['tripMemberId']);
         $this->setLocationId($row['locationId']);
@@ -215,7 +221,7 @@ class Activity
             ':startTime'    => $this->startTime,
             ':endTime'      => $this->endTime,
             ':category'     => $this->category,
-            ':status'       => $this->activityStatus,
+            ':status'       => $this->activityStatus instanceof ActivityStatus ? $this->activityStatus->value : $this->activityStatus,
             ':itineraryId'  => $this->itineraryId,
             ':tripMemberId' => $this->tripMemberId,
             ':locationId'   => $this->locationId,
@@ -235,11 +241,12 @@ class Activity
         $db  = Database::getInstance()->getConnection();
         $sql = "SELECT * FROM Activity
                 WHERE itineraryId = :itineraryId
-                AND status = 'Confirmed'
+                AND status = :status
                 AND (startTime < :endTime AND endTime > :startTime)";
 
         $params = [
             ':itineraryId' => $this->itineraryId,
+            ':status'      => ActivityStatus::CONFIRMED->value,
             ':startTime'   => $this->startTime,
             ':endTime'     => $this->endTime,
         ];
@@ -307,18 +314,24 @@ class Activity
     public function delete()
     {
         $db      = Database::getInstance()->getConnection();
-        $sql     = "UPDATE Activity SET status = 'Removed' WHERE id = :id";
+        $sql     = "UPDATE Activity SET status = :status WHERE id = :id";
         $stmt    = $db->prepare($sql);
-        $success = $stmt->execute([':id' => ($this->id)]);
+        $success = $stmt->execute([
+            ':status' => ActivityStatus::REMOVED->value,
+            ':id'     => ($this->id)
+        ]);
         return $success;
     }
 
     public static function getAllByItineraryId($itineraryId)
     {
         $db   = Database::getInstance()->getConnection();
-        $sql  = "SELECT * FROM Activity WHERE itineraryId = :itineraryId AND status != 'Removed' ORDER BY startTime ASC";
+        $sql  = "SELECT * FROM Activity WHERE itineraryId = :itineraryId AND status != :removedStatus ORDER BY startTime ASC";
         $stmt = $db->prepare($sql);
-        $stmt->execute([':itineraryId' => $itineraryId]);
+        $stmt->execute([
+            ':itineraryId'   => $itineraryId,
+            ':removedStatus' => ActivityStatus::REMOVED->value
+        ]);
         $data            = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $activityObjects = [];
 
@@ -333,12 +346,17 @@ class Activity
 
     public static function getAllByStatusAndItinerary($status, $itineraryId)
     {
+        if ($status instanceof ActivityStatus) {
+            $status = $status->value;
+        }
+
         $db   = Database::getInstance()->getConnection();
-        $sql  = "SELECT * FROM Activity WHERE status = :status AND itineraryId = :itineraryId AND status != 'Removed' ORDER BY startTime ASC";
+        $sql  = "SELECT * FROM Activity WHERE status = :status AND itineraryId = :itineraryId AND status != :removedStatus ORDER BY startTime ASC";
         $stmt = $db->prepare($sql);
         $stmt->execute([
-            ':status'      => $status,
-            ':itineraryId' => $itineraryId,
+            ':status'        => $status,
+            ':itineraryId'   => $itineraryId,
+            ':removedStatus' => ActivityStatus::REMOVED->value
         ]);
         $data            = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $activityObjects = [];
@@ -357,9 +375,17 @@ class Activity
         $db                   = Database::getInstance()->getConnection();
         $sql                  = "UPDATE Activity SET status = :status WHERE id = :id";
         $stmt                 = $db->prepare($sql);
-        $this->activityStatus = $status;
+        
+        if ($status instanceof ActivityStatus) {
+            $this->activityStatus = $status;
+            $statusValue = $status->value;
+        } else {
+            $this->activityStatus = ActivityStatus::tryFrom($status);
+            $statusValue = $status;
+        }
+
         return $stmt->execute([
-            ':status' => $status,
+            ':status' => $statusValue,
             ':id'     => $this->id,
         ]);
     }

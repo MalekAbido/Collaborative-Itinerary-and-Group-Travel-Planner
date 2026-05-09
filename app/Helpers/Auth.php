@@ -4,14 +4,14 @@ namespace App\Helpers;
 use App\Helpers\Session;
 use App\Models\TripMember;
 use App\Models\User;
-
+use App\Enums\TripMemberRole;
 
 class Auth
 {
     private static $roles = [
-        'Member'    => 1,
-        'Editor'    => 2,
-        'Organizer' => 3,
+        TripMemberRole::MEMBER->value    => 1,
+        TripMemberRole::EDITOR->value    => 2,
+        TripMemberRole::ORGANIZER->value => 3,
     ];
 
     public static function check()

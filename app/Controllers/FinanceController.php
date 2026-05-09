@@ -7,6 +7,7 @@ use App\Models\GroupFund;
 use App\Models\Itinerary;
 use App\Models\SettlementPayment;
 use App\Enums\TransactionType;
+use App\Enums\TripMemberRole;
 use App\Helpers\Auth;
 use App\Helpers\HistoryLogger;
 use App\Models\TripMember;
@@ -96,7 +97,7 @@ class FinanceController extends Controller
             exit;
         }
 
-        Auth::requireRole('Editor', $member->getRole());
+        Auth::requireRole(TripMemberRole::EDITOR->value, $member->getRole());
 
         $budget = floatval($_POST['budgetLimit'] ?? 0);
 
@@ -119,7 +120,7 @@ class FinanceController extends Controller
             exit;
         }
 
-        Auth::requireRole('Editor', $member->getRole());
+        Auth::requireRole(TripMemberRole::EDITOR->value, $member->getRole());
 
         $finance = new TripFinance();
         if ($finance->readByItinerary($itineraryId)) {

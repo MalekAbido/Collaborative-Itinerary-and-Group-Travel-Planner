@@ -6,6 +6,7 @@
     use App\Helpers\Auth;
     use App\Helpers\Session;
     use App\Models\TripMember;
+    use App\Enums\TripMemberRole;
     $currentUser = Auth::user();
     $websiteName = 'NoVoyageSync';
     $pageTitle = ($activeTab . ' - ' . $websiteName) ?? $websiteName;
@@ -67,7 +68,7 @@
                                 Inventory
                             </a>
                             <?php $currentMember = TripMember::getByUserAndItinerary($currentUser->getId(), $itineraryId); ?>
-                            <?php if ($currentMember && Auth::hasRole("Editor", $currentMember->getRole())): ?>
+                            <?php if ($currentMember && Auth::hasRole(TripMemberRole::EDITOR->value, $currentMember->getRole())): ?>
                             <a href="/itinerary/<?= htmlspecialchars($itineraryId) ?>/proposals"
                                 class="flex items-center h-full px-4 text-body-sm transition-all <?= ($activeTab ?? '') === 'proposals' ? 'font-bold text-primary border-b-2 border-primary' : 'font-medium text-on-surface-variant border-b-2 border-transparent hover:text-primary' ?>">
                                 Proposals

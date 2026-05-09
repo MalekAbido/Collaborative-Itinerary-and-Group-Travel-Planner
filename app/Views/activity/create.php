@@ -1,4 +1,5 @@
 <?php
+    use App\Enums\ActivityStatus;
     require __DIR__ . '/../layouts/header.php';
     $itineraryId = $data['itineraryId'];
     $itineraryStartDate = $data['itineraryStartDate'] ?? null;
@@ -17,7 +18,7 @@
                         <h2 class="text-xl font-bold text-on-surface">Time Conflict Detected</h2>
                     </div>
                     <p class="text-on-surface-variant mb-4">
-                        This activity overlaps with the following confirmed activities:
+                        This activity overlaps with the following <?php echo strtolower(ActivityStatus::CONFIRMED->value); ?> activities:
                     </p>
                     <ul class="list-disc list-inside mb-6 pl-5 text-on-surface-variant">
                         <?php foreach ($conflictingActivities as $conflict): ?>
@@ -28,14 +29,14 @@
                         <?php endforeach; ?>
                     </ul>
                     <p class="text-on-surface-variant mb-6">
-                        Do you still want to save this activity as a draft?
+                        Do you still want to save this activity as a <?php echo strtolower(ActivityStatus::DRAFT->value); ?>?
                     </p>
                     <div class="flex justify-end gap-4">
                         <button type="button" onclick="document.getElementById('conflict-modal').style.display='none';" class="px-4 py-2 rounded-lg border border-outline-variant text-on-surface hover:bg-surface-container transition">
                             Cancel
                         </button>
                         <button type="button" onclick="const form = document.getElementById('activity-form'); const input = document.createElement('input'); input.type = 'hidden'; input.name = 'confirm_override'; input.value = '1'; form.appendChild(input); form.submit();" class="px-4 py-2 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition font-semibold">
-                            Confirm & Save Draft
+                            Confirm & Save <?php echo ActivityStatus::DRAFT->value; ?>
                         </button>
                     </div>
                 </div>
@@ -147,7 +148,7 @@
 
                 <div class="pt-4 border-t border-outline-variant flex justify-end">
                     <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-primary text-on-primary font-semibold px-6 py-3 hover:bg-primary-container transition">
-                        <span class="material-symbols-outlined text-[20px]">save</span> Create Draft Activity
+                        <span class="material-symbols-outlined text-[20px]">save</span> Create <?php echo ActivityStatus::DRAFT->value; ?> Activity
                     </button>
                 </div>
             </form>

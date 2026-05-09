@@ -3,6 +3,7 @@ require __DIR__ . '/../layouts/header.php';
 
 use App\Helpers\Auth;
 use App\Models\HistoryLogEntry;
+use App\Enums\TripMemberRole;
 ?>
 
         <!-- <main class="max-w-[1280px] mx-auto px-6 lg:px-8 py-8 w-full"> -->
@@ -158,7 +159,7 @@ use App\Models\HistoryLogEntry;
                                 <?php endif; ?>
                             </div>                            
 
-                            <?php if ($entry->isUndoable && Auth::hasRole('Editor', $memberRole)): ?>
+                            <?php if ($entry->isUndoable && Auth::hasRole(TripMemberRole::EDITOR->value, $memberRole)): ?>
                             <div class="mt-4 flex justify-end">
                                 <form action="/itinerary/<?php echo $itineraryId; ?>/history/revert/<?php echo $entry->getId(); ?>" method="POST">
                                     <input type="hidden" name="timezone" id="clientTimezoneReopen" value="">

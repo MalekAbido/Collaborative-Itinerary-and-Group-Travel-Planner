@@ -1,7 +1,7 @@
 <?php
 namespace App\Enums;
 
-enum TripRole: string
+enum TripMemberRole: string
 {
     case MEMBER = 'Member';
     case EDITOR = 'Editor';

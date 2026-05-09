@@ -1,4 +1,6 @@
-<?php require __DIR__ . '/../layouts/header.php'; ?>
+<?php 
+use App\Enums\ActivityStatus;
+require __DIR__ . '/../layouts/header.php'; ?>
         <!-- Main Scrollable Canvas -->
         <!-- <main class="flex-1 overflow-y-auto bg-surface pb-16 pt-20"> -->
             <div class="max-w-7xl mx-auto px-6 lg:px-8 py-0">
@@ -163,7 +165,7 @@
                             <div class="flex justify-between items-start">
                                 <h4 class="text-base font-semibold text-on-surface-variant"><?php echo htmlspecialchars($activity->getName() ?? ''); ?></h4>
                                 <span
-                                    class="text-[10px] font-bold uppercase text-error px-2 py-1 bg-error-container/30 rounded">Rejected</span>
+                                    class="text-[10px] font-bold uppercase text-error px-2 py-1 bg-error-container/30 rounded"><?php echo ActivityStatus::REJECTED->value; ?></span>
                             </div>
                             <div class="flex flex-col gap-1">
                                 <div class="flex items-center gap-1.5 text-on-surface-variant/80 text-xs">

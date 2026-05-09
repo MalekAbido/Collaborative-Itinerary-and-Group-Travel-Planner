@@ -8,6 +8,9 @@ use App\Models\Activity;
 use App\Models\Itinerary;
 use App\Models\Poll;
 use App\Enums\TransactionType;
+use App\Enums\ActivityStatus;
+use App\Enums\PollStatus;
+use App\Enums\TripMemberRole;
 use App\Models\TripMember;
 use App\Models\Vote;
 use Core\Controller;
@@ -51,7 +54,7 @@ class PollController extends Controller
         $poll->setActivityId($activityId);
         $poll->setDeadline($formattedDeadline);
         $poll->setIsAnonymous($isAnonymous);
-        $poll->setStatus('OPEN');
+        $poll->setStatus(PollStatus::OPEN);
         $poll->setWeightedTotal(0.0);
 
         if ($poll->create()) {
@@ -80,8 +83,8 @@ class PollController extends Controller
             die("Poll not found.");
         }
 
-        if ($poll->getStatus() === 'CLOSED' || strtotime($poll->getDeadline()) <= time()) {
-            if ($poll->getStatus() === 'OPEN') {
+        if ($poll->getStatus() === PollStatus::CLOSED || strtotime($poll->getDeadline()) <= time()) {
+            if ($poll->getStatus() === PollStatus::OPEN) {
                 $poll->closePoll();
             }
 
@@ -188,10 +191,10 @@ class PollController extends Controller
         if ($member) {
             $role = is_array($member) ? $member['role'] : $member->getRole();
         } else {
-            $role = 'Member';
+            $role = TripMemberRole::MEMBER->value;
         }
 
-        Auth::requireRole('Editor', $role);
+        Auth::requireRole(TripMemberRole::EDITOR->value, $role);
     }
 
     public function index(int $itineraryId)
@@ -208,7 +211,7 @@ class PollController extends Controller
         $member = Auth::requireMembership($itineraryId);
         $userRole = $member->getRole();
 
-        $canManagePolls = Auth::hasRole('Editor', $userRole);
+        $canManagePolls = Auth::hasRole(TripMemberRole::EDITOR->value, $userRole);
 
         $allPolls = Poll::getPollsByItinerary($itineraryId);
 
@@ -223,12 +226,12 @@ class PollController extends Controller
 
             $deadlineTime = strtotime($pollData['deadline']);
 
-            if ($pollData['status'] === 'OPEN' && $deadlineTime <= $currentTime) {
+            if ($pollData['status'] === PollStatus::OPEN->value && $deadlineTime <= $currentTime) {
                 if ($pollObj->read($pollData['id'])) {
                     $this->closePoll($itineraryId, $pollObj);
                 }
 
-                $pollData['status'] = 'CLOSED';
+                $pollData['status'] = PollStatus::CLOSED->value;
             }
 
             $pollData['stats']      = $pollObj->getVoteStats();
@@ -260,7 +263,7 @@ class PollController extends Controller
                 }
             }
 
-            if ($pollData['status'] === 'OPEN') {
+            if ($pollData['status'] === PollStatus::OPEN->value) {
                 $activePolls[] = $pollData;
             } else {
                 $closedPolls[] = $pollData;
@@ -277,8 +280,6 @@ class PollController extends Controller
             'closedPolls'    => $closedPolls,
             'ratingChoices'  => $ratingChoices,
             'userRole'       => $userRole,
-            'itineraryId'    => $itineraryId,
-            'activeTab'      => 'polls',
             'canManagePolls' => $canManagePolls,
         ]);
     }
@@ -305,12 +306,12 @@ class PollController extends Controller
 
         if ($canConfirm) {
             HistoryLogger::log($itineraryId, TransactionType::ADDED_ACTIVITY, $activity, $activity->getTripMemberId());
-            $activity->updateStatus('Confirmed');
+            $activity->updateStatus(ActivityStatus::CONFIRMED);
             foreach ($conflicts as $conflict) {
-                $conflict->updateStatus('DECLINED');
+                $conflict->updateStatus(ActivityStatus::DECLINED);
             }
         } else {
-            $activity->updateStatus('DECLINED');
+            $activity->updateStatus(ActivityStatus::DECLINED);
         }
     }
 
@@ -318,6 +319,6 @@ class PollController extends Controller
     {
         $poll->openPoll();
         $activity = Activity::getByIdAndItinerary($poll->getActivityId(), $itineraryId);
-        $activity->updateStatus('PROPOSED');
+        $activity->updateStatus(ActivityStatus::PROPOSED);
     }
 }

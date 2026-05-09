@@ -1,4 +1,8 @@
-<?php require __DIR__ . '/../layouts/header.php'; ?>
+<?php 
+use App\Enums\ActivityStatus;
+use App\Enums\PollStatus;
+use App\Enums\RatingOption;
+require __DIR__ . '/../layouts/header.php'; ?>
 
 <!-- <main class="flex-1 mt-[64px] h-[calc(100vh-64px)] overflow-y-auto bg-surface p-6 lg:p-8 scroll-thin"> -->
 <div class="max-w-[1280px] mx-auto">
@@ -45,7 +49,7 @@
                                     <?php if (!empty($poll['conflicts'])): ?>
                                         <div class="mt-2 flex items-center gap-1.5 text-error text-[12px] font-bold">
                                             <span class="material-symbols-outlined text-[16px]">warning</span>
-                                            Conflicts with confirmed activities!
+                                            Conflicts with <?php echo strtolower(ActivityStatus::CONFIRMED->value); ?> activities!
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -81,13 +85,13 @@
 
                                             <span class="material-symbols-outlined mb-2 text-outline group-hover:text-primary transition">
                                                 <?php
-                                                if ($choice['value'] === 'MUST_HAVE') echo 'star';
-                                                elseif ($choice['value'] === 'NICE_TO_HAVE') echo 'thumb_up';
+                                                if ($choice['value'] === RatingOption::MUST_HAVE->value) echo 'star';
+                                                elseif ($choice['value'] === RatingOption::NICE_TO_HAVE->value) echo 'thumb_up';
                                                 else echo 'block';
                                                 ?>
                                             </span>
                                             <span class="font-display text-[14px] font-bold text-on-surface-variant group-hover:text-primary transition text-center"><?= htmlspecialchars($choice['label']) ?></span>
-                                            <span class="text-[10px] font-bold text-outline mt-1"><?= ($choice['value'] === 'MUST_HAVE' ? '+3' : ($choice['value'] === 'NICE_TO_HAVE' ? '+1' : '-1')) ?> pts</span>
+                                            <span class="text-[10px] font-bold text-outline mt-1"><?= ($choice['value'] === RatingOption::MUST_HAVE->value ? '+3' : ($choice['value'] === RatingOption::NICE_TO_HAVE->value ? '+1' : '-1')) ?> pts</span>
                                         </label>
                                     <?php endforeach; ?>
                                 </div>
@@ -143,7 +147,7 @@
                                             <?= htmlspecialchars($closedPoll['activityName']) ?>
                                         </button>
                                     </h4>
-                                    <span class="inline-flex items-center gap-1 rounded bg-surface-container-highest px-1.5 py-0.5 text-[10px] font-bold uppercase text-outline">Closed</span>
+                                    <span class="inline-flex items-center gap-1 rounded bg-surface-container-highest px-1.5 py-0.5 text-[10px] font-bold uppercase text-outline"><?= PollStatus::CLOSED->value ?></span>
                                 </div>
                                 <div class="flex justify-between items-end mt-2">
                                     <div class="flex flex-col">
@@ -258,7 +262,7 @@
                     <span class="material-symbols-outlined">warning</span> Conflicting Activities
                 </h3>
                 <p class="text-sm text-on-surface-variant mb-4">
-                    If this activity is accepted, the following confirmed activities will be <strong>DECLINED</strong> because they overlap in time:
+                    If this activity is accepted, the following <?php echo strtolower(ActivityStatus::CONFIRMED->value); ?> activities will be <strong><?php echo strtolower(ActivityStatus::DECLINED->value); ?></strong> because they overlap in time:
                 </p>
                 <ul id="modalConflictsList" class="space-y-3">
                     <!-- Conflicts will be injected here -->
@@ -382,11 +386,11 @@
             let colorClass = 'bg-error';
             let iconColorClass = 'text-error';
 
-            if (choice.value === 'MUST_HAVE') {
+            if (choice.value === '<?= RatingOption::MUST_HAVE->value ?>') {
                 icon = 'star';
                 colorClass = 'bg-primary';
                 iconColorClass = 'text-primary';
-            } else if (choice.value === 'NICE_TO_HAVE') {
+            } else if (choice.value === '<?= RatingOption::NICE_TO_HAVE->value ?>') {
                 icon = 'thumb_up';
                 colorClass = 'bg-secondary';
                 iconColorClass = 'text-secondary';
@@ -419,10 +423,10 @@
                 if (votersForChoice.length > 0) {
                     let icon = 'block';
                     let textColorClass = 'text-error';
-                    if (choice.value === 'MUST_HAVE') {
+                    if (choice.value === '<?= RatingOption::MUST_HAVE->value ?>') {
                         icon = 'star';
                         textColorClass = 'text-primary';
-                    } else if (choice.value === 'NICE_TO_HAVE') {
+                    } else if (choice.value === '<?= RatingOption::NICE_TO_HAVE->value ?>') {
                         icon = 'thumb_up';
                         textColorClass = 'text-secondary';
                     }

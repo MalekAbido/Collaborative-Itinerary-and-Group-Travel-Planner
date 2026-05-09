@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PollStatus;
 use Core\Database;
 use PDO;
 
@@ -11,6 +12,7 @@ class Poll
     private $id;
     private $pollId;
     private $deadline;
+    /** @var PollStatus|null */
     private $status;
     private $isAnonymous;
     private $weightedTotal;
@@ -49,13 +51,22 @@ class Poll
         $this->deadline = $deadline;
     }
 
-    public function getStatus()
+    /** @return PollStatus|null */
+    public function getStatus(): ?PollStatus
     {
-        return $this->status;
+        if ($this->status instanceof PollStatus) {
+            return $this->status;
+        }
+        return PollStatus::tryFrom((string)$this->status);
     }
+
     public function setStatus($status)
     {
-        $this->status = $status;
+        if (is_string($status)) {
+            $this->status = PollStatus::tryFrom($status);
+        } else {
+            $this->status = $status;
+        }
     }
 
     public function getIsAnonymous()
@@ -95,7 +106,7 @@ class Poll
         $success = $stmt->execute([
             ':pollId' => $this->pollId,
             ':deadline' => $this->deadline,
-            ':status' => $this->status ?? 'OPEN',
+            ':status' => $this->status instanceof PollStatus ? $this->status->value : ($this->status ?? PollStatus::OPEN->value),
             ':isAnonymous' => $this->isAnonymous ? 1 : 0,
             ':weightedTotal' => $this->weightedTotal ?? 0.0,
             ':activityId' => $this->activityId
@@ -118,7 +129,7 @@ class Poll
             $this->id = $data['id'];
             $this->pollId = $data['pollId'];
             $this->deadline = $data['deadline'];
-            $this->status = $data['status'];
+            $this->status = PollStatus::tryFrom($data['status']);
             $this->isAnonymous = (bool)$data['isAnonymous'];
             $this->weightedTotal = $data['weightedTotal'];
             $this->activityId = $data['activityId'];
@@ -134,7 +145,7 @@ class Poll
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             ':deadline' => $this->deadline,
-            ':status' => $this->status,
+            ':status' => $this->status instanceof PollStatus ? $this->status->value : $this->status,
             ':isAnonymous' => $this->isAnonymous ? 1 : 0,
             ':weightedTotal' => $this->weightedTotal,
             ':activityId' => $this->activityId,
@@ -152,13 +163,13 @@ class Poll
     // Object specific methods
     public function openPoll()
     {
-        $this->status = 'OPEN';
+        $this->status = PollStatus::OPEN;
         return $this->update();
     }
 
     public function closePoll()
     {
-        $this->status = 'CLOSED';
+        $this->status = PollStatus::CLOSED;
         return $this->update();
     }
 

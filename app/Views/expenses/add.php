@@ -1,4 +1,6 @@
-<?php require __DIR__ . '/../layouts/header.php'; ?>
+<?php 
+use App\Enums\SplitMethod;
+require __DIR__ . '/../layouts/header.php'; ?>
     <!-- <main class="max-w-2xl mx-auto"> -->
         <div class="mb-6 flex items-center justify-between">
             <h1 class="font-display text-h2 text-on-surface m-0">Log a New Expense</h1>
@@ -73,8 +75,8 @@
             <div id="splitMethodSection" class="mb-6 pt-6 border-t border-outline-variant">
                 <label class="block text-label-caps uppercase text-on-surface-variant mb-2">Split Method</label>
                 <select name="splitMethod" id="splitMethod" class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-md focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition">
-                    <option value="EVEN">Even Split (Everyone pays equally)</option>
-                    <option value="UNEVEN">Uneven Split (Specify exact amounts)</option>
+                    <option value="<?= SplitMethod::EVEN->value ?>">Even Split (Everyone pays equally)</option>
+                    <option value="<?= SplitMethod::UNEVEN->value ?>">Uneven Split (Specify exact amounts)</option>
                 </select>
             </div>
 
@@ -164,7 +166,7 @@
         });
 
         function calculateEvenSplit() {
-            if (splitMethodDropdown.value === 'EVEN' && !paidByKittyCheckbox.checked) {
+            if (splitMethodDropdown.value === '<?= SplitMethod::EVEN->value ?>' && !paidByKittyCheckbox.checked) {
                 const totalAmount = parseFloat(amountInput.value) || 0;
                 const count = shareInputs.length;
                 if (count > 0) {
@@ -195,7 +197,7 @@
                 remainingAmountSpan.textContent = diff.toFixed(2);
             }
             
-            if (splitMethodDropdown.value === 'UNEVEN' && !paidByKittyCheckbox.checked) {
+            if (splitMethodDropdown.value === '<?= SplitMethod::UNEVEN->value ?>' && !paidByKittyCheckbox.checked) {
                 remainingLabel.classList.remove('hidden');
                 if (Math.abs(diff) > 0.01) {
                     remainingLabel.classList.add('bg-error-container', 'text-on-error-container');
@@ -233,7 +235,7 @@
 
             shareInputs.forEach(input => {
                 input.disabled = isKitty;
-                if (isKitty || splitMethodDropdown.value === 'EVEN') {
+                if (isKitty || splitMethodDropdown.value === '<?= SplitMethod::EVEN->value ?>') {
                     input.readOnly = true;
                     input.classList.add('opacity-50', 'bg-surface-container');
                 } else {

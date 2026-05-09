@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Enums\RatingOption;
 use Core\Database;
 use PDO;
 
@@ -12,29 +13,32 @@ class Vote
     private $timestamp;
     private $pollId;
     private $tripMemberId;
+    /** @var RatingOption|null */
     private $ratingChoice;
-
-    public const MUST_HAVE = 'MUST_HAVE';
-    public const NICE_TO_HAVE = 'NICE_TO_HAVE';
-    public const NOT_NEEDED = 'NOT_NEEDED';
 
     public static function getWeight($choice)
     {
+        $option = $choice instanceof RatingOption ? $choice : RatingOption::tryFrom($choice);
+        
         $weights = [
-            self::MUST_HAVE => 3,
-            self::NICE_TO_HAVE => 1,
-            self::NOT_NEEDED => -1
+            RatingOption::MUST_HAVE->value => 3,
+            RatingOption::NICE_TO_HAVE->value => 1,
+            RatingOption::NOT_NEEDED->value => -1
         ];
-        return $weights[$choice] ?? 0;
+        return $weights[$option->value ?? ''] ?? 0;
     }
 
     public static function getRatingOptions()
     {
-        return [
-            ['id' => self::MUST_HAVE, 'label' => 'Must Have', 'value' => 'MUST_HAVE'],
-            ['id' => self::NICE_TO_HAVE, 'label' => 'Nice to Have', 'value' => 'NICE_TO_HAVE'],
-            ['id' => self::NOT_NEEDED, 'label' => 'Not Needed', 'value' => 'NOT_NEEDED'],
-        ];
+        $options = [];
+        foreach (RatingOption::cases() as $option) {
+            $options[] = [
+                'id' => $option->value,
+                'label' => $option->label(),
+                'value' => $option->value
+            ];
+        }
+        return $options;
     }
 
     public function __construct()
@@ -58,8 +62,15 @@ class Vote
     public function getTripMemberId() { return $this->tripMemberId; }
     public function setTripMemberId($tripMemberId) { $this->tripMemberId = $tripMemberId; }
 
-    public function getRatingChoice() { return $this->ratingChoice; }
-    public function setRatingChoice($ratingChoice) { $this->ratingChoice = $ratingChoice; }
+    public function getRatingChoice() { return $this->ratingChoice instanceof RatingOption ? $this->ratingChoice->value : $this->ratingChoice; }
+    public function setRatingChoice($ratingChoice) 
+    { 
+        if (is_string($ratingChoice)) {
+            $this->ratingChoice = RatingOption::tryFrom($ratingChoice);
+        } else {
+            $this->ratingChoice = $ratingChoice;
+        }
+    }
 
     // CRUD Operations
     public function create()
@@ -74,7 +85,7 @@ class Vote
             ':timestamp' => $this->timestamp,
             ':pollId' => $this->pollId,
             ':tripMemberId' => $this->tripMemberId,
-            ':ratingChoice' => $this->ratingChoice
+            ':ratingChoice' => $this->ratingChoice instanceof RatingOption ? $this->ratingChoice->value : $this->ratingChoice
         ]);
 
         if ($success) {
@@ -96,7 +107,7 @@ class Vote
             $this->timestamp = $data['timestamp'];
             $this->pollId = $data['pollId'];
             $this->tripMemberId = $data['tripMemberId'];
-            $this->ratingChoice = $data['ratingChoice'];
+            $this->ratingChoice = RatingOption::tryFrom($data['ratingChoice']);
             return true;
         }
         return false;
@@ -110,7 +121,7 @@ class Vote
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             ':timestamp' => $this->timestamp,
-            ':ratingChoice' => $this->ratingChoice,
+            ':ratingChoice' => $this->ratingChoice instanceof RatingOption ? $this->ratingChoice->value : $this->ratingChoice,
             ':id' => $this->id
         ]);
     }
@@ -138,7 +149,7 @@ class Vote
             $vote->timestamp = $data['timestamp'];
             $vote->pollId = $data['pollId'];
             $vote->tripMemberId = $data['tripMemberId'];
-            $vote->ratingChoice = $data['ratingChoice'];
+            $vote->ratingChoice = RatingOption::tryFrom($data['ratingChoice']);
             return $vote;
         }
         return null;

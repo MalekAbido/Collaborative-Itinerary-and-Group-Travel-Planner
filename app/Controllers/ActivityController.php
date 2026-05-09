@@ -10,6 +10,9 @@ use App\Models\AttendanceList;
 use App\Models\AttendanceMember;
 use App\Models\Location;
 use App\Enums\TransactionType;
+use App\Enums\ActivityStatus;
+use App\Enums\AttendanceStatus;
+use App\Enums\TripMemberRole;
 use App\Models\TripMember;
 use Core\Controller;
 
@@ -199,7 +202,7 @@ class ActivityController extends Controller
         $activity->setCategory($category);
         $activity->setIsAnonymous($isAnonymous);
         $activity->setLocationId($locationId);
-        $activity->setActivityStatus('Draft');
+        $activity->setActivityStatus(ActivityStatus::DRAFT);
         $activity->setItineraryId($itineraryId);
         $activity->setTripMemberId($tripMember->getId());
         $activity->setBannerImage($bannerImage);
@@ -211,7 +214,7 @@ class ActivityController extends Controller
                 $allMembers = $tripMember->getAllByItineraryId($itineraryId);
 
                 foreach ($allMembers as $memberData) {
-                    $attendanceList->updateStatus($memberData['memberId'], 'PENDING');
+                    $attendanceList->updateStatus($memberData['memberId'], AttendanceStatus::PENDING);
                 }
             }
 
@@ -238,7 +241,7 @@ class ActivityController extends Controller
 
         $activity = Activity::getByIdAndItinerary($activityId, $itineraryId);
 
-        if ($activity === null || $activity->getActivityStatus() === "REMOVED") {
+        if ($activity === null || $activity->getActivityStatus() === ActivityStatus::REMOVED->value) {
             Session::setFlash(Session::FLASH_ERROR, 'Activity not found or does not belong to this trip.');
             header("Location: /itinerary/dashboard/{$itineraryId}");
             exit;
@@ -252,9 +255,9 @@ class ActivityController extends Controller
         $totalGoing      = 0;
 
         if ($attendanceList) {
-            $goingMembers    = $attendanceList->getMembersByStatus('GOING');
-            $pendingMembers  = $attendanceList->getMembersByStatus('PENDING');
-            $notGoingMembers = $attendanceList->getMembersByStatus('NOT_GOING');
+            $goingMembers    = $attendanceList->getMembersByStatus(AttendanceStatus::GOING);
+            $pendingMembers  = $attendanceList->getMembersByStatus(AttendanceStatus::PENDING);
+            $notGoingMembers = $attendanceList->getMembersByStatus(AttendanceStatus::NOT_GOING);
             $totalGoing      = $attendanceList->getTotalAttendeeCount();
         }
 
@@ -294,7 +297,7 @@ class ActivityController extends Controller
             exit;
         }
 
-        $newStatus      = $_POST['status'] ?? 'PENDING';
+        $newStatus      = $_POST['status'] ?? AttendanceStatus::PENDING->value;
         $attendanceList = $activity->getAttendanceList();
 
         if ($attendanceList) {
@@ -320,7 +323,7 @@ class ActivityController extends Controller
             exit;
         }
 
-        Auth::requireRole('Editor', $tripMember->getRole());
+        Auth::requireRole(TripMemberRole::EDITOR->value, $tripMember->getRole());
 
         $activity = Activity::getByIdAndItinerary($activityId, $itineraryId);
 

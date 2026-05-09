@@ -1,4 +1,5 @@
 <?php
+use App\Enums\TripMemberRole;
 require __DIR__ . '/../layouts/header.php';
 // Calculate the percentage for the progress bar
 $percentage = 0;
@@ -23,7 +24,7 @@ if ($percentage >= 100) {
                         <h1 class="font-display text-display text-on-surface mb-2">Finance Dashboard</h1>
                         <p class="text-body-lg text-on-surface-variant">Track group expenses and monitor budget limits.</p>
                     </div>
-                    <?php if ($userRole !== 'Member'): ?>
+                    <?php if ($userRole !== TripMemberRole::MEMBER->value): ?>
                     <button type="button" onclick="document.getElementById('financeSettingsModal').classList.remove('hidden')" class="inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-body-sm px-6 py-2.5 hover:bg-surface-container transition">
                         <span class="material-symbols-outlined text-[18px]">settings</span> Settings
                     </button>
@@ -176,7 +177,7 @@ if ($percentage >= 100) {
                                                         <div class="text-body-md font-bold text-on-surface">
                                                             +<?= number_format($contribution['amount']) ?> <span class="text-body-xs font-normal text-outline"><?= htmlspecialchars($baseCurrency) ?></span>
                                                         </div>
-                                                        <?php if ($contribution['tripMemberId'] == $currentMemberId || \App\Helpers\Auth::hasRole('Editor', $userRole)): ?>
+                                                        <?php if ($contribution['tripMemberId'] == $currentMemberId || \App\Helpers\Auth::hasRole(TripMemberRole::EDITOR->value, $userRole)): ?>
                                                             <form action="/fund/contribution/delete/<?= htmlspecialchars($contribution['id']) ?>" method="POST" onsubmit="return confirm('Are you sure you want to delete this contribution? This will also deduct the amount from the kitty balance.')">
                                                                 <button type="submit" class="text-outline hover:text-error transition flex items-center">
                                                                     <span class="material-symbols-outlined text-[18px]">delete</span>
@@ -193,7 +194,7 @@ if ($percentage >= 100) {
                                 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5 flex flex-col justify-center items-center text-center text-on-surface-variant min-h-[160px]">
                                     <span class="material-symbols-outlined text-[40px] mb-3 text-outline">account_balance_wallet</span>
                                     <p class="text-body-md mb-4">No Group Fund exists for this trip yet.</p>
-                                    <?php if (\App\Helpers\Auth::hasRole('Editor', $userRole)): ?>
+                                    <?php if (\App\Helpers\Auth::hasRole(TripMemberRole::EDITOR->value, $userRole)): ?>
                                         <form action="/finance/create-fund/<?= htmlspecialchars($itineraryId) ?>" method="POST">
                                             <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-tertiary text-on-tertiary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-tertiary/90 transition">
                                                 <span class="material-symbols-outlined text-base">add</span> Set up Group Fund

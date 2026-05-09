@@ -9,6 +9,7 @@ use App\Models\Activity;
 use App\Models\InventoryItem;
 use App\Models\Itinerary;
 use App\Models\TripMember;
+use App\Enums\TripMemberRole;
 
 class InventoryController extends Controller
 {
@@ -115,7 +116,7 @@ class InventoryController extends Controller
         if ($item->read($itemId)) {
             // Check authorization: creator OR organizer/editor
             $isCreator = ($item->getCreatorMemberId() == $member->getId());
-            $isManager = Auth::hasRole('Editor', $member->getRole());
+            $isManager = Auth::hasRole(TripMemberRole::EDITOR->value, $member->getRole());
 
             if ($isCreator || $isManager) {
                 if ($item->delete()) {

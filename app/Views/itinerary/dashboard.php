@@ -1,4 +1,6 @@
-<?php require __DIR__ . '/../layouts/header.php'; ?>
+<?php 
+use App\Enums\TripMemberRole;
+require __DIR__ . '/../layouts/header.php'; ?>
 <?php 
     $trip      = $data['trip'] ?? null;
     $tripId    = $trip['id'] ?? null;
@@ -18,7 +20,7 @@
                         </p>
                     </div>
                     <div class="flex gap-3">
-                        <?php if(App\Helpers\Auth::hasRole('Organizer', $userRole)):?>
+                        <?php if(App\Helpers\Auth::hasRole(TripMemberRole::ORGANIZER->value, $userRole)):?>
                         <a href="/itinerary/settings/<?= htmlspecialchars($data['trip']['id']) ?>" class="inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-body-sm px-6 py-2.5 hover:bg-surface-container transition">
                             <span class="material-symbols-outlined text-[18px]">settings</span> Settings
                         </a>
@@ -107,7 +109,7 @@
                                                         <?= htmlspecialchars($activity->getCategory()) ?>
                                                     </span>
                                                     
-                                                    <?php if($userRole !== 'Member'): ?>
+                                                    <?php if($userRole !== TripMemberRole::MEMBER->value): ?>
                                                         <form action="/itinerary/<?= htmlspecialchars($data['trip']['id']) ?>/activity/<?= $activity->getId() ?>/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this activity?');" class="m-0">
                                                             <button type="submit" class="text-error hover:bg-error-container/50 p-1.5 rounded-md transition-colors flex items-center justify-center" title="Delete Activity">
                                                                 <span class="material-symbols-outlined text-[20px]">delete</span>
@@ -167,9 +169,9 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <?php if ($member['role'] === 'Organizer'): ?>
+                                                <?php if ($member['role'] === TripMemberRole::ORGANIZER->value): ?>
                                                     <span class="inline-flex items-center rounded-full bg-primary-fixed px-2 py-0.5 text-[10px] font-bold uppercase text-primary">👑 Organizer</span>
-                                                <?php elseif ($member['role'] === 'Editor'): ?>
+                                                <?php elseif ($member['role'] === TripMemberRole::EDITOR->value): ?>
                                                     <span class="inline-flex items-center rounded-full bg-secondary-fixed px-2 py-0.5 text-[10px] font-bold uppercase text-secondary">✏️ Editor</span>
                                                 <?php else: ?>
                                                     <span class="inline-flex items-center rounded-full bg-surface-container-highest px-2 py-0.5 text-[10px] font-bold uppercase text-outline">👤 Member</span>

@@ -5,6 +5,7 @@ use App\Helpers\Auth;
 use App\Models\GroupFund;
 use App\Models\FundContribution;
 use App\Models\TripMember;
+use App\Enums\TripMemberRole;
 use App\Helpers\Session;
 use Core\Controller;
 
@@ -51,7 +52,7 @@ class CommonPoolController extends Controller
 
         // Authorization: Creator OR Editor/Organizer
         $isCreator = ($contribution->getTripMemberId() == $member->getId());
-        $isEditor  = Auth::hasRole('Editor', $member->getRole());
+        $isEditor  = Auth::hasRole(TripMemberRole::EDITOR->value, $member->getRole());
 
         if (!$isCreator && !$isEditor) {
             Session::setFlash(Session::FLASH_ERROR, 'You do not have permission to delete this contribution.');

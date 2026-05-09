@@ -2,6 +2,7 @@
 <html lang="en" class="scroll-smooth">
 
 <head>
+    <?php use App\Enums\TripMemberRole; ?>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Itinerary | Login</title>
@@ -93,17 +94,17 @@
                     <div class="h-px flex-1 bg-outline-variant"></div>
                 </div>
                 <div class="grid grid-cols-3 gap-3">
-                    <button type="button" onclick="testLogin('Organizer')"
+                    <button type="button" onclick="testLogin('<?= TripMemberRole::ORGANIZER->value ?>')"
                         class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-primary/5 hover:bg-primary/10 border border-primary/10 transition-colors group cursor-pointer">
                         <span class="material-symbols-outlined text-primary text-xl group-hover:scale-110 transition-transform">shield_person</span>
                         <span class="text-[11px] font-bold text-primary">Organizer</span>
                     </button>
-                    <button type="button" onclick="testLogin('Editor')"
+                    <button type="button" onclick="testLogin('<?= TripMemberRole::EDITOR->value ?>')"
                         class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-tertiary/5 hover:bg-tertiary/10 border border-tertiary/10 transition-colors group cursor-pointer">
                         <span class="material-symbols-outlined text-tertiary text-xl group-hover:scale-110 transition-transform">edit_square</span>
                         <span class="text-[11px] font-bold text-tertiary">Editor</span>
                     </button>
-                    <button type="button" onclick="testLogin('Member')"
+                    <button type="button" onclick="testLogin('<?= TripMemberRole::MEMBER->value ?>')"
                         class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-on-surface-variant/5 hover:bg-on-surface-variant/10 border border-on-surface-variant/10 transition-colors group cursor-pointer">
                         <span class="material-symbols-outlined text-on-surface-variant text-xl group-hover:scale-110 transition-transform">person</span>
                         <span class="text-[11px] font-bold text-on-surface-variant">Member</span>

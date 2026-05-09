@@ -1,6 +1,7 @@
 <?php 
+use App\Enums\TripMemberRole;
 require __DIR__ . '/../layouts/header.php';
-$canManageMembers = App\Helpers\Auth::hasRole('Organizer', $currentUserRole);
+$canManageMembers = App\Helpers\Auth::hasRole(TripMemberRole::ORGANIZER->value, $currentUserRole);
 ?>
 
 <!-- <main class="max-w-[900px] mx-auto mt-[100px] px-6 pb-12"> -->
@@ -41,8 +42,8 @@ $canManageMembers = App\Helpers\Auth::hasRole('Organizer', $currentUserRole);
                 Role</label>
             <select id="role" name="role"
                 class="w-full sm:w-48 rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-body-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/30 focus:outline-none transition">
-                <option value="Member">👤 Member</option>
-                <option value="Editor">✏️ Editor</option>
+                <option value="<?= TripMemberRole::MEMBER->value ?>">👤 Member</option>
+                <option value="<?= TripMemberRole::EDITOR->value ?>">✏️ Editor</option>
             </select>
         </div>
         <button type="submit"
@@ -86,11 +87,11 @@ $canManageMembers = App\Helpers\Auth::hasRole('Organizer', $currentUserRole);
             <!-- 2. Role Badge -->
             <div class="text-left sm:text-center">
                 <?php
-                if ($member['role'] === 'Organizer'): ?>
+                if ($member['role'] === TripMemberRole::ORGANIZER->value): ?>
                 <span
                     class="inline-flex items-center rounded-full bg-primary-fixed px-3 py-1 text-label-xs font-bold uppercase text-primary">👑
                     <?php echo htmlspecialchars($member['role']) ?></span>
-                <?php elseif ($member['role'] === 'Editor'): ?>
+                <?php elseif ($member['role'] === TripMemberRole::EDITOR->value): ?>
                 <span
                     class="inline-flex items-center rounded-full bg-secondary-fixed px-3 py-1 text-label-xs font-bold uppercase text-secondary">✏️
                     Editor</span>
@@ -110,12 +111,12 @@ $canManageMembers = App\Helpers\Auth::hasRole('Organizer', $currentUserRole);
             <?php if ($canManageMembers): ?>
             <div class="flex justify-start sm:justify-end gap-2">
                 <?php
-                if ($member['role'] !== 'Organizer'): ?>
+                if ($member['role'] !== TripMemberRole::ORGANIZER->value): ?>
                 <form action="/itinerary/members/updateRole/<?php echo htmlspecialchars($data['trip']['id']) ?>" method="POST"
                     class="inline">
                     <input type="hidden" name="memberId" value="<?php echo htmlspecialchars($member['memberId'] ?? '') ?>">
                     <input type="hidden" name="newRole"
-                        value="<?php echo $member['role'] === 'Member' ? 'Editor' : 'Member' ?>">
+                        value="<?php echo $member['role'] === TripMemberRole::MEMBER->value ? TripMemberRole::EDITOR->value : TripMemberRole::MEMBER->value ?>">
                     <button type="submit" title="Toggle Role"
                         class="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary text-primary hover:bg-primary-fixed transition">
                         <span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>
@@ -175,7 +176,7 @@ if (! empty($pendingInvites)): ?>
 
             <div class="text-left sm:text-center">
                 <?php
-                if ($invite['role'] === 'Editor'): ?>
+                if ($invite['role'] === TripMemberRole::EDITOR->value): ?>
                 <span
                     class="inline-flex items-center rounded-full bg-secondary-fixed px-3 py-1 text-label-xs font-bold uppercase text-secondary">
                     Editor</span>

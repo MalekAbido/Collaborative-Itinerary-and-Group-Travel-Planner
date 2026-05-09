@@ -1,4 +1,6 @@
-<?php require __DIR__ . '/../layouts/header.php'; ?>
+<?php 
+use App\Enums\TripMemberRole;
+require __DIR__ . '/../layouts/header.php'; ?>
 
 <div class="max-w-[1280px] mx-auto">
     <header class="mb-10 flex justify-between items-end">
@@ -37,7 +39,7 @@
                                     <h3 class="font-display text-[18px] font-bold text-on-surface"><?= htmlspecialchars($item['name']) ?></h3>
                                     <div class="flex items-center gap-2">
                                         <span class="bg-primary-fixed text-primary px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide">Qty: <?= htmlspecialchars($item['quantity']) ?></span>
-                                        <?php if ($item['creatorMemberId'] == $currentMemberId || App\Helpers\Auth::hasRole('Editor', $currentMemberRole)): ?>
+                                        <?php if ($item['creatorMemberId'] == $currentMemberId || App\Helpers\Auth::hasRole(TripMemberRole::EDITOR->value, $currentMemberRole)): ?>
                                             <form action="/inventory/delete" method="POST" onsubmit="return confirm('Are you sure you want to remove this item from the inventory?');">
                                                 <input type="hidden" name="itemId" value="<?= $item['id'] ?>">
                                                 <input type="hidden" name="itineraryId" value="<?= $itineraryId ?>">
@@ -85,7 +87,7 @@
                                     <h3 class="font-display text-[18px] font-bold text-on-surface"><?= htmlspecialchars($item['name']) ?></h3>
                                     <div class="flex items-center gap-2">
                                         <span class="bg-surface-container-highest text-on-surface-variant px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide">Qty: <?= htmlspecialchars($item['quantity']) ?></span>
-                                        <?php if ($item['creatorMemberId'] == $currentMemberId || App\Helpers\Auth::hasRole('Editor', $currentMemberRole)): ?>
+                                        <?php if ($item['creatorMemberId'] == $currentMemberId || App\Helpers\Auth::hasRole(TripMemberRole::EDITOR->value, $currentMemberRole)): ?>
                                             <form action="/inventory/delete" method="POST" onsubmit="return confirm('Are you sure you want to remove this item from the inventory?');">
                                                 <input type="hidden" name="itemId" value="<?= $item['id'] ?>">
                                                 <input type="hidden" name="itineraryId" value="<?= $itineraryId ?>">

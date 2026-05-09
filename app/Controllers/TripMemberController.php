@@ -7,7 +7,7 @@ use App\Models\Itinerary;
 use App\Models\Invitation;
 use App\Helpers\Auth;
 use App\Helpers\Mailer;
-// use App\Models\User; // You will likely need this to look up users by email!
+use App\Enums\TripMemberRole;
 
 class TripMemberController extends Controller
 {
@@ -39,7 +39,7 @@ class TripMemberController extends Controller
         $currentUserId = Auth::id();
         $currentMember = TripMember::getByUserAndItinerary($currentUserId, $id);
         
-        $currentUserRole = 'Member'; // Default
+        $currentUserRole = TripMemberRole::MEMBER->value; // Default
         if ($currentMember) {
             $currentUserRole = is_array($currentMember) ? $currentMember['role'] : $currentMember->getRole();
         }
@@ -60,7 +60,7 @@ class TripMemberController extends Controller
     {
         $member = Auth::requireMembership($id);
         $memberRole = $member->getRole();
-        Auth::requireRole('Organizer', $memberRole);
+        Auth::requireRole(TripMemberRole::ORGANIZER->value, $memberRole);
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = trim($_POST['email']);
             $role = $_POST['role'];
@@ -93,7 +93,7 @@ class TripMemberController extends Controller
     {
         $member = Auth::requireMembership($id);
         $memberRole = $member->getRole();
-        Auth::requireRole('Organizer', $memberRole);
+        Auth::requireRole(TripMemberRole::ORGANIZER->value, $memberRole);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $memberId = $_POST['memberId'];
@@ -115,7 +115,7 @@ class TripMemberController extends Controller
     {
         $currentMember = Auth::requireMembership($id);
         $currentMemberRole = $currentMember->getRole();
-        Auth::requireRole('Organizer', $currentMemberRole);
+        Auth::requireRole(TripMemberRole::ORGANIZER->value, $currentMemberRole);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $memberId = $_POST['memberId'];
@@ -131,10 +131,10 @@ class TripMemberController extends Controller
                 // Check if this is the last organizer
                 $allMembers = $memberModel->getAllByItineraryId($id);
                 $organizers = array_filter($allMembers, function($m) {
-                    return $m['role'] === 'Organizer';
+                    return $m['role'] === TripMemberRole::ORGANIZER->value;
                 });
 
-                if ($memberModel->getRole() === 'Organizer' && count($organizers) <= 1) {
+                if ($memberModel->getRole() === TripMemberRole::ORGANIZER->value && count($organizers) <= 1) {
                     header("Location: /itinerary/members/" . $id . "?status=error_last_organizer");
                     exit;
                 }
@@ -159,7 +159,7 @@ class TripMemberController extends Controller
         $currentMember = Auth::requireMembership($id);
         $currentMemberRole = $currentMember->getRole();
 
-        if (Auth::hasRole('Organizer', $currentMemberRole)) {
+        if (Auth::hasRole(TripMemberRole::ORGANIZER->value, $currentMemberRole)) {
             header("Location: /itinerary/members/" . $id . "?status=error_organizer_cannot_leave");
             exit;
         }

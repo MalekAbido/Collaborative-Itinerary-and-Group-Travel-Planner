@@ -8,6 +8,9 @@ use App\Helpers\TimeHelper;
 use App\Models\Activity;
 use App\Models\Poll;
 use App\Models\TripMember;
+use App\Enums\ActivityStatus;
+use App\Enums\PollStatus;
+use App\Enums\TripMemberRole;
 use Core\Controller;
 
 class ProposalController extends Controller
@@ -28,16 +31,16 @@ class ProposalController extends Controller
             exit;
         }
 
-        Auth::requireRole('Editor', $tripMember->getRole());
+        Auth::requireRole(TripMemberRole::EDITOR->value, $tripMember->getRole());
 
-        $allDrafts = Activity::getAllByStatusAndItinerary('Draft', $itineraryId);
+        $allDrafts = Activity::getAllByStatusAndItinerary(ActivityStatus::DRAFT, $itineraryId);
         $draftActivities = [];
         $currentTime = time();
 
         foreach ($allDrafts as $activity) {
             $startTime = strtotime($activity->getStartTime());
             if ($startTime <= $currentTime) {
-                $activity->updateStatus('Rejected');
+                $activity->updateStatus(ActivityStatus::REJECTED);
                 continue;
             }
 
@@ -47,7 +50,7 @@ class ProposalController extends Controller
             $draftActivities[] = $activity;
         }
 
-        $rejectedActivities = Activity::getAllByStatusAndItinerary('Rejected', $itineraryId);
+        $rejectedActivities = Activity::getAllByStatusAndItinerary(ActivityStatus::REJECTED, $itineraryId);
 
         $this->view('proposal/dashboard', [
             'itineraryId' => $itineraryId,
@@ -69,11 +72,11 @@ class ProposalController extends Controller
             exit;
         }
 
-        Auth::requireRole('Editor', $tripMember->getRole());
+        Auth::requireRole(TripMemberRole::EDITOR->value, $tripMember->getRole());
 
         $activity = Activity::getByIdAndItinerary($activityId, $itineraryId);
 
-        if ($activity === null || $activity->getActivityStatus() !== 'Draft') {
+        if ($activity === null || $activity->getActivityStatus() !== ActivityStatus::DRAFT->value) {
             Session::setFlash(Session::FLASH_ERROR, 'Invalid activity or activity is not a draft.');
             header("Location: /itinerary/{$itineraryId}/proposals");
             exit;
@@ -83,7 +86,7 @@ class ProposalController extends Controller
         $startTime = strtotime($activity->getStartTime());
 
         if ($startTime <= $currentTime) {
-            $activity->updateStatus('Rejected');
+            $activity->updateStatus(ActivityStatus::REJECTED);
             Session::setFlash(Session::FLASH_ERROR, 'Activity start time has already passed. Proposal rejected.');
             header("Location: /itinerary/{$itineraryId}/proposals");
             exit;
@@ -113,11 +116,11 @@ class ProposalController extends Controller
             exit;
         }
 
-        if ($activity->updateStatus('Proposed')) {
+        if ($activity->updateStatus(ActivityStatus::PROPOSED)) {
             $poll = new Poll();
             $poll->setActivityId($activityId);
             $poll->setDeadline($pollDeadline);
-            $poll->setStatus('OPEN');
+            $poll->setStatus(PollStatus::OPEN);
             $poll->setIsAnonymous($activity->getIsAnonymous());
             
             if ($poll->create()) {
@@ -144,17 +147,17 @@ class ProposalController extends Controller
             exit;
         }
 
-        Auth::requireRole('Editor', $tripMember->getRole());
+        Auth::requireRole(TripMemberRole::EDITOR->value, $tripMember->getRole());
 
         $activity = Activity::getByIdAndItinerary($activityId, $itineraryId);
 
-        if ($activity === null || $activity->getActivityStatus() !== 'Draft') {
+        if ($activity === null || $activity->getActivityStatus() !== ActivityStatus::DRAFT->value) {
             Session::setFlash(Session::FLASH_ERROR, 'Invalid activity or activity is not a draft.');
             header("Location: /itinerary/{$itineraryId}/proposals");
             exit;
         }
 
-        if ($activity->updateStatus('Rejected')) {
+        if ($activity->updateStatus(ActivityStatus::REJECTED)) {
             Session::setFlash(Session::FLASH_SUCCESS, 'Proposal has been rejected.');
         } else {
             Session::setFlash(Session::FLASH_ERROR, 'Failed to reject the proposal.');

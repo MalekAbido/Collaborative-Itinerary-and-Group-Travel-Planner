@@ -7,6 +7,8 @@ use App\Models\Expense;
 use App\Models\ExpenseShare;
 use App\Enums\TransactionType;
 use App\Models\TripFinance;
+use App\Enums\SplitMethod;
+use App\Enums\TripMemberRole;
 use Core\Controller;
 
 class ExpenseController extends Controller
@@ -45,7 +47,7 @@ class ExpenseController extends Controller
 
         $financeId    = $_POST['financeId'] ?? '';
         $payerId      = (int) ($_POST['payerId'] ?? 0);
-        $splitMethod  = $_POST['splitMethod'] ?? 'EVEN';
+        $splitMethod  = $_POST['splitMethod'] ?? SplitMethod::EVEN->value;
         $totalAmount  = (float) ($_POST['amount'] ?? 0);
         $currencyType = trim($_POST['currencyType'] ?? 'EGP');
         $isNonCash    = isset($_POST['isNonCash']) ? 1 : 0;
@@ -123,7 +125,7 @@ class ExpenseController extends Controller
         if ($paidByKitty !== 1) {
             $shareModel = new ExpenseShare();
 
-            if ($splitMethod === 'EVEN') {
+            if ($splitMethod === SplitMethod::EVEN->value) {
                 $memberIds = array_keys($details['shares']);
                 $memberCount = count($memberIds);
                 $totalCents = (int) round($totalAmount * 100);
@@ -136,7 +138,7 @@ class ExpenseController extends Controller
                     $isPayer = ((int) $memberId === $payerId) ? 1 : 0;
                     $shareModel->create($expenseId, $memberId, $shareAmount, $isPayer);
                 }
-            } elseif ($splitMethod === 'UNEVEN') {
+            } elseif ($splitMethod === SplitMethod::UNEVEN->value) {
                 foreach ($details['shares'] as $memberId => $amountOwed) {
                     $isPayer = ((int) $memberId === $payerId) ? 1 : 0;
                     $shareModel->create($expenseId, $memberId, round((float) $amountOwed, 2), $isPayer);
@@ -171,7 +173,7 @@ class ExpenseController extends Controller
         $itineraryId   = $itineraryData['itineraryId'] ?? null;
 
         $tripMember = Auth::requireMembership($itineraryId);
-        Auth::requireRole('Editor', $tripMember->getRole());
+        Auth::requireRole(TripMemberRole::EDITOR->value, $tripMember->getRole());
 
         if ($expense->delete($tripMember->getId())) {
             // I corrected a mistake, id should be numeric not string
@@ -253,7 +255,7 @@ class ExpenseController extends Controller
     }
 
     /**
-     * @param string $splitMethod (EVEN or UNEVEN)
+     * @param string $splitMethod (Even or Uneven)
      * @param float $totalAmount The total bill amount
      * @param array $shares The array of member debts
      * @return bool Returns true if valid, false if invalid
@@ -270,7 +272,7 @@ class ExpenseController extends Controller
             return false;
         }
 
-        if ($splitMethod === 'UNEVEN') {
+        if ($splitMethod === SplitMethod::UNEVEN->value) {
             $sumOfShares = array_sum($shares);
 
 // the epsilon method to handle decimal inaccuracy

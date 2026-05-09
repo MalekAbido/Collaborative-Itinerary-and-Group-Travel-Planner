@@ -4,6 +4,7 @@ namespace App\Controllers;
 use App\Helpers\Auth;
 use App\Helpers\Session;
 use App\Models\User;
+use App\Enums\TripMemberRole;
 use Core\Controller;
 
 class AuthController extends Controller
@@ -61,7 +62,7 @@ class AuthController extends Controller
         header('Content-Type: application/json');
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $role = $_POST['role'] ?? 'Member';
+            $role = $_POST['role'] ?? TripMemberRole::MEMBER->value;
             $db   = \Core\Database::getInstance()->getConnection();
             $sql  = "SELECT u.id, u.email
                     FROM User u

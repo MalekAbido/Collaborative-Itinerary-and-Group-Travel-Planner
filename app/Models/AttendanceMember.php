@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Enums\AttendanceStatus;
 use Core\Database;
 use PDO;
 
@@ -8,6 +9,7 @@ class AttendanceMember
 {
     private $db;
     private $id;
+    /** @var AttendanceStatus|null */
     private $status;
     private $note;
     private $attendanceListId;
@@ -25,14 +27,19 @@ class AttendanceMember
         return $this->id;
     }
 
+    /** @return string|null */
     public function getStatus()
     {
-        return $this->status;
+        return $this->status instanceof AttendanceStatus ? $this->status->value : $this->status;
     }
 
     public function setStatus($status)
     {
-        $this->status = $status;
+        if (is_string($status)) {
+            $this->status = AttendanceStatus::tryFrom($status);
+        } else {
+            $this->status = $status;
+        }
     }
 
     public function getNote()
@@ -58,7 +65,7 @@ class AttendanceMember
     public function fill($row)
     {
         $this->id               = $row['id'];
-        $this->status           = $row['status'];
+        $this->status           = AttendanceStatus::tryFrom($row['status']);
         $this->note             = $row['note'];
         $this->attendanceListId = $row['attendanceListId'];
         $this->tripMemberId     = $row['tripMemberId'];
@@ -87,19 +94,28 @@ class AttendanceMember
 
         if ($itineraryId) {
             $syncSql = "INSERT INTO AttendanceMember (status, attendanceListId, tripMemberId)
-                        SELECT 'Pending', :listId, tm.id
+                        SELECT :status, :listId, tm.id
                         FROM TripMember tm
                         WHERE tm.itineraryId = :itineraryId AND tm.deletedAt IS NULL
                         AND tm.id NOT IN (
                             SELECT tripMemberId FROM AttendanceMember WHERE attendanceListId = :listId
                         )";
             $syncStmt = $db->prepare($syncSql);
-            $syncStmt->execute([':listId' => $listId, ':itineraryId' => $itineraryId]);
+            $syncStmt->execute([
+                ':status'      => AttendanceStatus::PENDING->value,
+                ':listId'      => $listId, 
+                ':itineraryId' => $itineraryId
+            ]);
         }
 
-        $sql = "SELECT * FROM AttendanceMember WHERE attendanceListId = :listId ORDER BY FIELD(status, 'Going', 'Not Going', 'Pending')";
+        $sql = "SELECT * FROM AttendanceMember WHERE attendanceListId = :listId ORDER BY FIELD(status, :going, :notGoing, :pending)";
         $stmt = $db->prepare($sql);
-        $stmt->execute([':listId' => $listId]);
+        $stmt->execute([
+            ':listId'   => $listId,
+            ':going'    => AttendanceStatus::GOING->value,
+            ':notGoing' => AttendanceStatus::NOT_GOING->value,
+            ':pending'  => AttendanceStatus::PENDING->value
+        ]);
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         $members = [];
@@ -139,7 +155,7 @@ class AttendanceMember
         $sql    = "UPDATE AttendanceMember SET status = :status, note = :note WHERE id = :id";
         $stmt   = $db->prepare($sql);
         $result = $stmt->execute([
-            ':status' => $this->status,
+            ':status' => $this->status instanceof AttendanceStatus ? $this->status->value : $this->status,
             ':note'   => $this->note,
             ':id'     => $this->id,
         ]);
