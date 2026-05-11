@@ -1,10 +1,10 @@
 <?php
 namespace App\Controllers;
 
-use App\Helpers\Auth;
-use App\Helpers\Session;
+use App\Services\Auth;
+use App\Services\Session;
 use App\Constants\Messages;
-use App\Helpers\HistoryLogger;
+use App\Services\HistoryLogger;
 use App\Models\Expense;
 use App\Models\ExpenseShare;
 use App\Enums\TransactionType;

@@ -79,7 +79,7 @@ namespace Core {
     }
 }
 
-namespace App\Helpers {
+namespace App\Services {
     class Session
     {
         public static $store = [];

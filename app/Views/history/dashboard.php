@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . '/../layouts/header.php';
 
-use App\Helpers\Auth;
+use App\Services\Auth;
 use App\Models\HistoryLogEntry;
 use App\Enums\TripMemberRole;
 use App\Enums\EntityType;

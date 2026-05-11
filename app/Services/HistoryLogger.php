@@ -1,5 +1,5 @@
 <?php
-namespace App\Helpers;
+namespace App\Services;
 
 use App\Models\HistoryLog;
 use App\Models\HistoryLogEntry;

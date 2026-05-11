@@ -132,7 +132,7 @@
                 dismissible: true
             });
 
-            <?php use App\Helpers\Session; ?>
+            <?php use App\Services\Session; ?>
 
             <?php if (Session::hasFlash('success')): ?>
                 notyf.success("<?= addslashes(Session::getFlash('success')) ?>");

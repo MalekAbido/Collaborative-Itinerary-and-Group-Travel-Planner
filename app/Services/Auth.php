@@ -1,7 +1,7 @@
 <?php
-namespace App\Helpers;
+namespace App\Services;
 
-use App\Helpers\Session;
+use App\Services\Session;
 use App\Models\TripMember;
 use App\Models\User;
 use App\Enums\TripMemberRole;

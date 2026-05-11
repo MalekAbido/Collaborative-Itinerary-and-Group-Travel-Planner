@@ -1,8 +1,8 @@
 <?php
 namespace App\Controllers;
 
-use App\Helpers\Auth;
-use App\Helpers\Session;
+use App\Services\Auth;
+use App\Services\Session;
 use App\Constants\Messages;
 use App\Models\Allergy;
 use Core\Controller;

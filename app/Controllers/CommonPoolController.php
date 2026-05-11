@@ -1,12 +1,12 @@
 <?php
 namespace App\Controllers;
 
-use App\Helpers\Auth;
+use App\Services\Auth;
 use App\Models\GroupFund;
 use App\Models\FundContribution;
 use App\Models\TripMember;
 use App\Enums\TripMemberRole;
-use App\Helpers\Session;
+use App\Services\Session;
 use App\Constants\Messages;
 use Core\Controller;
 

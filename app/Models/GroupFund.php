@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 
-use App\Helpers\HistoryLogger;
+use App\Services\HistoryLogger;
 use App\Models\FundContribution;
 use App\Enums\TransactionType;
 use Core\Database;

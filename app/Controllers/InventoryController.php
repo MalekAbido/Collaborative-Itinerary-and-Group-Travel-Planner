@@ -3,10 +3,10 @@
 namespace App\Controllers;
 
 use Core\Controller;
-use App\Helpers\Auth;
+use App\Services\Auth;
 use App\Constants\Messages;
-use App\Helpers\HistoryLogger;
-use App\Helpers\Session;
+use App\Services\HistoryLogger;
+use App\Services\Session;
 use App\Models\Activity;
 use App\Models\InventoryItem;
 use App\Models\Itinerary;

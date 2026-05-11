@@ -1,8 +1,8 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use App\Helpers\Auth;
-use App\Helpers\Session;
+use App\Services\Auth;
+use App\Services\Session;
 
 class AuthTest extends TestCase
 {

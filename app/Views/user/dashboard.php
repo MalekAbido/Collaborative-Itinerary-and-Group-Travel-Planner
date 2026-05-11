@@ -1,5 +1,5 @@
 <?php 
-use App\Helpers\Session;
+use App\Services\Session;
 require __DIR__ . '/../layouts/header.php'; ?>
 
         <div class="max-w-content mx-auto">

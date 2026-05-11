@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Helpers\HistoryLogger;
+use App\Services\HistoryLogger;
 use App\Enums\TransactionType;
 use Core\Database;
 use PDO;

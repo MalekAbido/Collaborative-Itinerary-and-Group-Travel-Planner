@@ -1,6 +1,6 @@
 <?php
 
-    use App\Helpers\Auth;
+    use App\Services\Auth;
     use App\Enums\ActivityStatus;
     use App\Enums\AttendanceStatus;
     use App\Enums\TripMemberRole;

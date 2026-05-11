@@ -1,11 +1,11 @@
 <?php
 namespace App\Controllers;
 
-use App\Helpers\Auth;
-use App\Helpers\HistoryLogger;
-use App\Helpers\Session;
+use App\Services\Auth;
+use App\Services\HistoryLogger;
+use App\Services\Session;
 use App\Constants\Messages;
-use App\Helpers\TimeHelper;
+use App\Services\TimeHelper;
 use App\Models\Activity;
 use App\Models\AttendanceList;
 use App\Models\AttendanceMember;

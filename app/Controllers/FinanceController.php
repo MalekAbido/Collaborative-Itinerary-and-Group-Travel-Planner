@@ -8,10 +8,10 @@ use App\Models\Itinerary;
 use App\Models\SettlementPayment;
 use App\Enums\TransactionType;
 use App\Enums\TripMemberRole;
-use App\Helpers\Auth;
-use App\Helpers\HistoryLogger;
+use App\Services\Auth;
+use App\Services\HistoryLogger;
 use App\Models\TripMember;
-use App\Helpers\Session;
+use App\Services\Session;
 use App\Constants\Messages;
 use App\Services\FinanceService;
 

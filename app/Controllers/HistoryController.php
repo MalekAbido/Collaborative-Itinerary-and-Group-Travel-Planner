@@ -2,13 +2,12 @@
 namespace App\Controllers;
 
 use App\Enums\ActivityStatus;
-use App\Enums\EntityType;
 use App\Enums\TransactionType;
 use App\Enums\TripMemberRole;
-use App\Helpers\Auth;
-use App\Helpers\Session;
+use App\Services\Auth;
+use App\Services\Session;
 use App\Constants\Messages;
-use App\Helpers\HistoryLogger;
+use App\Services\HistoryLogger;
 use App\Models\Activity;
 use App\Models\Expense;
 use App\Models\FundContribution;

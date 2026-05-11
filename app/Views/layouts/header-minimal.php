@@ -3,7 +3,7 @@
 
 <head>
     <?php
-    use App\Helpers\Auth;
+    use App\Services\Auth;
     $websiteName = 'NoVoyageSync';
     $pageTitle = $pageTitle ?? $websiteName;
     ?>

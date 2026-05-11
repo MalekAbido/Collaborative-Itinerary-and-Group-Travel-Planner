@@ -2,13 +2,13 @@
 
 namespace App\Controllers;
 
-use App\Helpers\Auth;
-use App\Helpers\Session;
+use App\Services\Auth;
+use App\Services\Session;
 use App\Constants\Messages;
 use App\Models\EmergencyContact;
 use Core\Controller;
 use App\Models\User;
-use App\Helpers\Mailer;
+use App\Services\Mailer;
 
 class EmergencyController extends Controller
 {

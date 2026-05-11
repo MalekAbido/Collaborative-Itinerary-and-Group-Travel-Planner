@@ -3,8 +3,8 @@
 
 <head>
     <?php
-    use App\Helpers\Auth;
-    use App\Helpers\Session;
+    use App\Services\Auth;
+    use App\Services\Session;
     use App\Models\TripMember;
     use App\Enums\TripMemberRole;
     $currentUser = Auth::user();

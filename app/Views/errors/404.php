@@ -1,5 +1,5 @@
 <?php
-use App\Helpers\Auth;
+use App\Services\Auth;
 $isLoggedIn = Auth::check();
 $activeTab = '404';
 

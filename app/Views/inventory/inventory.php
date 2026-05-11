@@ -1,18 +1,18 @@
-<?php 
-use App\Enums\TripMemberRole;
+<?php
+    use App\Enums\TripMemberRole;
 require __DIR__ . '/../layouts/header.php'; ?>
 
 <div class="max-w-[1280px] mx-auto">
     <header class="mb-10 flex justify-between items-end">
         <div>
-            <h1 class="font-display text-display text-on-surface mb-2"><?= htmlspecialchars($itinerary['title']) ?></h1>
+            <h1 class="font-display text-display text-on-surface mb-2"><?php echo htmlspecialchars($itinerary['title']) ?></h1>
             <p class="text-[18px] text-on-surface-variant">Coordinate items and equipment needed for the trip.</p>
         </div>
         <div class="flex gap-3">
             <button class="inline-flex items-center gap-2 rounded-lg bg-primary text-on-primary font-bold text-[14px] px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition cursor-pointer"    onclick="openAddItemModal()" >
                 <span class="material-symbols-outlined text-[18px]">add_box</span> Add Item
             </button>
-            <a class="cursor-pointer inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-[14px] px-6 py-2.5 hover:bg-surface-container transition"    href="/itinerary/dashboard/<?= htmlspecialchars($itineraryId) ?>"  >
+            <a class="cursor-pointer inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-[14px] px-6 py-2.5 hover:bg-surface-container transition"    href="/itinerary/dashboard/<?php echo htmlspecialchars($itineraryId) ?>"  >
                 <span class="material-symbols-outlined text-[18px]">arrow_back</span> Back
             </a>
         </div>
@@ -27,22 +27,25 @@ require __DIR__ . '/../layouts/header.php'; ?>
                     <h2 class="font-display text-[24px] font-semibold text-on-surface m-0">My Volunteers</h2>
                 </div>
 
-                <?php if (empty($myVolunteers)): ?>
+                <?php
+                if (empty($myVolunteers)): ?>
                     <div class="bg-surface-container-lowest border border-outline-variant border-dashed rounded-xl p-8 text-center">
                         <p class="text-on-surface-variant italic">You haven't volunteered for any items yet.</p>
                     </div>
                 <?php else: ?>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <?php foreach ($myVolunteers as $item): ?>
+                        <?php
+                        foreach ($myVolunteers as $item): ?>
                             <div class="bg-surface-container-low border border-outline-variant rounded-xl p-5 shadow-sm relative group">
                                 <div class="flex justify-between items-start mb-3">
-                                    <h3 class="font-display text-[18px] font-bold text-on-surface"><?= htmlspecialchars($item['name']) ?></h3>
+                                    <h3 class="font-display text-[18px] font-bold text-on-surface"><?php echo htmlspecialchars($item['name']) ?></h3>
                                     <div class="flex items-center gap-2">
-                                        <span class="bg-primary-fixed text-primary px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide">Qty: <?= htmlspecialchars($item['quantity']) ?></span>
-                                        <?php if ($item['creatorMemberId'] == $currentMemberId || App\Helpers\Auth::hasRole(TripMemberRole::EDITOR->value, $currentMemberRole)): ?>
+                                        <span class="bg-primary-fixed text-primary px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide">Qty: <?php echo htmlspecialchars($item['quantity']) ?></span>
+                                        <?php
+                                        if ($item['creatorMemberId'] == $currentMemberId || App\Services\Auth::hasRole(TripMemberRole::EDITOR->value, $currentMemberRole)): ?>
                                             <form action="/inventory/delete" method="POST" onsubmit="return confirm('Are you sure you want to remove this item from the inventory?');">
-                                                <input type="hidden" name="itemId" value="<?= $item['id'] ?>">
-                                                <input type="hidden" name="itineraryId" value="<?= $itineraryId ?>">
+                                                <input type="hidden" name="itemId" value="<?php echo $item['id'] ?>">
+                                                <input type="hidden" name="itineraryId" value="<?php echo $itineraryId ?>">
                                                 <button class="text-error hover:text-error/80 transition p-1 leading-none cursor-pointer"    type="submit"  title="Delete Item">
                                                     <span class="material-symbols-outlined text-[18px]">delete</span>
                                                 </button>
@@ -50,14 +53,14 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                         <?php endif; ?>
                                     </div>
                                 </div>
-                                <p class="text-[14px] text-on-surface-variant mb-4"><?= htmlspecialchars($item['description']) ?></p>
+                                <p class="text-[14px] text-on-surface-variant mb-4"><?php echo htmlspecialchars($item['description']) ?></p>
                                 <div class="flex items-center gap-2 text-[12px] text-outline mb-4">
                                     <span class="material-symbols-outlined text-[16px]">event</span>
-                                    <span>For: <?= htmlspecialchars($item['activityName']) ?></span>
+                                    <span>For: <?php echo htmlspecialchars($item['activityName']) ?></span>
                                 </div>
                                 <form action="/inventory/unvolunteer" method="POST">
-                                    <input type="hidden" name="itemId" value="<?= $item['id'] ?>">
-                                    <input type="hidden" name="itineraryId" value="<?= $itineraryId ?>">
+                                    <input type="hidden" name="itemId" value="<?php echo $item['id'] ?>">
+                                    <input type="hidden" name="itineraryId" value="<?php echo $itineraryId ?>">
                                     <button class="w-full py-2 rounded-lg border border-error text-error text-[13px] font-bold hover:bg-error/5 transition flex items-center justify-center gap-2 cursor-pointer"    type="submit" >
                                         <span class="material-symbols-outlined text-[16px]">undo</span> Unvolunteer
                                     </button>
@@ -75,22 +78,25 @@ require __DIR__ . '/../layouts/header.php'; ?>
                     <h2 class="font-display text-[24px] font-semibold text-on-surface m-0">All Other Items</h2>
                 </div>
 
-                <?php if (empty($otherItems)): ?>
+                <?php
+                if (empty($otherItems)): ?>
                     <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 text-center">
                         <p class="text-on-surface-variant italic">No other items in the inventory.</p>
                     </div>
                 <?php else: ?>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <?php foreach ($otherItems as $item): ?>
+                        <?php
+                        foreach ($otherItems as $item): ?>
                             <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm relative group">
                                 <div class="flex justify-between items-start mb-3">
-                                    <h3 class="font-display text-[18px] font-bold text-on-surface"><?= htmlspecialchars($item['name']) ?></h3>
+                                    <h3 class="font-display text-[18px] font-bold text-on-surface"><?php echo htmlspecialchars($item['name']) ?></h3>
                                     <div class="flex items-center gap-2">
-                                        <span class="bg-surface-container-highest text-on-surface-variant px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide">Qty: <?= htmlspecialchars($item['quantity']) ?></span>
-                                        <?php if ($item['creatorMemberId'] == $currentMemberId || App\Helpers\Auth::hasRole(TripMemberRole::EDITOR->value, $currentMemberRole)): ?>
+                                        <span class="bg-surface-container-highest text-on-surface-variant px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide">Qty: <?php echo htmlspecialchars($item['quantity']) ?></span>
+                                        <?php
+                                        if ($item['creatorMemberId'] == $currentMemberId || App\Services\Auth::hasRole(TripMemberRole::EDITOR->value, $currentMemberRole)): ?>
                                             <form action="/inventory/delete" method="POST" onsubmit="return confirm('Are you sure you want to remove this item from the inventory?');">
-                                                <input type="hidden" name="itemId" value="<?= $item['id'] ?>">
-                                                <input type="hidden" name="itineraryId" value="<?= $itineraryId ?>">
+                                                <input type="hidden" name="itemId" value="<?php echo $item['id'] ?>">
+                                                <input type="hidden" name="itineraryId" value="<?php echo $itineraryId ?>">
                                                 <button class="text-error hover:text-error/80 transition p-1 leading-none cursor-pointer"    type="submit"  title="Delete Item">
                                                     <span class="material-symbols-outlined text-[18px]">delete</span>
                                                 </button>
@@ -98,28 +104,30 @@ require __DIR__ . '/../layouts/header.php'; ?>
                                         <?php endif; ?>
                                     </div>
                                 </div>
-                                <p class="text-[14px] text-on-surface-variant mb-4"><?= htmlspecialchars($item['description']) ?></p>
+                                <p class="text-[14px] text-on-surface-variant mb-4"><?php echo htmlspecialchars($item['description']) ?></p>
                                 <div class="flex items-center gap-2 text-[12px] text-outline mb-4">
                                     <span class="material-symbols-outlined text-[16px]">event</span>
-                                    <span>For: <?= htmlspecialchars($item['activityName']) ?></span>
+                                    <span>For: <?php echo htmlspecialchars($item['activityName']) ?></span>
                                 </div>
-                                
+
                                 <div class="mt-4 pt-4 border-t border-outline-variant flex items-center justify-between">
-                                    <?php if ($item['tripMemberId']): ?>
+                                    <?php
+                                    if ($item['tripMemberId']): ?>
                                         <div class="flex items-center gap-2">
-                                            <?php if (!empty($item['profileImage'])): ?>
-                                                <img src="/<?= htmlspecialchars($item['profileImage']) ?>" alt="Volunteer" class="h-6 w-6 rounded-full object-cover border border-outline-variant">
+                                            <?php
+                                            if (! empty($item['profileImage'])): ?>
+                                                <img src="/<?php echo htmlspecialchars($item['profileImage']) ?>" alt="Volunteer" class="h-6 w-6 rounded-full object-cover border border-outline-variant">
                                             <?php else: ?>
                                                 <div class="w-6 h-6 rounded-full bg-secondary-fixed text-secondary flex items-center justify-center text-[10px] font-bold">
-                                                    <?= strtoupper(substr($item['firstName'], 0, 1) . substr($item['lastName'], 0, 1)) ?>
+                                                    <?php echo strtoupper(substr($item['firstName'], 0, 1) . substr($item['lastName'], 0, 1)) ?>
                                                 </div>
                                             <?php endif; ?>
-                                            <span class="text-[12px] font-medium text-on-surface-variant"><?= htmlspecialchars($item['firstName']) ?> is bringing this</span>
+                                            <span class="text-[12px] font-medium text-on-surface-variant"><?php echo htmlspecialchars($item['firstName']) ?> is bringing this</span>
                                         </div>
                                     <?php else: ?>
                                         <form action="/inventory/volunteer" method="POST" class="w-full">
-                                            <input type="hidden" name="itemId" value="<?= $item['id'] ?>">
-                                            <input type="hidden" name="itineraryId" value="<?= $itineraryId ?>">
+                                            <input type="hidden" name="itemId" value="<?php echo $item['id'] ?>">
+                                            <input type="hidden" name="itineraryId" value="<?php echo $itineraryId ?>">
                                             <button class="w-full py-2 rounded-lg bg-secondary text-on-secondary text-[13px] font-bold hover:bg-secondary/90 transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"    type="submit" >
                                                 <span class="material-symbols-outlined text-[16px]">volunteer_activism</span> Volunteer to Bring
                                             </button>
@@ -140,18 +148,18 @@ require __DIR__ . '/../layouts/header.php'; ?>
                 <div class="space-y-4">
                     <div class="flex justify-between items-center text-[14px]">
                         <span class="text-on-surface-variant">Total Items</span>
-                        <span class="font-bold text-on-surface"><?= count($myVolunteers) + count($otherItems) ?></span>
+                        <span class="font-bold text-on-surface"><?php echo count($myVolunteers) + count($otherItems) ?></span>
                     </div>
                     <div class="flex justify-between items-center text-[14px]">
                         <span class="text-on-surface-variant">Volunteered</span>
-                        <?php 
+                        <?php
                             $volunteeredCount = count($myVolunteers) + count(array_filter($otherItems, fn($i) => $i['tripMemberId'] !== null));
                         ?>
-                        <span class="font-bold text-secondary"><?= $volunteeredCount ?></span>
+                        <span class="font-bold text-secondary"><?php echo $volunteeredCount ?></span>
                     </div>
                     <div class="flex justify-between items-center text-[14px]">
                         <span class="text-on-surface-variant">Needed</span>
-                        <span class="font-bold text-error"><?= (count($myVolunteers) + count($otherItems)) - $volunteeredCount ?></span>
+                        <span class="font-bold text-error"><?php echo (count($myVolunteers) + count($otherItems)) - $volunteeredCount ?></span>
                     </div>
                 </div>
             </div>
@@ -177,8 +185,8 @@ require __DIR__ . '/../layouts/header.php'; ?>
         </div>
         <div class="p-6">
             <form action="/inventory/add" method="POST" class="space-y-4">
-                <input type="hidden" name="itineraryId" value="<?= $itineraryId ?>">
-                
+                <input type="hidden" name="itineraryId" value="<?php echo $itineraryId ?>">
+
                 <div>
                     <label class="block text-[12px] font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">Item Name</label>
                     <input type="text" name="name" required placeholder="e.g., First Aid Kit, Camera, Tent"
@@ -194,8 +202,9 @@ require __DIR__ . '/../layouts/header.php'; ?>
                     <div class="w-full sm:w-2/3">
                         <label class="block text-[12px] font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">Related Activity</label>
                         <select name="activityId" required class="block w-full rounded-lg border border-outline-variant bg-surface px-4 py-2.5 text-[14px] focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition h-[45px]">
-                            <?php foreach ($activities as $activity): ?>
-                                <option value="<?= $activity->getId() ?>"><?= htmlspecialchars($activity->getName()) ?></option>
+                            <?php
+                            foreach ($activities as $activity): ?>
+                                <option value="<?php echo $activity->getId() ?>"><?php echo htmlspecialchars($activity->getName()) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>

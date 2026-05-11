@@ -5,11 +5,11 @@ use Core\Controller;
 use App\Models\TripMember;
 use App\Models\Itinerary;
 use App\Models\Invitation;
-use App\Helpers\Auth;
-use App\Helpers\Session;
+use App\Services\Auth;
+use App\Services\Session;
 use App\Constants\Messages;
-use App\Helpers\Mailer;
-use App\Helpers\HistoryLogger;
+use App\Services\Mailer;
+use App\Services\HistoryLogger;
 use App\Enums\TripMemberRole;
 use App\Enums\TransactionType;
 

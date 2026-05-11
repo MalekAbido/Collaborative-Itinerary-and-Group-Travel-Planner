@@ -1,19 +1,22 @@
 <?php
-use App\Enums\TripMemberRole;
-require __DIR__ . '/../layouts/header.php';
-// Calculate the percentage for the progress bar
-$percentage = 0;
-if ($totalBudget > 0) {
-    $percentage = min(100, round(($actualSpending / $totalBudget) * 100));
-}
+    use App\Enums\TripMemberRole;
+    require __DIR__ . '/../layouts/header.php';
+    // Calculate the percentage for the progress bar
+    $percentage = 0;
 
-// Determine progress bar color based on percentage
-$barColor = 'bg-primary'; // Default
-if ($percentage >= 100) {
+    if ($totalBudget > 0) {
+    $percentage = min(100, round(($actualSpending / $totalBudget) * 100));
+    }
+
+    // Determine progress bar color based on percentage
+    $barColor = 'bg-primary';
+    // Default
+    if ($percentage >= 100) {
     $barColor = 'bg-error';
-} elseif ($percentage >= 80) {
+    } elseif ($percentage >= 80) {
     $barColor = 'bg-secondary-container'; // Warning approaching limit
-}
+    }
+
 ?>
 
         <!-- <main class="flex-1 mt-navbar h-[calc(100vh-theme(spacing.navbar))] overflow-y-auto bg-surface p-6 lg:p-8 scroll-thin"> -->
@@ -24,20 +27,22 @@ if ($percentage >= 100) {
                         <h1 class="font-display text-display text-on-surface mb-2">Finance Dashboard</h1>
                         <p class="text-body-lg text-on-surface-variant">Track group expenses and monitor budget limits.</p>
                     </div>
-                    <?php if ($userRole !== TripMemberRole::MEMBER->value): ?>
+                    <?php
+                    if ($userRole !== TripMemberRole::MEMBER->value): ?>
                     <button class="inline-flex items-center gap-2 rounded-lg border-2 border-outline-variant text-on-surface font-semibold text-body-sm px-6 py-2.5 hover:bg-surface-container transition cursor-pointer"    type="button" onclick="document.getElementById('financeSettingsModal').classList.remove('hidden')" >
                         <span class="material-symbols-outlined text-[18px]">settings</span> Settings
                     </button>
                     <?php endif; ?>
                 </header>
 
-                <?php if (isset($alert) && $alert['status'] === 'warning'): ?>
+                <?php
+                if (isset($alert) && $alert['status'] === 'warning'): ?>
                     <div class="mb-8 flex items-center gap-3 rounded-xl border border-secondary/30 bg-secondary-fixed px-4 py-3 shadow-sm">
                         <span class="material-symbols-outlined text-secondary">warning</span>
                         <div class="flex-1">
                             <span class="block text-label-xs uppercase text-secondary font-bold">Budget Warning</span>
                             <h4 class="text-body-md font-semibold text-on-secondary-container m-0">
-                                <?= htmlspecialchars($alert['message']) ?>
+                                <?php echo htmlspecialchars($alert['message']) ?>
                             </h4>
                         </div>
                     </div>
@@ -47,7 +52,7 @@ if ($percentage >= 100) {
                         <div class="flex-1">
                             <span class="block text-label-xs uppercase text-error font-bold">Over Budget</span>
                             <h4 class="text-body-md font-semibold text-on-error-container m-0">
-                                You have exceeded the total budget limit of <?= htmlspecialchars($totalBudget . ' ' . $baseCurrency) ?>.
+                                You have exceeded the total budget limit of <?php echo htmlspecialchars($totalBudget . ' ' . $baseCurrency) ?>.
                             </h4>
                         </div>
                     </div>
@@ -62,7 +67,7 @@ if ($percentage >= 100) {
                             </div>
                         </div>
                         <div class="font-display text-[28px] font-extrabold text-on-surface">
-                            <?= number_format($actualSpending) ?> <span class="text-h4 text-outline"><?= htmlspecialchars($baseCurrency) ?></span>
+                            <?php echo number_format($actualSpending) ?> <span class="text-h4 text-outline"><?php echo htmlspecialchars($baseCurrency) ?></span>
                         </div>
                     </div>
 
@@ -74,7 +79,7 @@ if ($percentage >= 100) {
                             </div>
                         </div>
                         <div class="font-display text-[28px] font-extrabold text-on-surface">
-                            <?= $totalBudget > 0 ? number_format($totalBudget) : 'No Limit' ?> <span class="text-h4 text-outline"><?= htmlspecialchars($baseCurrency) ?></span>
+                            <?php echo $totalBudget > 0 ? number_format($totalBudget) : 'No Limit' ?> <span class="text-h4 text-outline"><?php echo htmlspecialchars($baseCurrency) ?></span>
                         </div>
                     </div>
 
@@ -85,25 +90,26 @@ if ($percentage >= 100) {
                                 <span class="material-symbols-outlined text-[18px] text-on-success-container">savings</span>
                             </div>
                         </div>
-                        <div class="font-display text-[28px] font-extrabold <?= ($totalBudget - $actualSpending) < 0 ? 'text-error' : 'text-on-surface' ?>">
-                            <?= $totalBudget > 0 ? number_format($totalBudget - $actualSpending) : '∞' ?> <span class="text-h4 text-outline"><?= htmlspecialchars($baseCurrency) ?></span>
+                        <div class="font-display text-[28px] font-extrabold <?php echo ($totalBudget - $actualSpending) < 0 ? 'text-error' : 'text-on-surface' ?>">
+                            <?php echo $totalBudget > 0 ? number_format($totalBudget - $actualSpending) : '∞' ?> <span class="text-h4 text-outline"><?php echo htmlspecialchars($baseCurrency) ?></span>
                         </div>
                     </div>
                 </div>
 
-                <?php if ($totalBudget > 0): ?>
+                <?php
+                if ($totalBudget > 0): ?>
                     <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 mb-8">
                         <h3 class="font-display text-h4 text-on-surface mb-5">Budget Usage</h3>
                         <div>
                             <div class="flex justify-between mb-2">
-                                <span class="text-label-caps uppercase text-outline">0 <?= htmlspecialchars($baseCurrency) ?></span>
-                                <span class="text-body-sm font-semibold <?= $percentage >= 100 ? 'text-error' : 'text-primary' ?>">
-                                    <?= $percentage ?>% Used
+                                <span class="text-label-caps uppercase text-outline">0 <?php echo htmlspecialchars($baseCurrency) ?></span>
+                                <span class="text-body-sm font-semibold <?php echo $percentage >= 100 ? 'text-error' : 'text-primary' ?>">
+                                    <?php echo $percentage ?>% Used
                                 </span>
-                                <span class="text-label-caps uppercase text-outline"><?= number_format($totalBudget) ?> <?= htmlspecialchars($baseCurrency) ?></span>
+                                <span class="text-label-caps uppercase text-outline"><?php echo number_format($totalBudget) ?> <?php echo htmlspecialchars($baseCurrency) ?></span>
                             </div>
                             <div class="h-3 w-full rounded-full bg-outline-variant overflow-hidden">
-                                <div class="h-full rounded-full <?= $barColor ?> transition-all" style="width: <?= $percentage ?>%"></div>
+                                <div class="h-full rounded-full <?php echo $barColor ?> transition-all" style="width: <?php echo $percentage ?>%"></div>
                             </div>
                         </div>
                     </div>
@@ -121,22 +127,23 @@ if ($percentage >= 100) {
                         <div class="bg-tertiary-fixed border border-outline-variant rounded-xl shadow-sm p-6 flex flex-col justify-center items-center text-center">
                             <span class="text-label-caps uppercase text-on-tertiary-fixed-variant mb-2">Current Pool Balance</span>
                             <div class="font-display text-[40px] font-extrabold text-on-surface">
-                                <?= number_format($kittyBalance ?? 0) ?> <span class="text-h3 text-on-surface-variant"><?= htmlspecialchars($baseCurrency) ?></span>
+                                <?php echo number_format($kittyBalance ?? 0) ?> <span class="text-h3 text-on-surface-variant"><?php echo htmlspecialchars($baseCurrency) ?></span>
                             </div>
                             <p class="text-body-sm text-on-surface-variant mt-2">Available for central group expenses</p>
                         </div>
 
                         <div class="lg:col-span-2">
-                            <?php if (isset($fundId) && $fundId): ?>
+                            <?php
+                            if (isset($fundId) && $fundId): ?>
                                 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5">
                                     <h3 class="font-display text-h4 text-on-surface mb-1">Make a Contribution</h3>
                                     <p class="text-body-xs text-on-surface-variant mb-4">Add your money to the central pool.</p>
 
-                                    <form action="/fund/contribute/<?= htmlspecialchars($fundId) ?>" method="POST" class="flex flex-col gap-3">
-                                        <input type="hidden" name="itineraryId" value="<?= htmlspecialchars($itineraryId) ?>">
+                                    <form action="/fund/contribute/<?php echo htmlspecialchars($fundId) ?>" method="POST" class="flex flex-col gap-3">
+                                        <input type="hidden" name="itineraryId" value="<?php echo htmlspecialchars($itineraryId) ?>">
                                         <input type="hidden" name="userId" value="1">
                                         <div class="flex items-center gap-2">
-                                            <span class="text-body-md font-semibold text-outline"><?= htmlspecialchars($baseCurrency) ?></span>
+                                            <span class="text-body-md font-semibold text-outline"><?php echo htmlspecialchars($baseCurrency) ?></span>
                                             <input type="number" name="amount" min="1" step="0.01" required placeholder="0.00"
                                                 class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-md focus:border-primary focus:ring-primary focus:outline-none transition">
                                         </div>
@@ -149,36 +156,39 @@ if ($percentage >= 100) {
                                 <div class="mt-6 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
                                     <div class="px-5 py-4 border-b border-outline-variant flex items-center justify-between">
                                         <h4 class="font-display text-body-lg font-semibold text-on-surface">Recent Contributions</h4>
-                                        <span class="text-label-xs uppercase text-outline font-bold"><?= isset($contributions) ? count($contributions) : 0 ?> Records</span>
+                                        <span class="text-label-xs uppercase text-outline font-bold"><?php echo isset($contributions) ? count($contributions) : 0 ?> Records</span>
                                     </div>
-                                    <?php if (empty($contributions)): ?>
+                                    <?php
+                                    if (empty($contributions)): ?>
                                         <div class="p-6 text-center text-body-sm text-on-surface-variant">
                                             No contributions have been made yet.
                                         </div>
                                     <?php else: ?>
                                         <ul class="divide-y divide-outline-variant/50 max-h-[300px] overflow-y-auto scroll-thin">
-                                            <?php foreach ($contributions as $contribution): ?>
+                                            <?php
+                                            foreach ($contributions as $contribution): ?>
                                                 <li class="px-5 py-3 flex items-center justify-between hover:bg-surface-container/50 transition">
                                                     <div class="flex items-center gap-3">
                                                         <div class="flex h-9 w-9 items-center justify-center rounded-full bg-tertiary-fixed text-tertiary text-xs font-bold border border-outline-variant/30">
-                                                            <?= strtoupper(substr($contribution['firstName'], 0, 1) . substr($contribution['lastName'], 0, 1)) ?>
+                                                            <?php echo strtoupper(substr($contribution['firstName'], 0, 1) . substr($contribution['lastName'], 0, 1)) ?>
                                                         </div>
                                                         <div>
                                                             <p class="text-body-sm font-semibold text-on-surface m-0">
-                                                                <?= htmlspecialchars($contribution['firstName'] . ' ' . $contribution['lastName']) ?>
-                                                                <?= $contribution['deletedAt'] !== null ? '<span class="text-outline font-normal">(Former Member)</span>' : '' ?>
+                                                                <?php echo htmlspecialchars($contribution['firstName'] . ' ' . $contribution['lastName']) ?>
+                                                                <?php echo $contribution['deletedAt'] !== null ? '<span class="text-outline font-normal">(Former Member)</span>' : '' ?>
                                                             </p>
                                                             <p class="text-label-xs text-outline m-0 mt-0.5">
-                                                                <?= date('M j, Y - g:i A', strtotime($contribution['timestamp'])) ?>
+                                                                <?php echo date('M j, Y - g:i A', strtotime($contribution['timestamp'])) ?>
                                                             </p>
                                                         </div>
                                                     </div>
                                                     <div class="flex items-center gap-4">
                                                         <div class="text-body-md font-bold text-on-surface">
-                                                            +<?= number_format($contribution['amount']) ?> <span class="text-body-xs font-normal text-outline"><?= htmlspecialchars($baseCurrency) ?></span>
+                                                            +<?php echo number_format($contribution['amount']) ?> <span class="text-body-xs font-normal text-outline"><?php echo htmlspecialchars($baseCurrency) ?></span>
                                                         </div>
-                                                        <?php if ($contribution['tripMemberId'] == $currentMemberId || \App\Helpers\Auth::hasRole(TripMemberRole::EDITOR->value, $userRole)): ?>
-                                                            <form action="/fund/contribution/delete/<?= htmlspecialchars($contribution['id']) ?>" method="POST" onsubmit="return confirm('Are you sure you want to delete this contribution? This will also deduct the amount from the kitty balance.')">
+                                                        <?php
+                                                        if ($contribution['tripMemberId'] == $currentMemberId || \App\Services\Auth::hasRole(TripMemberRole::EDITOR->value, $userRole)): ?>
+                                                            <form action="/fund/contribution/delete/<?php echo htmlspecialchars($contribution['id']) ?>" method="POST" onsubmit="return confirm('Are you sure you want to delete this contribution? This will also deduct the amount from the kitty balance.')">
                                                                 <button class="text-outline hover:text-error transition flex items-center cursor-pointer"    type="submit" >
                                                                     <span class="material-symbols-outlined text-[18px]">delete</span>
                                                                 </button>
@@ -194,8 +204,9 @@ if ($percentage >= 100) {
                                 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5 flex flex-col justify-center items-center text-center text-on-surface-variant min-h-[160px]">
                                     <span class="material-symbols-outlined text-[40px] mb-3 text-outline">account_balance_wallet</span>
                                     <p class="text-body-md mb-4">No Group Fund exists for this trip yet.</p>
-                                    <?php if (\App\Helpers\Auth::hasRole(TripMemberRole::EDITOR->value, $userRole)): ?>
-                                        <form action="/finance/create-fund/<?= htmlspecialchars($itineraryId) ?>" method="POST">
+                                    <?php
+                                    if (\App\Services\Auth::hasRole(TripMemberRole::EDITOR->value, $userRole)): ?>
+                                        <form action="/finance/create-fund/<?php echo htmlspecialchars($itineraryId) ?>" method="POST">
                                             <button class="inline-flex items-center gap-2 rounded-lg bg-tertiary text-on-tertiary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-tertiary/90 transition cursor-pointer"    type="submit" >
                                                 <span class="material-symbols-outlined text-base">add</span> Set up Group Fund
                                             </button>
@@ -216,9 +227,10 @@ if ($percentage >= 100) {
                         <h2 class="font-display text-h2 text-on-surface m-0">Settlement Ledger</h2>
                     </div>
 
-                    <?php if (!isset($settlementResult['success']) || !$settlementResult['success']): ?>
+                    <?php
+                    if (! isset($settlementResult['success']) || ! $settlementResult['success']): ?>
                         <div class="mb-6 rounded-xl border border-error/30 bg-error-container p-5 text-on-error-container">
-                            <?= htmlspecialchars($settlementResult['message'] ?? 'There was a problem calculating settlements.') ?>
+                            <?php echo htmlspecialchars($settlementResult['message'] ?? 'There was a problem calculating settlements.') ?>
                         </div>
                     <?php elseif (empty($settlementResult['transactions'])): ?>
                         <div class="mb-6 rounded-xl border border-outline-variant bg-surface-container-lowest p-5 text-on-surface-variant">
@@ -226,26 +238,28 @@ if ($percentage >= 100) {
                         </div>
                     <?php else: ?>
                         <div class="grid gap-4 mb-6">
-                            <?php foreach ($settlementResult['transactions'] as $transaction): ?>
+                            <?php
+                            foreach ($settlementResult['transactions'] as $transaction): ?>
                                 <?php
                                     $fromName = $memberMap[$transaction['from']] ?? 'Member ' . $transaction['from'];
-                                    $toName = $memberMap[$transaction['to']] ?? 'Member ' . $transaction['to'];
+                                    $toName   = $memberMap[$transaction['to']] ?? 'Member ' . $transaction['to'];
                                 ?>
                                 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
                                         <p class="text-body-sm text-on-surface-variant mb-1">Settle payment</p>
-                                        <p class="font-semibold text-body-md text-on-surface"><?= htmlspecialchars($fromName) ?> owes <?= htmlspecialchars($toName) ?></p>
+                                        <p class="font-semibold text-body-md text-on-surface"><?php echo htmlspecialchars($fromName) ?> owes <?php echo htmlspecialchars($toName) ?></p>
                                     </div>
                                     <div class="flex items-center gap-4 flex-wrap justify-between sm:justify-end">
                                         <div class="text-right">
-                                            <p class="text-body-lg font-bold text-on-surface"><?= number_format($transaction['amount'], 2) ?></p>
-                                            <p class="text-label-xs text-outline uppercase tracking-widest"><?= htmlspecialchars($baseCurrency) ?></p>
+                                            <p class="text-body-lg font-bold text-on-surface"><?php echo number_format($transaction['amount'], 2) ?></p>
+                                            <p class="text-label-xs text-outline uppercase tracking-widest"><?php echo htmlspecialchars($baseCurrency) ?></p>
                                         </div>
-                                        <?php if ($transaction['from'] === $currentMemberId): ?>
-                                            <form action="/finance/settlement/mark-paid/<?= htmlspecialchars($itineraryId) ?>" method="POST" class="m-0">
-                                                <input type="hidden" name="fromMemberId" value="<?= htmlspecialchars($transaction['from']) ?>">
-                                                <input type="hidden" name="toMemberId" value="<?= htmlspecialchars($transaction['to']) ?>">
-                                                <input type="hidden" name="amount" value="<?= htmlspecialchars(number_format($transaction['amount'], 2, '.', '')) ?>">
+                                        <?php
+                                        if ($transaction['from'] === $currentMemberId): ?>
+                                            <form action="/finance/settlement/mark-paid/<?php echo htmlspecialchars($itineraryId) ?>" method="POST" class="m-0">
+                                                <input type="hidden" name="fromMemberId" value="<?php echo htmlspecialchars($transaction['from']) ?>">
+                                                <input type="hidden" name="toMemberId" value="<?php echo htmlspecialchars($transaction['to']) ?>">
+                                                <input type="hidden" name="amount" value="<?php echo htmlspecialchars(number_format($transaction['amount'], 2, '.', '')) ?>">
                                                 <button class="inline-flex items-center gap-2 rounded-lg bg-success text-on-success font-semibold text-body-sm px-4 py-2 shadow-sm hover:bg-success/90 transition cursor-pointer"    type="submit" >
                                                     <span class="material-symbols-outlined text-[18px]">check_circle</span> Mark as paid
                                                 </button>
@@ -265,12 +279,13 @@ if ($percentage >= 100) {
                             <span class="material-symbols-outlined text-primary">receipt_long</span>
                             <h2 class="font-display text-h2 text-on-surface m-0">Expenses</h2>
                         </div>
-                        <a class="cursor-pointer inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition"    href="/finance/expense/add/<?= htmlspecialchars($itineraryId) ?>"  >
+                        <a class="cursor-pointer inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition"    href="/finance/expense/add/<?php echo htmlspecialchars($itineraryId) ?>"  >
                             <span class="material-symbols-outlined text-[18px]">add</span> Add Expense
                         </a>
                     </div>
 
-                    <?php if (empty($expenses)): ?>
+                    <?php
+                    if (empty($expenses)): ?>
                         <div class="flex flex-col items-center justify-center py-16 border-2 border-dashed border-outline-variant rounded-xl bg-surface-container-lowest text-center">
                             <div class="flex h-16 w-16 items-center justify-center rounded-full bg-surface-container mb-4">
                                 <span class="material-symbols-outlined text-[32px] text-outline">receipt_long</span>
@@ -280,43 +295,46 @@ if ($percentage >= 100) {
                         </div>
                     <?php else: ?>
                         <div class="flex flex-col gap-4">
-                            <?php foreach ($expenses as $expense): ?>
+                            <?php
+                            foreach ($expenses as $expense): ?>
                                 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5 flex flex-col hover:shadow-md transition">
                                     <div class="flex justify-between items-start mb-2">
                                         <div class="flex-1 pr-4">
-                                            <h4 class="font-display text-h4 text-on-surface leading-tight mb-1"><?= htmlspecialchars($expense->getDescription()) ?></h4>
+                                            <h4 class="font-display text-h4 text-on-surface leading-tight mb-1"><?php echo htmlspecialchars($expense->getDescription()) ?></h4>
                                             <span class="inline-block bg-surface-container-highest px-2 py-0.5 rounded-md text-label-xs uppercase text-on-surface-variant tracking-wider">
-                                                <?= htmlspecialchars($expense->getCategory()) ?>
+                                                <?php echo htmlspecialchars($expense->getCategory()) ?>
                                             </span>
                                         </div>
                                         <div class="text-right shrink-0">
                                             <div class="font-display text-h3 font-extrabold text-on-surface">
-                                                <?= number_format($expense->getAmount(), 2) ?> <span class="text-body-xs font-normal text-outline"><?= htmlspecialchars($expense->getCurrencyType()) ?></span>
+                                                <?php echo number_format($expense->getAmount(), 2) ?> <span class="text-body-xs font-normal text-outline"><?php echo htmlspecialchars($expense->getCurrencyType()) ?></span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <!-- Partial Refund Warning Box -->
-                                    <?php if ($expense->getRefundedAmount() > 0): ?>
+                                    <?php
+                                    if ($expense->getRefundedAmount() > 0): ?>
                                         <div class="mt-3 bg-secondary-fixed text-on-secondary-fixed px-3 py-2.5 rounded-lg text-body-sm border border-secondary/20">
                                             <div class="flex items-center gap-1.5 font-bold mb-0.5">
                                                 <span class="material-symbols-outlined text-[18px]">currency_exchange</span>
-                                                Refund Applied: <?= number_format($expense->getRefundedAmount(), 2) ?> <?= htmlspecialchars($expense->getCurrencyType()) ?>
+                                                Refund Applied: <?php echo number_format($expense->getRefundedAmount(), 2) ?> <?php echo htmlspecialchars($expense->getCurrencyType()) ?>
                                             </div>
                                             <div class="text-label-xs opacity-80 uppercase tracking-wide">
-                                                Original Total: <?= number_format($expense->getAmount() + $expense->getRefundedAmount(), 2) ?> <?= htmlspecialchars($expense->getCurrencyType()) ?>
+                                                Original Total: <?php echo number_format($expense->getAmount() + $expense->getRefundedAmount(), 2) ?> <?php echo htmlspecialchars($expense->getCurrencyType()) ?>
                                             </div>
                                         </div>
                                     <?php endif; ?>
 
                                     <!-- Card Actions -->
                                     <div class="mt-auto pt-5 flex items-center justify-between gap-3 border-t border-outline-variant/50">
-                                        <a class="cursor-pointer text-body-sm font-semibold text-primary hover:underline group flex items-center gap-1"    href="/finance/expense/details?id=<?= htmlspecialchars($expense->getId()) ?>"  >
+                                        <a class="cursor-pointer text-body-sm font-semibold text-primary hover:underline group flex items-center gap-1"    href="/finance/expense/details?id=<?php echo htmlspecialchars($expense->getId()) ?>"  >
                                             View Details <span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
                                         </a>
 
-                                        <?php if ($expense->getAmount() > 0): ?>
-                                            <button class="cursor-pointer inline-flex items-center gap-1.5 text-body-sm font-semibold text-outline hover:text-secondary transition"    onclick="openRefundModal(<?= htmlspecialchars($expense->getId()) ?>, <?= htmlspecialchars($expense->getAmount()) ?>)"  >
+                                        <?php
+                                        if ($expense->getAmount() > 0): ?>
+                                            <button class="cursor-pointer inline-flex items-center gap-1.5 text-body-sm font-semibold text-outline hover:text-secondary transition"    onclick="openRefundModal(<?php echo htmlspecialchars($expense->getId()) ?>, <?php echo htmlspecialchars($expense->getAmount()) ?>)"  >
                                                 <span class="material-symbols-outlined text-[18px]">undo</span> Partial Refund
                                             </button>
                                         <?php else: ?>
@@ -346,36 +364,37 @@ if ($percentage >= 100) {
                 </button>
             </div>
             <div class="p-6">
-                <form action="/finance/update-settings/<?= htmlspecialchars($itineraryId) ?>" method="POST" class="flex flex-col gap-5">
+                <form action="/finance/update-settings/<?php echo htmlspecialchars($itineraryId) ?>" method="POST" class="flex flex-col gap-5">
                     <div>
                         <label class="block text-label-caps uppercase text-on-surface-variant mb-2">Base Currency</label>
                         <select name="baseCurrency" disabled class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-md focus:border-primary focus:ring-primary focus:outline-none transition opacity-70 cursor-not-allowed">
                             <?php
-                            $currencies = [
-                                'USD' => 'US Dollar (USD)', 
-                                'EUR' => 'Euro (EUR)', 
-                                'GBP' => 'British Pound (GBP)', 
-                                'JPY' => 'Japanese Yen (JPY)', 
-                                'EGP' => 'Egyptian Pound (EGP)', 
-                                'AED' => 'United Arab Emirates Dirham (AED)', 
-                                'SAR' => 'Saudi Riyal (SAR)', 
-                                'CAD' => 'Canadian Dollar (CAD)', 
-                                'AUD' => 'Australian Dollar (AUD)', 
-                                'CHF' => 'Swiss Franc (CHF)', 
-                                'CNY' => 'Chinese Yuan (CNY)', 
-                                'INR' => 'Indian Rupee (INR)'
-                            ];
-                            foreach ($currencies as $code => $name):
-                                $selected = ($baseCurrency === $code) ? 'selected' : '';
-                                echo "<option value=\"$code\" $selected>$name</option>";
-                            endforeach;
+                                $currencies = [
+                                    'USD' => 'US Dollar (USD)',
+                                    'EUR' => 'Euro (EUR)',
+                                    'GBP' => 'British Pound (GBP)',
+                                    'JPY' => 'Japanese Yen (JPY)',
+                                    'EGP' => 'Egyptian Pound (EGP)',
+                                    'AED' => 'United Arab Emirates Dirham (AED)',
+                                    'SAR' => 'Saudi Riyal (SAR)',
+                                    'CAD' => 'Canadian Dollar (CAD)',
+                                    'AUD' => 'Australian Dollar (AUD)',
+                                    'CHF' => 'Swiss Franc (CHF)',
+                                    'CNY' => 'Chinese Yuan (CNY)',
+                                    'INR' => 'Indian Rupee (INR)',
+                                ];
+
+                                foreach ($currencies as $code => $name):
+                                    $selected = ($baseCurrency === $code) ? 'selected' : '';
+                                    echo "<option value=\"$code\" $selected>$name</option>";
+                                endforeach;
                             ?>
                         </select>
                         <p class="text-body-xs text-outline mt-2">The base currency was set during trip creation and cannot be changed.</p>
                     </div>
                     <div>
                         <label class="block text-label-caps uppercase text-on-surface-variant mb-2">Total Budget Limit</label>
-                        <input type="number" name="budgetLimit" min="0" max="999999999" step="1" value="<?= htmlspecialchars($totalBudget) ?>" placeholder="0.00" class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-md focus:border-primary focus:ring-primary focus:outline-none transition">
+                        <input type="number" name="budgetLimit" min="0" max="999999999" step="1" value="<?php echo htmlspecialchars($totalBudget) ?>" placeholder="0.00" class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-md focus:border-primary focus:ring-primary focus:outline-none transition">
                         <p class="text-body-xs text-outline mt-2">Set to 0 for no limit.</p>
                     </div>
                     <div class="mt-2 flex justify-end gap-3">
@@ -409,7 +428,7 @@ if ($percentage >= 100) {
                     <div>
                         <label class="block text-label-caps uppercase text-on-surface-variant mb-2">Amount to Refund</label>
                         <div class="flex items-center gap-2">
-                            <span class="text-body-md font-semibold text-outline"><?= htmlspecialchars($baseCurrency ?? '$') ?></span>
+                            <span class="text-body-md font-semibold text-outline"><?php echo htmlspecialchars($baseCurrency ?? '$') ?></span>
                             <input type="number" name="refundAmount" id="refundAmountInput" min="0.01" step="0.01" required placeholder="0.00"
                                 class="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-md focus:border-secondary focus:ring-secondary focus:outline-none transition">
                         </div>

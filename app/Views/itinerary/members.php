@@ -1,7 +1,7 @@
-<?php 
-use App\Enums\TripMemberRole;
-require __DIR__ . '/../layouts/header.php';
-$canManageMembers = App\Helpers\Auth::hasRole(TripMemberRole::ORGANIZER->value, $currentUserRole);
+<?php
+    use App\Enums\TripMemberRole;
+    require __DIR__ . '/../layouts/header.php';
+    $canManageMembers = App\Services\Auth::hasRole(TripMemberRole::ORGANIZER->value, $currentUserRole);
 ?>
 
 <!-- <main class="max-w-[900px] mx-auto mt-[100px] px-6 pb-12"> -->
@@ -9,10 +9,11 @@ $canManageMembers = App\Helpers\Auth::hasRole(TripMemberRole::ORGANIZER->value, 
 <!-- Reverted this header back to normal -->
 <div class="flex items-center gap-2 pb-3 mb-8 border-b border-outline-variant">
     <span class="material-symbols-outlined text-primary text-[28px]">group</span>
-    <h2 class="font-display text-h2 text-on-surface m-0"><?php echo($canManageMembers)?'Manage':'Itinerary'; ?> Members</h2>
+    <h2 class="font-display text-h2 text-on-surface m-0"><?php echo($canManageMembers) ? 'Manage' : 'Itinerary'; ?> Members</h2>
 </div>
 
-<?php if ($canManageMembers): ?>
+<?php
+if ($canManageMembers): ?>
 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 mb-8">
 
     <!-- NEW: Flex container to hold the title and the Master Link button side-by-side -->
@@ -42,8 +43,8 @@ $canManageMembers = App\Helpers\Auth::hasRole(TripMemberRole::ORGANIZER->value, 
                 Role</label>
             <select id="role" name="role"
                 class="w-full sm:w-48 rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-body-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/30 focus:outline-none transition">
-                <option value="<?= TripMemberRole::MEMBER->value ?>">👤 Member</option>
-                <option value="<?= TripMemberRole::EDITOR->value ?>">✏️ Editor</option>
+                <option value="<?php echo TripMemberRole::MEMBER->value ?>">👤 Member</option>
+                <option value="<?php echo TripMemberRole::EDITOR->value ?>">✏️ Editor</option>
             </select>
         </div>
         <button class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-on-primary font-semibold text-body-sm px-6 py-2.5 shadow-sm hover:bg-on-primary-fixed-variant transition h-[42px] cursor-pointer"    type="submit"
@@ -58,18 +59,21 @@ $canManageMembers = App\Helpers\Auth::hasRole(TripMemberRole::ORGANIZER->value, 
     <h3 class="font-display text-h4 text-on-surface mb-4">Current Members</h3>
     <div class="divide-y divide-outline-variant">
 
-        <div class="hidden sm:grid <?php echo ($canManageMembers ? 'sm:grid-cols-[1fr_120px_120px_100px]' : 'sm:grid-cols-[1fr_120px_120px]'); ?> gap-4 py-3 text-label-caps uppercase text-outline">
+        <div class="hidden sm:grid <?php echo($canManageMembers ? 'sm:grid-cols-[1fr_120px_120px_100px]' : 'sm:grid-cols-[1fr_120px_120px]'); ?> gap-4 py-3 text-label-caps uppercase text-outline">
             <span>Member</span><span class="text-center">Role</span><span>Joined</span>
-            <?php if ($canManageMembers): ?>
+            <?php
+            if ($canManageMembers): ?>
             <span class="text-right">Actions</span>
             <?php endif; ?>
         </div>
 
         <?php
+
         if (! empty($data['members'])): ?>
         <?php
+
         foreach ($data['members'] as $member): ?>
-        <div class="grid grid-cols-1 <?php echo ($canManageMembers ? 'sm:grid-cols-[1fr_120px_120px_100px]' : 'sm:grid-cols-[1fr_120px_120px]'); ?> gap-4 py-4 sm:py-3 items-center">
+        <div class="grid grid-cols-1 <?php echo($canManageMembers ? 'sm:grid-cols-[1fr_120px_120px_100px]' : 'sm:grid-cols-[1fr_120px_120px]'); ?> gap-4 py-4 sm:py-3 items-center">
 
             <!-- 1. Avatar and Info -->
             <div class="flex items-center gap-3">
@@ -87,6 +91,7 @@ $canManageMembers = App\Helpers\Auth::hasRole(TripMemberRole::ORGANIZER->value, 
             <!-- 2. Role Badge -->
             <div class="text-left sm:text-center">
                 <?php
+
                 if ($member['role'] === TripMemberRole::ORGANIZER->value): ?>
                 <span
                     class="inline-flex items-center rounded-full bg-primary-fixed px-3 py-1 text-label-xs font-bold uppercase text-primary">👑
@@ -108,9 +113,11 @@ $canManageMembers = App\Helpers\Auth::hasRole(TripMemberRole::ORGANIZER->value, 
             </span>
 
             <!-- 4. Action Buttons -->
-            <?php if ($canManageMembers): ?>
+            <?php
+            if ($canManageMembers): ?>
             <div class="flex justify-start sm:justify-end gap-2">
                 <?php
+
                 if ($member['role'] !== TripMemberRole::ORGANIZER->value): ?>
                 <form action="/itinerary/members/updateRole/<?php echo htmlspecialchars($data['trip']['id']) ?>" method="POST"
                     class="inline">
@@ -147,6 +154,7 @@ $canManageMembers = App\Helpers\Auth::hasRole(TripMemberRole::ORGANIZER->value, 
 </div>
 
 <?php
+
 if (! empty($pendingInvites)): ?>
 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 mt-8">
     <h3 class="font-display text-h4 text-on-surface mb-4">Pending Invitations</h3>
@@ -158,6 +166,7 @@ if (! empty($pendingInvites)): ?>
         </div>
 
         <?php
+
         foreach ($pendingInvites as $invite): ?>
         <?php $joinLink = $appUrl . "/join/" . $invite['secureToken']; ?>
         <div class="grid grid-cols-1 sm:grid-cols-[1fr_120px_140px] gap-4 py-4 sm:py-3 items-center">
@@ -176,6 +185,7 @@ if (! empty($pendingInvites)): ?>
 
             <div class="text-left sm:text-center">
                 <?php
+
                 if ($invite['role'] === TripMemberRole::EDITOR->value): ?>
                 <span
                     class="inline-flex items-center rounded-full bg-secondary-fixed px-3 py-1 text-label-xs font-bold uppercase text-secondary">
@@ -199,7 +209,8 @@ if (! empty($pendingInvites)): ?>
     </div>
 </div>
 <?php endif; ?>
-<?php if (!$canManageMembers): ?>
+<?php
+if (! $canManageMembers): ?>
 <div class="flex justify-end mt-12 pb-12">
     <form action="/itinerary/members/leave/<?php echo htmlspecialchars($trip['id'] ?? '') ?>" method="POST"
         onsubmit="return confirm('Are you sure you want to leave this itinerary? This action cannot be undone.');">
