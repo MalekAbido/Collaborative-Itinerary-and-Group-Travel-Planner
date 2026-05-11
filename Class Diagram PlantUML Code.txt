@@ -273,13 +273,6 @@ class FundContribution {
     + update(): boolean
 }
 
-class TripSettlementManager <<service>> {
-    - String tripId
-    - Map<String, Boolean> memberSettlementStatuses
-    + confirmMemberSettlement(memberId: String): void
-    + finalizeTrip(): boolean
-}
-
 class FinanceService <<service>> {
     - float tolerance
     + getTripSettlementLedger(itineraryId: int): array
@@ -606,7 +599,7 @@ Activity "*" --> "1" Location : located at
 Itinerary "0..*" --> "1" User : created by
 Itinerary "1" --> "0..*" TripMember : includes
 Itinerary "1" *-- "0..*" Invitation : has
-Itinerary "1" *-- "1" HistoryLog : maintains
+Itinerary "1" *-right- "1" HistoryLog : maintains
 Itinerary "1" *-- "1" TripFinance : contains
 Itinerary "1" *-- "0..*" Activity : contains
 
@@ -639,10 +632,10 @@ Expense "*" --> "1" SplitMethod : utilizes
 ExpenseShare "*" --> "1" TripMember : owed/paid by
 SettlementPayment "*" --> "1" TripMember : debtor
 SettlementPayment "*" --> "1" TripMember : creditor
-TripSettlementManager "1" --> "1" TripFinance : manages
 
 FinanceService "1" --> "1" TripFinance : monitors
 FinanceService "1" --> "*" Expense : analyzes
+FinanceService "1" --> "*" SettlementPayment : analyzes
 
 Router ..> Controller : <<instantiates>>\nvia dispatch()
 
