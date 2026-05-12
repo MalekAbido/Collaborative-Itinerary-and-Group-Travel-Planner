@@ -1,3 +1,4 @@
+<?php $websiteName = 'VoyageSync';?>
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 
@@ -5,7 +6,7 @@
     <?php use App\Enums\TripMemberRole; ?>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Itinerary | Login</title>
+    <title><?= $websiteName ?> | Login</title>
 
     <link rel="stylesheet" href="/assets/css/tailwind.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
@@ -44,7 +45,7 @@
 
             <div class="flex items-center gap-2 mb-10">
                 <span class="material-symbols-outlined text-primary text-3xl">flight_takeoff</span>
-                <span class="text-xl font-display font-extrabold text-on-surface tracking-tight">Itinerary</span>
+                <span class="text-xl font-display font-extrabold text-on-surface tracking-tight"><?= $websiteName ?></span>
             </div>
 
             <h2 class="font-display text-3xl font-bold text-on-surface mb-2">Welcome back</h2>

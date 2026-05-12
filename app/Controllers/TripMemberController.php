@@ -43,7 +43,7 @@ class TripMemberController extends Controller
         $currentUserId = Auth::id();
         $currentMember = TripMember::getByUserAndItinerary($currentUserId, $id);
         
-        $currentUserRole = TripMemberRole::MEMBER->value; // Default
+        $currentUserRole = TripMemberRole::MEMBER->value;
         if ($currentMember) {
             $currentUserRole = is_array($currentMember) ? $currentMember['role'] : $currentMember->getRole();
         }
@@ -71,9 +71,6 @@ class TripMemberController extends Controller
             
             $invitationModel = new Invitation();
             $token = $invitationModel->createToken($id, $email, $role);
-
-            
-            $userId = rand(100, 999);
 
             if (!$token) { 
                 Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);

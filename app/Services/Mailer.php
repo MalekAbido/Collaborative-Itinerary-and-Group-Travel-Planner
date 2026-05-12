@@ -15,9 +15,8 @@ class Mailer
             $mail->Host        = $_ENV['MAIL_HOST'];
             $mail->SMTPAuth    = true;
 
-                                                                // UNCOMMENT THESE TWO LINES:
-            $mail->AuthType   = 'LOGIN';                        // Forces the method Brevo expects
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Required for Port 587
+            $mail->AuthType   = 'LOGIN';                        
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
 
             $mail->Username = $_ENV['MAIL_USERNAME'];
             $mail->Password = $_ENV['MAIL_PASSWORD'];

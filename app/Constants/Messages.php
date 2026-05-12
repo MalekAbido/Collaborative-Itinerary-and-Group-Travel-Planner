@@ -12,6 +12,7 @@ class Messages
     public const LOGIN_SUCCESS = 'Welcome back!';
     public const LOGOUT_SUCCESS = 'You have been logged out.';
     public const REGISTER_SUCCESS = 'Registration successful! Please log in.';
+    public const PROFILE_UPDATED = 'Profile updated successfully.';
 
     // Generic Success/Error
     public const SUCCESS_GENERIC = 'Action completed successfully.';

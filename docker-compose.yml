@@ -26,11 +26,12 @@ services:
       - db_data:/var/lib/mysql 
       - ./install.sql:/docker-entrypoint-initdb.d/init.sql:z
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD"]
+      test: ["CMD-SHELL", "mysql -u root --password=${DB_ROOT_PASSWORD} -e 'SELECT 1 FROM ${DB_NAME}.schema_setup_completed LIMIT 1;'"]
+      # test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD"]
       interval: 5s
       timeout: 5s
-      retries: 20
-      start_period: 10s
+      retries: 10
+      start_period: 15s
 
   # 3. phpMyAdmin (Optional, for you and your team)
   phpmyadmin:

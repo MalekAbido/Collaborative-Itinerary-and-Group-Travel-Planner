@@ -1,10 +1,14 @@
+<?php 
+use App\Services\Session;
+$websiteName = 'VoyageSync';?>
+
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Itinerary | Register</title>
+    <title><?= $websiteName ?> | Register</title>
 
     <link rel="stylesheet" href="/assets/css/tailwind.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
@@ -34,7 +38,7 @@
                     <span class="material-symbols-outlined text-4xl text-primary-fixed">format_quote</span>
                 </div>
                 <h3 class="font-display text-[26px] font-bold leading-tight mb-4 text-white">
-                    "Itinerary made planning our summer trip an absolute breeze. Highly recommended!"
+                    "<?= $websiteName ?> made planning our summer trip an absolute breeze. Highly recommended!"
                 </h3>
                 <p class="font-body text-[15px] text-white/80 font-medium">Hana AbdelHamid</p>
                 <p class="font-body text-[13px] text-white/60">Group Organizer</p>
@@ -45,7 +49,7 @@
 
             <div class="flex items-center gap-2 mb-8">
                 <span class="material-symbols-outlined text-primary text-3xl">flight_takeoff</span>
-                <span class="text-xl font-display font-extrabold text-on-surface tracking-tight">Itinerary</span>
+                <span class="text-xl font-display font-extrabold text-on-surface tracking-tight"><?= $websiteName ?></span>
             </div>
 
             <h2 class="font-display text-3xl font-bold text-on-surface mb-2">Create an account</h2>
@@ -131,8 +135,6 @@
                 position: { x: 'right', y: 'bottom' },
                 dismissible: true
             });
-
-            <?php use App\Services\Session; ?>
 
             <?php if (Session::hasFlash('success')): ?>
                 notyf.success("<?= addslashes(Session::getFlash('success')) ?>");

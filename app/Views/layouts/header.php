@@ -8,7 +8,7 @@
     use App\Models\TripMember;
     use App\Enums\TripMemberRole;
     $currentUser = Auth::user();
-    $websiteName = 'NoVoyageSync';
+    $websiteName = 'VoyageSync';
     $pageTitle = ($activeTab . ' - ' . $websiteName) ?? $websiteName;
     ?>
     <meta charset="UTF-8" />

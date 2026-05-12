@@ -4,7 +4,7 @@
 <head>
     <?php
     use App\Services\Auth;
-    $websiteName = 'NoVoyageSync';
+    $websiteName = 'VoyageSync';
     $pageTitle = $pageTitle ?? $websiteName;
     ?>
     <meta charset="utf-8" />

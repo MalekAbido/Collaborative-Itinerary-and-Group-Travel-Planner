@@ -98,7 +98,7 @@ class UserController extends Controller
             }
 
             if ($user->updateProfile($data)) {
-                Session::setFlash(Session::FLASH_SUCCESS, Messages::SUCCESS_GENERIC);
+                Session::setFlash(Session::FLASH_SUCCESS, Messages::PROFILE_UPDATED);
             }
             
             header("Location: /profile");

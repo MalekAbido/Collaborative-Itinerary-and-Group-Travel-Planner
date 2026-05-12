@@ -23,7 +23,6 @@ class Itinerary
     private $historyLog;
     private $tripFinance;
     private $activities = null;
-    private $subtrips   = null;
 
     public function __construct()
     {
@@ -244,35 +243,27 @@ class Itinerary
         try {
             $this->db->beginTransaction();
 
-            // 1. Delete Level 4-5 dependencies (Votes, AttendanceMembers, etc)
             $this->db->prepare("DELETE FROM Vote WHERE pollId IN (SELECT id FROM Poll WHERE activityId IN (SELECT id FROM Activity WHERE itineraryId = ?))")->execute([$numericId]);
             $this->db->prepare("DELETE FROM AttendanceMember WHERE attendanceListId IN (SELECT id FROM AttendanceList WHERE activityId IN (SELECT id FROM Activity WHERE itineraryId = ?))")->execute([$numericId]);
             
-            // 2. Delete Level 3 dependencies (Polls, AttendanceLists, InventoryItems)
             $this->db->prepare("DELETE FROM Poll WHERE activityId IN (SELECT id FROM Activity WHERE itineraryId = ?)")->execute([$numericId]);
             $this->db->prepare("DELETE FROM AttendanceList WHERE activityId IN (SELECT id FROM Activity WHERE itineraryId = ?)")->execute([$numericId]);
             $this->db->prepare("DELETE FROM InventoryItem WHERE activityId IN (SELECT id FROM Activity WHERE itineraryId = ?)")->execute([$numericId]);
 
-            // 3. Delete Activity
             $this->db->prepare("DELETE FROM Activity WHERE itineraryId = ?")->execute([$numericId]);
 
-            // 4. Delete Finance dependencies
             $this->db->prepare("DELETE FROM ExpenseShare WHERE expenseId IN (SELECT id FROM Expense WHERE tripFinanceId IN (SELECT id FROM TripFinance WHERE itineraryId = ?))")->execute([$numericId]);
             $this->db->prepare("DELETE FROM Expense WHERE tripFinanceId IN (SELECT id FROM TripFinance WHERE itineraryId = ?)")->execute([$numericId]);
             $this->db->prepare("DELETE FROM FundContribution WHERE groupFundId IN (SELECT id FROM GroupFund WHERE tripFinanceId IN (SELECT id FROM TripFinance WHERE itineraryId = ?))")->execute([$numericId]);
             $this->db->prepare("DELETE FROM GroupFund WHERE tripFinanceId IN (SELECT id FROM TripFinance WHERE itineraryId = ?)")->execute([$numericId]);
             $this->db->prepare("DELETE FROM TripFinance WHERE itineraryId = ?")->execute([$numericId]);
 
-            // 5. Delete History dependencies (The core of the reported error)
-            // HistoryLogEntry references TripMember
             $this->db->prepare("DELETE FROM HistoryLogEntry WHERE historyLogId IN (SELECT id FROM HistoryLog WHERE itineraryId = ?)")->execute([$numericId]);
             $this->db->prepare("DELETE FROM HistoryLog WHERE itineraryId = ?")->execute([$numericId]);
 
-            // 6. Delete other itinerary-level items
             $this->db->prepare("DELETE FROM SettlementPayment WHERE itineraryId = ?")->execute([$numericId]);
             $this->db->prepare("DELETE FROM Invitation WHERE itineraryId = ?")->execute([$numericId]);
 
-            // 7. Finally delete members and the itinerary itself
             $this->db->prepare("DELETE FROM TripMember WHERE itineraryId = ?")->execute([$numericId]);
             
             $sql  = "DELETE FROM Itinerary WHERE id = :id";
