@@ -22,7 +22,7 @@ if ($isLoggedIn) {
                 </div>
                 <!-- Main Illustration -->
                 <div class="relative z-10 w-full h-full flex items-center justify-center">
-                    <img class="rounded-lg object-cover h-full w-full shadow-lg" alt="Confused traveler illustration" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9P81H1t1K3r2J94MWvlTwb9GXoLPr5B920u2Q8Dlex3f-JxKyzLs8bL5Ar7tPnnonsBdBV9Jb6UpMTBc49ElgwlyMFuQe6I4VLSM-Z_7si4uKb1SJfTZP1PrnK19BYGDdgUXlWUgkkvTOrvq28VQ3yhsmQk5KWtrHo-09y8MC0dcSluOnVr-7o0rXGFMftPEBMK2lvPLI7DnR1vc24YGhw-O9AWJBPSNGIXDlAcDFV92Hn7QEa8F5PLM6YvXsCorsDVmm1dwDssY" />
+                    <img class="rounded-lg object-cover h-full w-full shadow-lg" alt="Confused traveler illustration" src="/assets/images/404.png" />
                     <!-- Floating Navigation Elements Decor -->
                     <div class="absolute -top-4 -right-4 bg-primary text-on-primary p-3 rounded-lg shadow-lg flex items-center gap-2">
                         <span class="material-symbols-outlined">explore</span>
