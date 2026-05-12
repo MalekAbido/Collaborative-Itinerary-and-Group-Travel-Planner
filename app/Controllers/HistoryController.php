@@ -112,7 +112,6 @@ class HistoryController extends Controller
                 $activity = Activity::getByActivityId($entry->getChangedEntityId());
 
                 if ($activity) {
-// if ($activity->hasOverlap($itineraryId, $activity->getStartTime(), $activity->getEndTime())) {
                     if (false) {
                         Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
                         header("Location: /itinerary/{$itineraryId}/history");
@@ -156,7 +155,6 @@ class HistoryController extends Controller
                     $contribution->setDeletedAt(null);
                     $success = $contribution->update();
                     if ($success) {
-                        // Update balance
                         $db = \Core\Database::getInstance()->getConnection();
                         $sql = "UPDATE GroupFund SET currentBalance = currentBalance + :amount WHERE id = :id";
                         $stmt = $db->prepare($sql);

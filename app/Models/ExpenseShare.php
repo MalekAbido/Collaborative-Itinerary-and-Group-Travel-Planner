@@ -4,7 +4,6 @@ namespace App\Models;
 use Core\Database;
 use PDO;
 
-
 class ExpenseShare
 {
     private $id;
@@ -65,12 +64,9 @@ class ExpenseShare
     public function create($expenseId, $tripMemberId, $amount, $isPayer) 
     {
         $pdo = Database::getInstance()->getConnection();
-        
         $uniqueShareId = 'SHR-' . uniqid(); 
-        
         $sql = "INSERT INTO ExpenseShare (shareId, amount, isPayer, expenseId, tripMemberId) 
                 VALUES (:shareId, :amount, :isPayer, :expenseId, :tripMemberId)";
-
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'shareId' => $uniqueShareId,
@@ -107,12 +103,9 @@ class ExpenseShare
     {
         $pdo = Database::getInstance()->getConnection();
         $sql = "SELECT * FROM ExpenseShare WHERE expenseId = :expenseId";
-        
         $stmt = $pdo->prepare($sql);
-        
         $stmt->execute(['expenseId' => $expenseId]);
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
         $shares = [];
         foreach ($data as $row) {
             $share = new self();
@@ -131,7 +124,6 @@ class ExpenseShare
     {
         $pdo = Database::getInstance()->getConnection();
         $sql = "DELETE FROM ExpenseShare WHERE expenseId = :expenseId";
-        
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['expenseId' => $expenseId]);
     }

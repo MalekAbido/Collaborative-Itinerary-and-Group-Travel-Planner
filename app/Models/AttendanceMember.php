@@ -9,12 +9,10 @@ class AttendanceMember
 {
     private $db;
     private $id;
-    /** @var AttendanceStatus|null */
     private $status;
     private $note;
     private $attendanceListId;
     private $tripMemberId;
-
     private $tripMemberObject = null;
 
     public function __construct()
@@ -27,7 +25,6 @@ class AttendanceMember
         return $this->id;
     }
 
-    /** @return string|null */
     public function getStatus()
     {
         return $this->status instanceof AttendanceStatus ? $this->status->value : $this->status;
@@ -73,11 +70,9 @@ class AttendanceMember
 
     public function getTripMember()
     {
-
         if ($this->tripMemberObject === null) {
             $this->tripMemberObject = (new TripMember())->read($this->tripMemberId);
         }
-
         return $this->tripMemberObject;
     }
 
@@ -117,14 +112,12 @@ class AttendanceMember
             ':pending'  => AttendanceStatus::PENDING->value
         ]);
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
         $members = [];
         foreach ($data as $row) {
             $member = new self();
             $member->fill($row);
             $members[] = $member;
         }
-
         return $members;
     }
 
@@ -139,13 +132,11 @@ class AttendanceMember
         ]);
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($row) {
             $member = new self();
             $member->fill($row);
             return $member;
         }
-
         return null;
     }
 

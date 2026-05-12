@@ -65,13 +65,11 @@ class HistoryLog
         $stmt = $db->prepare($sql);
         $stmt->execute([':itineraryId' => $itineraryId]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($data) {
             $log = new self();
             $log->fill($data);
             return $log;
         }
-
         return null;
     }
 
@@ -82,12 +80,10 @@ class HistoryLog
         $stmt = $db->prepare($sql);
         $stmt->execute([':itineraryId' => $itineraryId]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($data) {
             $this->fill($data);
             return $this;
         }
-
         return null;
     }
 
@@ -104,7 +100,6 @@ class HistoryLog
         if ($success) {
             $this->id = $this->db->lastInsertId();
         }
-
         return $success;
     }
 

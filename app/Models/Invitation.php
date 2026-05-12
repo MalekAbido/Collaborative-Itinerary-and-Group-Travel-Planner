@@ -39,7 +39,6 @@ class Invitation
         $sql = "SELECT * FROM Invitation WHERE secureToken = :token AND isActive = 1 LIMIT 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':token' => $secureToken]);
-        
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
@@ -48,7 +47,6 @@ class Invitation
         $sql = "SELECT * FROM Invitation WHERE itineraryId = :itineraryId AND isActive = 1 AND email IS NOT NULL";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':itineraryId' => $itineraryId]);
-        
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

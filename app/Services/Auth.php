@@ -24,7 +24,6 @@ class Auth
         if (isset($_COOKIE[Session::getCookieName()])) {
             $plainToken  = $_COOKIE[Session::getCookieName()];
             $hashedToken = hash('sha256', $plainToken);
-
             $userId = User::getBySessionToken($hashedToken);
 
             if ($userId) {
@@ -32,7 +31,6 @@ class Auth
                 return true;
             }
         }
-
         return false;
     }
 
@@ -46,18 +44,15 @@ class Auth
         return null;
     }
 
-    // Add this inside your Auth class
     public static function user()
     {
         $userId = self::id();
-
         if ($userId) {
             $user = new User();
             if ($user->read($userId)) {
                 return $user;
             }
         }
-
         return null;
     }
 
@@ -81,7 +76,6 @@ class Auth
         }
 
         Session::destroy();
-
         setcookie(Session::getCookieName(), '', time() - 3600, '/');
     }
 
@@ -89,13 +83,11 @@ class Auth
     {
         $requiredLevel = self::$roles[$requiredRole] ?? 0;
         $currentLevel  = self::$roles[$currentRole] ?? 0;
-
         return $currentLevel >= $requiredLevel;
     }
 
     public static function requireRole($requiredRole, $currentRole)
     {
-
         if (! self::hasRole($requiredRole, $currentRole)) {
             Session::setFlash(Session::FLASH_ERROR, 'You do not have permission to perform this action.');
             header("Location: " . $_SERVER['HTTP_REFERER']);
@@ -105,10 +97,8 @@ class Auth
 
     public static function requireLogin()
     {
-
         if (! self::check()) {
             Session::set('intended_url', $_SERVER['REQUEST_URI']);
-            
             Session::setFlash(Session::FLASH_ERROR, 'Please log in to continue.');
             header('Location: /login');
             exit;
@@ -118,13 +108,11 @@ class Auth
     public static function requireMembership($itineraryId) {
         $userId = Auth::id();
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
-
         if (!$member || $member->getDeletedAt() !== null) {
             Session::setFlash(Session::FLASH_ERROR, 'Access denied. You are not a member of this itinerary.');
             header("Location: /dashboard");
             exit;
         }
-
         return $member;
     }
 }

@@ -20,7 +20,6 @@ class TimeHelper
 
             return $dt->format($format);
         } catch (Exception $e) {
-            // Log the error if necessary
             error_log("Timezone Conversion Error: " . $e->getMessage());
             return null;
         }
@@ -39,7 +38,7 @@ class TimeHelper
 
             return $dt->format($format);
         } catch (Exception $e) {
-            return $utcDatetime; // Fallback
+            return $utcDatetime;
         }
     }
 }

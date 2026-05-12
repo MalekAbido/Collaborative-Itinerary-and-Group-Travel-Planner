@@ -32,14 +32,12 @@ class FinanceService
             $balances[$fromId] = round(($balances[$fromId] ?? 0) + $amount, 2);
             $balances[$toId] = round(($balances[$toId] ?? 0) - $amount, 2);
         }
-
         return $this->computeMinimalTransactions($balances);
     }
 
     private function calculateBalances(array $expenses): array
     {
         $balances = [];
-
         foreach ($expenses as $expense) {
             if ($expense->getPaidByKitty()) {
                 continue;
@@ -62,7 +60,6 @@ class FinanceService
 
             $payerBalance = round($expense->getAmount() - $payerShareTotal, 2);
             $balances[$payerId] = round(($balances[$payerId] ?? 0) + $payerBalance, 2);
-
             foreach ($expense->getExpenseShares() as $share) {
                 if ($share->getIsPayer()) {
                     continue;
@@ -72,10 +69,8 @@ class FinanceService
                 $balances[$memberId] = round(($balances[$memberId] ?? 0) - $share->getAmount(), 2);
             }
         }
-
         return $balances;
     }
-
 
     public function computeMinimalTransactions(array $balances): array
     {

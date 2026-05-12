@@ -124,7 +124,6 @@ class SettlementPayment
         $stmt = $db->prepare($sql);
         $stmt->execute([':itineraryId' => $itineraryId]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
         $payments = [];
         foreach ($rows as $row) {
             $payment = new self();

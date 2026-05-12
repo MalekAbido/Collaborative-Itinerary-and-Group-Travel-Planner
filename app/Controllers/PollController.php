@@ -1,20 +1,20 @@
 <?php
 namespace App\Controllers;
 
-use App\Services\Auth;
-use App\Services\Session;
 use App\Constants\Messages;
-use App\Services\HistoryLogger;
-use App\Services\TimeHelper;
+use App\Enums\ActivityStatus;
+use App\Enums\PollStatus;
+use App\Enums\TransactionType;
+use App\Enums\TripMemberRole;
 use App\Models\Activity;
 use App\Models\Itinerary;
 use App\Models\Poll;
-use App\Enums\TransactionType;
-use App\Enums\ActivityStatus;
-use App\Enums\PollStatus;
-use App\Enums\TripMemberRole;
 use App\Models\TripMember;
 use App\Models\Vote;
+use App\Services\Auth;
+use App\Services\HistoryLogger;
+use App\Services\Session;
+use App\Services\TimeHelper;
 use Core\Controller;
 
 class PollController extends Controller
@@ -179,7 +179,6 @@ class PollController extends Controller
             $formattedDeadline = TimeHelper::convertToUTC($newDeadlineRaw, $clientTimezoneStr);
 
             if ($formattedDeadline) {
-                // Check against activity start time
                 $activity = Activity::getByActivityId($poll->getActivityId());
                 if ($activity) {
                     $startTime = strtotime($activity->getStartTime());
@@ -207,10 +206,8 @@ class PollController extends Controller
     private function enforceEditorRole(int $itineraryId)
     {
         $userId = Auth::id();
-
         $member = TripMember::getByUserAndItinerary($userId, $itineraryId);
 
-// Handle array or object
         if ($member) {
             $role = is_array($member) ? $member['role'] : $member->getRole();
         } else {
@@ -265,20 +262,17 @@ class PollController extends Controller
 
             $activity = Activity::getByActivityId($pollData['activityId']);
 
-            // Fetch activity details for the modal
             $pollData['activityDescription'] = $activity ? $activity->getDescription() : '';
             $pollData['startTime'] = $activity ? $activity->getStartTime() : '';
             $pollData['endTime'] = $activity ? $activity->getEndTime() : '';
             $location = $activity ? $activity->getLocation() : null;
             $pollData['locationName'] = $location ? $location->getName() : '';
 
-            // Fetch conflicting activities and their poll points
             $pollData['conflicts'] = [];
             if ($activity) {
                 $conflicts = $activity->getConflictingConfirmedActivities();
                 foreach ($conflicts as $conflict) {
                     $conflictPolls = Poll::getByActivityId($conflict->getId());
-                    // Use the first poll (assuming 1:1 ratio)
                     $cpPoints = !empty($conflictPolls) ? (float)$conflictPolls[0]['weightedTotal'] : 0;
                     
                     $pollData['conflicts'][] = [
@@ -322,7 +316,6 @@ class PollController extends Controller
             $conflictPolls = Poll::getByActivityId($conflict->getId());
             $cpPoints = !empty($conflictPolls) ? (float)$conflictPolls[0]['weightedTotal'] : 0;
             
-            // If current poll doesn't beat each independent conflict (or match it), it cannot be confirmed
             if ($currentPoints < $cpPoints) {
                 $canConfirm = false;
                 break;

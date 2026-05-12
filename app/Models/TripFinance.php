@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Core\Database;
 use PDO;
-use App\Models\Expense; // Ensure we pull in the Expense class!
+use App\Models\Expense;
 
 class TripFinance
 {
@@ -14,7 +14,6 @@ class TripFinance
     private $itineraryId;
     private $baseCurrency;
     private $totalBudgetLimit;
-
     private $groupFund;     
     private $expenses = []; 
 
@@ -24,22 +23,16 @@ class TripFinance
     }
 
     public function getId() { return $this->id; }
-
     public function getFinanceId() { return $this->financeId; }
     public function setFinanceId($financeId) { $this->financeId = $financeId; }
-
     public function getItineraryId() { return $this->itineraryId; }
     public function setItineraryId($itineraryId) { $this->itineraryId = $itineraryId; }
-
     public function getBaseCurrency() { return $this->baseCurrency; }
     public function setBaseCurrency($baseCurrency) { $this->baseCurrency = $baseCurrency; }
-
     public function getTotalBudgetLimit() { return $this->totalBudgetLimit; }
     public function setTotalBudgetLimit($limit) { $this->totalBudgetLimit = $limit; }
-
     public function getGroupFund() { return $this->groupFund; }
     public function setGroupFund(GroupFund $groupFund) { $this->groupFund = $groupFund; }
-
     public function getExpenses() { return $this->expenses; }
     public function setExpenses(array $expenses) { $this->expenses = $expenses; }
 
@@ -69,7 +62,6 @@ class TripFinance
     public function checkBudgetAlert()
     {
         $currentSpending = $this->getActualSpending();
-
         if ($this->totalBudgetLimit > 0 && $currentSpending >= $this->totalBudgetLimit) {
             return [
                 'status' => 'warning',
@@ -95,7 +87,6 @@ class TripFinance
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($data) {
             $this->id = $data['id'];
             $this->financeId = $data['financeId'];
@@ -113,7 +104,6 @@ class TripFinance
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':itineraryId' => $itineraryId]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($data) {
             $this->id = $data['id'];
             $this->financeId = $data['financeId'];
@@ -122,7 +112,6 @@ class TripFinance
             $this->totalBudgetLimit = $data['budgetLimit']; 
             
             $this->loadExpensesFromDatabase();
-            
             return true;
         }
         return false;
@@ -131,13 +120,10 @@ class TripFinance
     private function loadExpensesFromDatabase()
     {
         $this->expenses = []; 
-        
-        $sql = "SELECT * FROM Expense WHERE tripFinanceId = :id AND deletedAt IS NULL ORDER BY id DESC"; // Added ORDER BY to show newest first!
+        $sql = "SELECT * FROM Expense WHERE tripFinanceId = :id AND deletedAt IS NULL ORDER BY id DESC";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $this->id]);
-        
         $expenseRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
         foreach ($expenseRows as $row) {
             $expense = new Expense();
             $expense->setId($row['id']);

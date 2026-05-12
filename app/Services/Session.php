@@ -8,12 +8,9 @@ class Session
     public const FLASH_SUCCESS  = 'success';
     public const FLASH_ERROR    = 'error';
     public const FLASH_INFO     = 'info';
-    /**
-     * Resumes the existing session or starts a new one.
-     */
+
     public static function start()
     {
-
         if (session_status() === PHP_SESSION_NONE) {
             session_name(self::$sessionName);
             $lifetime = 60 * 60 * 24 * 30;
@@ -27,17 +24,11 @@ class Session
         }
     }
 
-    /**
-     * Stores a key-value pair in the session array.
-     */
     public static function set($key, $value)
     {
         $_SESSION[$key] = $value;
     }
 
-    /**
-     * Retrieves a value from the session, returning a default if not found.
-     */
     public static function get($key, $default = null)
     {
 
@@ -48,9 +39,6 @@ class Session
         }
     }
 
-    /**
-     * Completely destroys the session file.
-     */
     public static function destroy()
     {
         session_unset();
@@ -58,28 +46,18 @@ class Session
         setcookie(self::$sessionName, '', time() - 3600, '/');
     }
 
-    /**
-     * Sets a one-time flash message.
-     */
     public static function setFlash($key, $message)
     {
         $_SESSION['flashMessages'][$key] = $message;
     }
 
-    /**
-     * Checks if a flash message exists.
-     */
     public static function hasFlash($key)
     {
         return isset($_SESSION['flashMessages'][$key]);
     }
 
-    /**
-     * Gets and immediately deletes a flash message.
-     */
     public static function getFlash($key)
     {
-
         if (isset($_SESSION['flashMessages'][$key])) {
             $message = $_SESSION['flashMessages'][$key];
 

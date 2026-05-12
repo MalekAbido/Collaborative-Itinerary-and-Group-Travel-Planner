@@ -141,7 +141,6 @@ class User
         $stmt = $db->prepare($sql);
         $stmt->execute([':userId' => $userId]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($data) {
             $user = new self();
             $user->setId($data['id']);
@@ -155,7 +154,6 @@ class User
             $user->setProfileImage($data['profileImage'] ?? null);
             return $user;
         }
-
         return null;
     }
 
@@ -166,7 +164,6 @@ class User
         $stmt = $db->prepare($sql);
         $stmt->execute([':email' => $email]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($data) {
             $user = new self();
             $user->setId($data['id']);
@@ -178,7 +175,6 @@ class User
             $user->setProfileImage($data['profileImage'] ?? null);
             return $user;
         }
-
         return null;
     }
 
@@ -212,7 +208,6 @@ class User
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($data) {
             $this->id           = $data['id'];
             $this->userId       = $data['userId'];
@@ -225,7 +220,6 @@ class User
             $this->profileImage = $data['profileImage'] ?? null;
             return $this;
         }
-
         return false;
     }
 
@@ -273,15 +267,12 @@ class User
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':email' => $email]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($data && password_verify($password, $data['passwordHash'])) {
             $this->read($data['id']);
             return $data['id'];
         }
-
         return false;
     }
-
 
     public function updateProfile($data)
     {
@@ -311,9 +302,7 @@ class User
         $sql  = "SELECT * FROM Allergy WHERE userId = :userId";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':userId' => $this->id]);
-
         $this->allergies = [];
-
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $allergy = new Allergy();
             $allergy->setId($row['id']);
@@ -331,9 +320,7 @@ class User
         $sql  = "SELECT * FROM EmergencyContact WHERE userId = :userId";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':userId' => $this->id]);
-
         $this->emergencyContacts = [];
-
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $contact = new EmergencyContact();
             $contact->setId($row['id']);
@@ -360,11 +347,8 @@ class User
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function createItinerary()
-    {}
-
-    public function joinItinerary($secureToken)
-    {}
+    // public function createItinerary() {}
+    // public function joinItinerary($secureToken) {}
 
     public static function updateSessionToken($userId, $hashedSessionToken)
     {

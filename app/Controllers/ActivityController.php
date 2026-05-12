@@ -95,7 +95,6 @@ class ActivityController extends Controller
             exit;
         }
 
-        // Validation: Duration shouldn't exceed 24 hours
         $durationInSeconds = strtotime($endTime) - strtotime($startTime);
         if ($durationInSeconds > 86400) {
             Session::setFlash(Session::FLASH_ERROR, Messages::ACTIVITY_DURATION_ERROR);
@@ -103,19 +102,14 @@ class ActivityController extends Controller
             exit;
         }
 
-        // Fetch Itinerary for date validation
         $itineraryModel = new \App\Models\Itinerary();
         $itineraryData = $itineraryModel->findByIdNumeric($itineraryId);
         if ($itineraryData) {
-            $itinStart = $itineraryData['startDate']; // YYYY-MM-DD
-            $itinEnd   = $itineraryData['endDate'];   // YYYY-MM-DD
-
-            // Compare as naive dates/times (ignoring timezone offset for range check)
-            // Itinerary start date is considered 00:00:00 of that day
-            // Itinerary end date is considered 23:59:59 of that day
+            $itinStart = $itineraryData['startDate'];
+            $itinEnd   = $itineraryData['endDate'];
             
-            $activityStartNaive = strtotime(substr($startTimeRaw, 0, 10)); // Just the date part
-            $activityEndNaive   = strtotime(substr($endTimeRaw, 0, 10));   // Just the date part
+            $activityStartNaive = strtotime(substr($startTimeRaw, 0, 10));
+            $activityEndNaive   = strtotime(substr($endTimeRaw, 0, 10));
             
             $itinStartTs = strtotime($itinStart);
             $itinEndTs   = strtotime($itinEnd);
@@ -249,6 +243,16 @@ class ActivityController extends Controller
         }
 
         $attendanceList = $activity->getAttendanceList();
+        if (!$attendanceList) {
+                $attendanceList = new AttendanceList();
+                if ($attendanceList->create($activityId)) {
+                $allMembers = $tripMember->getAllByItineraryId($itineraryId);
+
+                foreach ($allMembers as $memberData) {
+                    $attendanceList->updateStatus($memberData['memberId'], AttendanceStatus::PENDING);
+                }
+            }
+        }
 
         $goingMembers    = [];
         $pendingMembers  = [];

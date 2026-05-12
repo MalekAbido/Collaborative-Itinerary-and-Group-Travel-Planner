@@ -9,7 +9,6 @@ class Mailer
     public static function send($toEmail, $subject, $htmlBody)
     {
         $mail = new PHPMailer(true);
-
         try {
             $mail->isSMTP();
             $mail->Host        = $_ENV['MAIL_HOST'];

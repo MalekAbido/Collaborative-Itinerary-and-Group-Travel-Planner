@@ -17,14 +17,11 @@ class HistoryLogEntry
     private $transactionType;
     private $timestamp;
     private $changedEntityId;
-    /** @var EntityType|null */
     private $changedEntityType;
     private $historyLogId;
     private $tripMemberId;
     private $previousSnapshotId;
-
     public bool $isUndoable = false;
-
     private $db;
     private $tripMember = null;
 
@@ -83,7 +80,6 @@ class HistoryLogEntry
         $this->changedEntityId = $changedEntityId;
     }
 
-    /** @return string|null */
     public function getChangedEntityType()
     {
         return $this->changedEntityType instanceof EntityType ? $this->changedEntityType->value : $this->changedEntityType;
@@ -128,27 +124,20 @@ class HistoryLogEntry
         $this->previousSnapshotId = $previousSnapshotId;
     }
 
-    /**
-     * Lazy Loading for TripMember
-     */
     public function getTripMember()
     {
-
         if ($this->tripMember === null && $this->tripMemberId) {
             $member = new TripMember();
-
             if ($member->read($this->tripMemberId)) {
                 $this->tripMember = $member;
             }
         }
-
         return $this->tripMember;
     }
 
     public function getRelatedEntity()
     {
         $type = $this->changedEntityType instanceof EntityType ? $this->changedEntityType : EntityType::tryFrom((string)$this->getChangedEntityType());
-
         switch ($type) {
             case EntityType::ACTIVITY:
                 $activity = new Activity();
@@ -168,7 +157,6 @@ class HistoryLogEntry
     {
         $id = $this->changedEntityId;
         $type = $this->changedEntityType instanceof EntityType ? $this->changedEntityType : EntityType::tryFrom((string)$this->getChangedEntityType());
-
         switch ($type) {
             case EntityType::ACTIVITY:
                 $item = Activity::getByActivityId($id);
@@ -189,7 +177,6 @@ class HistoryLogEntry
                 $item = new SettlementPayment();
                 return ($item->read($id)) ? 'Settlement of ' . $item->getAmount() : 'Unknown Settlement';
         }
-
         return 'Unknown Entity';
     }
 
@@ -248,20 +235,17 @@ class HistoryLogEntry
                 ORDER BY timestamp DESC LIMIT 1";
         
         $typeValue = $entityType instanceof EntityType ? $entityType->value : $entityType;
-
         $stmt = $db->prepare($sql);
         $stmt->execute([
             ':entityId'   => $entityId,
             ':entityType' => $typeValue,
         ]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($data) {
             $entry = new self();
             $entry->fill($data);
             return $entry;
         }
-
         return null;
     }
 
@@ -300,20 +284,16 @@ class HistoryLogEntry
                     break;
             }
         }
-
         $sql .= " ORDER BY hle.timestamp DESC";
         $stmt = $db->prepare($sql);
         $stmt->execute($params);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
         $entries = [];
-
         foreach ($results as $data) {
             $entry = new self();
             $entry->fill($data);
             $entries[] = $entry;
         }
-
         return $entries;
     }
 
@@ -324,13 +304,11 @@ class HistoryLogEntry
         $stmt = $db->prepare($sql);
         $stmt->execute([':id' => $entryId]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($data) {
             $entry = new self();
             $entry->fill($data);
             return $entry;
         }
-
         return null;
     }
 }

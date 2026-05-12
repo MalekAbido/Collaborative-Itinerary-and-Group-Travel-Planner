@@ -42,7 +42,6 @@ class AllergyController extends Controller
 
     public function removeAllergy()
     {
-        // The ID comes from the hidden input field in our HTML form
         $allergyId = $_POST['allergyId'] ?? null;
         
         if (!$allergyId) {

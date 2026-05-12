@@ -75,14 +75,12 @@ class GroupFund
         if ($success) {
             $lastId       = $this->db->lastInsertId();
             $contribution = new FundContribution();
-
             if ($contribution->read($lastId)) {
                 $itineraryId = $contribution->getItineraryId();
 
                 HistoryLogger::log($itineraryId, TransactionType::ADDED_FUND_CONTRIBUTION, $contribution, $contributorId);
             }
         }
-
         return $success;
     }
 
@@ -94,7 +92,6 @@ class GroupFund
         }
 
         $this->currentBalance -= $amount;
-
         $sql  = "UPDATE GroupFund SET currentBalance = :balance WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
@@ -106,7 +103,6 @@ class GroupFund
     public function processRefund($refundAmount)
     {
         $this->currentBalance += $refundAmount;
-
         $sql  = "UPDATE GroupFund SET currentBalance = :balance WHERE fundId = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
@@ -121,13 +117,11 @@ class GroupFund
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':tripFinanceId' => $tripFinanceId]);
         $data = $stmt->fetch(\PDO::FETCH_ASSOC);
-
         if ($data) {
             $this->fundId         = $data['id'];
             $this->currentBalance = $data['currentBalance'];
             return true;
         }
-
         return false;
     }
 

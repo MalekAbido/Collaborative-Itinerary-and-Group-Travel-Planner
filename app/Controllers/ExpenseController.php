@@ -25,7 +25,6 @@ class ExpenseController extends Controller
         $financeModel->readByItinerary($itineraryId);
         $financeId = $financeModel->getId();
 
-        // Get group fund balance if it exists
         $groupFundBalance = 0;
         $groupFundModel   = new \App\Models\GroupFund();
 
@@ -189,7 +188,6 @@ class ExpenseController extends Controller
         Auth::requireRole(TripMemberRole::EDITOR->value, $tripMember->getRole());
 
         if ($expense->delete($tripMember->getId())) {
-            // I corrected a mistake, id should be numeric not string
             HistoryLogger::log($itineraryId, TransactionType::DELETED_EXPENSE, $expense, $tripMember->getId());
         }
 
@@ -279,13 +277,6 @@ class ExpenseController extends Controller
         exit();
     }
 
-    /**
-     * @param string $splitMethod (Even or Uneven)
-     * @param float $totalAmount The total bill amount
-     * @param array $shares The array of member debts
-     * @return bool Returns true if valid, false if invalid
-     */
-
     private function validateExpenseData($splitMethod, $totalAmount, $shares, $paidByKitty = 0)
     {
 
@@ -300,7 +291,6 @@ class ExpenseController extends Controller
         if ($splitMethod === SplitMethod::UNEVEN->value) {
             $sumOfShares = array_sum($shares);
 
-// the epsilon method to handle decimal inaccuracy
             if (abs($sumOfShares - $totalAmount) > 0.01) {
                 return false;
             }

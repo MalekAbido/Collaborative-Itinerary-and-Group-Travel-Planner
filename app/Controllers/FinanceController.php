@@ -54,7 +54,6 @@ class FinanceController extends Controller
         $financeService = new FinanceService();
         $settlementResult = $financeService->getTripSettlementLedger($itineraryId);
 
-        // Fetch all members (active and deleted) for the mapping
         $memberModel = new TripMember();
         $allMembers = $memberModel->getAllByItineraryId($itineraryId, true);
 

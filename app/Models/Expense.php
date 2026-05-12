@@ -22,9 +22,7 @@ class Expense
     private $tripFinanceId;
     private $tripMemberId;
     private $deletedAt;
-
     public array $expenseShares = [];
-
 
     public function __construct()
     {
@@ -164,20 +162,16 @@ class Expense
     public function getItinerary()
     {
         $sql = "SELECT itineraryId FROM TripFinance WHERE id = :financeId LIMIT 1";
-        
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['financeId' => $this->tripFinanceId]);
-                
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function create($data)
     {
         $uniqueExpenseId = 'EXP-' . uniqid();
-
         $sql = "INSERT INTO Expense (expenseId, amount, currencyType, description, category, isNonCash, paidByKitty, tripFinanceId, tripMemberId) 
                 VALUES (:expenseId, :amount, :currencyType, :description, :category, :isNonCash, :paidByKitty, :tripFinanceId, :tripMemberId)";
-
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             'expenseId' => $uniqueExpenseId,
@@ -190,19 +184,15 @@ class Expense
             'tripFinanceId' => $data['financeId'],
             'tripMemberId' => $data['payerId']
         ]);
-
         return $this->pdo->lastInsertId();
     }
 
     public function findById($id)
     {
         $sql = "SELECT * FROM Expense WHERE id = :id";
-
         $stmt = $this->pdo->prepare($sql);
-
         $stmt->execute(['id' => $id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($data) {
             $expense = new self();
             $expense->setId($data['id']);
@@ -226,8 +216,7 @@ class Expense
     {
         $sql = "UPDATE Expense SET deletedAt = NOW() WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
-        $success = $stmt->execute(['id' => $this->id]);
-        return $success;
+        return $stmt->execute(['id' => $this->id]);
     }
 
     public function update()
@@ -271,21 +260,16 @@ class Expense
         }
 
         $reductionRatio = $newRefundInput / $this->amount;
-
         $this->amount -= $newRefundInput;
         $this->refundedAmount += $newRefundInput;
         $this->update();
-
         $shares = $this->loadShares($this->id);
-        
         foreach ($shares as $share) {
             $shareReduction = $share->getAmount() * $reductionRatio;
             $newShareAmount = $share->getAmount() - $shareReduction;
-            
             $share->setAmount($newShareAmount);
             $share->update();
         }
-
         return true;
     }
 
@@ -293,12 +277,9 @@ class Expense
     {
         $this->pdo = Database::getInstance()->getConnection();
         $sql = "SELECT * FROM ExpenseShare WHERE expenseId = :expenseId";
-
         $stmt = $this->pdo->prepare($sql);
-
         $stmt->execute(['expenseId' => $expenseId]);
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
         $this->expenseShares = [];
         foreach ($data as $row) {
             $share = new ExpenseShare();

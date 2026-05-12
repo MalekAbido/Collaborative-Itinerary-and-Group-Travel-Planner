@@ -13,7 +13,6 @@ class Vote
     private $timestamp;
     private $pollId;
     private $tripMemberId;
-    /** @var RatingOption|null */
     private $ratingChoice;
 
     public static function getWeight($choice)
@@ -46,23 +45,18 @@ class Vote
         $this->db = Database::getInstance()->getConnection();
     }
 
-    // Getters and Setters
     public function getId() { return $this->id; }
     public function setId($id) { $this->id = $id; }
-
     public function getVoteId() { return $this->voteId; }
     public function setVoteId($voteId) { $this->voteId = $voteId; }
-
     public function getTimestamp() { return $this->timestamp; }
     public function setTimestamp($timestamp) { $this->timestamp = $timestamp; }
-
     public function getPollId() { return $this->pollId; }
     public function setPollId($pollId) { $this->pollId = $pollId; }
-
     public function getTripMemberId() { return $this->tripMemberId; }
     public function setTripMemberId($tripMemberId) { $this->tripMemberId = $tripMemberId; }
-
     public function getRatingChoice() { return $this->ratingChoice instanceof RatingOption ? $this->ratingChoice->value : $this->ratingChoice; }
+    
     public function setRatingChoice($ratingChoice) 
     { 
         if (is_string($ratingChoice)) {
@@ -72,7 +66,6 @@ class Vote
         }
     }
 
-    // CRUD Operations
     public function create()
     {
         $this->voteId = uniqid('vote_');
@@ -100,7 +93,6 @@ class Vote
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($data) {
             $this->id = $data['id'];
             $this->voteId = $data['voteId'];
@@ -133,7 +125,6 @@ class Vote
         return $stmt->execute([':id' => $this->id]);
     }
 
-    // Object methods
     public static function getByMemberAndPoll($tripMemberId, $pollId)
     {
         $db = Database::getInstance()->getConnection();
@@ -141,7 +132,6 @@ class Vote
         $stmt = $db->prepare($sql);
         $stmt->execute([':tripMemberId' => $tripMemberId, ':pollId' => $pollId]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-        
         if ($data) {
             $vote = new self();
             $vote->id = $data['id'];

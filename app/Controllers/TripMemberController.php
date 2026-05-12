@@ -130,13 +130,11 @@ class TripMemberController extends Controller
             $memberModel = new \App\Models\TripMember();
             
             if ($memberModel->read($memberId)) {
-                // Ensure this is the correct itinerary
                 if ($memberModel->getItineraryId() != $id) {
                     header("Location: /itinerary/members/" . $id . "?status=error");
                     exit;
                 }
 
-                // Check if this is the last organizer
                 $allMembers = $memberModel->getAllByItineraryId($id);
                 $organizers = array_filter($allMembers, function($m) {
                     return $m['role'] === TripMemberRole::ORGANIZER->value;
@@ -147,15 +145,13 @@ class TripMemberController extends Controller
                     exit;
                 }
 
-                // Invalidate pending invitations for this user's email if possible
                 $user = $memberModel->getUser();
                 if ($user) {
                     $invitationModel = new Invitation();
                     $invitationModel->invalidateByEmail($id, $user->getEmail());
                 }
 
-                if ($memberModel->delete()) { // This is now a soft delete
-                    // Log history
+                if ($memberModel->delete()) {
                     HistoryLogger::log($id, TransactionType::MEMBER_REMOVED, $memberModel, $currentMember->getId());
                     Session::setFlash(Session::FLASH_SUCCESS, Messages::MEMBER_REMOVED);
                 }
@@ -182,7 +178,6 @@ class TripMemberController extends Controller
 
             $currentMember->delete();
 
-            // Log history
             HistoryLogger::log($itineraryId, TransactionType::MEMBER_LEFT, $currentMember, $memberId);
 
             Session::setFlash('info', Messages::MEMBER_LEFT);
@@ -215,13 +210,11 @@ class TripMemberController extends Controller
                 header("Location: /itinerary/dashboard/" . $itineraryId . "?status=already_joined");
                 exit;
             } else {
-                // Reactivate
                 if ($existingMember->reactivate($role)) {
                     if ($invitation['email'] !== null) {
                         $invitationModel->markUsed($invitation['secureToken']);
                     }
 
-                    // Log history
                     HistoryLogger::log($itineraryId, TransactionType::MEMBER_JOINED, $existingMember, $existingMember->getId());
 
                     header("Location: /itinerary/dashboard/" . $itineraryId . "?status=joined");
@@ -243,7 +236,6 @@ class TripMemberController extends Controller
                 $invitationModel->markUsed($invitation['secureToken']);
             }
 
-            // Log history
             HistoryLogger::log($itineraryId, TransactionType::MEMBER_JOINED, $newMember, $newMember->getId());
             
             header("Location: /itinerary/dashboard/" . $itineraryId . "?status=joined");

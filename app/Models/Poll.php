@@ -12,7 +12,6 @@ class Poll
     private $id;
     private $pollId;
     private $deadline;
-    /** @var PollStatus|null */
     private $status;
     private $isAnonymous;
     private $weightedTotal;
@@ -51,7 +50,6 @@ class Poll
         $this->deadline = $deadline;
     }
 
-    /** @return PollStatus|null */
     public function getStatus(): ?PollStatus
     {
         if ($this->status instanceof PollStatus) {
@@ -96,7 +94,6 @@ class Poll
         $this->activityId = $activityId;
     }
 
-    // CRUD Operations
     public function create()
     {
         $this->pollId = uniqid('poll_');
@@ -124,7 +121,6 @@ class Poll
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($data) {
             $this->id = $data['id'];
             $this->pollId = $data['pollId'];
@@ -160,7 +156,6 @@ class Poll
         return $stmt->execute([':id' => $this->id]);
     }
 
-    // Object specific methods
     public function openPoll()
     {
         $this->status = PollStatus::OPEN;
@@ -179,7 +174,6 @@ class Poll
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':pollId' => $this->id]);
         $votes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
         $total = 0;
         foreach ($votes as $vote) {
             $total += Vote::getWeight($vote['ratingChoice']);
@@ -192,12 +186,9 @@ class Poll
 
     public function assignLeadingOption()
     {
-        // This logic might depend on how we define "leading option"
-        // For now, let's just say it calculates the points.
         return $this->calculateTotalPoints();
     }
 
-    // Collections
     public function getVotes()
     {
         $sql = "SELECT * FROM Vote WHERE pollId = :pollId";

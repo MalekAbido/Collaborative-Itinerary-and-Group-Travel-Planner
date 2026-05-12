@@ -8,10 +8,8 @@ use PDO;
 class Itinerary
 {
     private $db;
-
     private $id;
     private $itineraryItems;
-
     private $itineraryId;
     private $title;
     private $description;
@@ -171,7 +169,6 @@ class Itinerary
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($data) {
             $this->id          = $data['id'];
             $this->itineraryId = $data['itineraryId'];
@@ -182,7 +179,6 @@ class Itinerary
             $this->coverImage  = $data['coverImage'];
             return true;
         }
-
         return false;
     }
 
@@ -239,40 +235,29 @@ class Itinerary
             return false;
         }
         $numericId = $trip['id'];
-
         try {
             $this->db->beginTransaction();
-
             $this->db->prepare("DELETE FROM Vote WHERE pollId IN (SELECT id FROM Poll WHERE activityId IN (SELECT id FROM Activity WHERE itineraryId = ?))")->execute([$numericId]);
             $this->db->prepare("DELETE FROM AttendanceMember WHERE attendanceListId IN (SELECT id FROM AttendanceList WHERE activityId IN (SELECT id FROM Activity WHERE itineraryId = ?))")->execute([$numericId]);
-            
             $this->db->prepare("DELETE FROM Poll WHERE activityId IN (SELECT id FROM Activity WHERE itineraryId = ?)")->execute([$numericId]);
             $this->db->prepare("DELETE FROM AttendanceList WHERE activityId IN (SELECT id FROM Activity WHERE itineraryId = ?)")->execute([$numericId]);
             $this->db->prepare("DELETE FROM InventoryItem WHERE activityId IN (SELECT id FROM Activity WHERE itineraryId = ?)")->execute([$numericId]);
-
             $this->db->prepare("DELETE FROM Activity WHERE itineraryId = ?")->execute([$numericId]);
-
             $this->db->prepare("DELETE FROM ExpenseShare WHERE expenseId IN (SELECT id FROM Expense WHERE tripFinanceId IN (SELECT id FROM TripFinance WHERE itineraryId = ?))")->execute([$numericId]);
             $this->db->prepare("DELETE FROM Expense WHERE tripFinanceId IN (SELECT id FROM TripFinance WHERE itineraryId = ?)")->execute([$numericId]);
             $this->db->prepare("DELETE FROM FundContribution WHERE groupFundId IN (SELECT id FROM GroupFund WHERE tripFinanceId IN (SELECT id FROM TripFinance WHERE itineraryId = ?))")->execute([$numericId]);
             $this->db->prepare("DELETE FROM GroupFund WHERE tripFinanceId IN (SELECT id FROM TripFinance WHERE itineraryId = ?)")->execute([$numericId]);
             $this->db->prepare("DELETE FROM TripFinance WHERE itineraryId = ?")->execute([$numericId]);
-
             $this->db->prepare("DELETE FROM HistoryLogEntry WHERE historyLogId IN (SELECT id FROM HistoryLog WHERE itineraryId = ?)")->execute([$numericId]);
             $this->db->prepare("DELETE FROM HistoryLog WHERE itineraryId = ?")->execute([$numericId]);
-
             $this->db->prepare("DELETE FROM SettlementPayment WHERE itineraryId = ?")->execute([$numericId]);
             $this->db->prepare("DELETE FROM Invitation WHERE itineraryId = ?")->execute([$numericId]);
-
             $this->db->prepare("DELETE FROM TripMember WHERE itineraryId = ?")->execute([$numericId]);
-            
             $sql  = "DELETE FROM Itinerary WHERE id = :id";
             $stmt = $this->db->prepare($sql);
             $result = $stmt->execute([':id' => $numericId]);
-
             $this->db->commit();
             return $result;
-
         } catch (\Exception $e) {
             if ($this->db->inTransaction()) {
                 $this->db->rollBack();
@@ -284,7 +269,6 @@ class Itinerary
 
     public function getActivities()
     {
-
         if ($this->activities === null) {
             $this->activities = Activity::getAllByItineraryId($this->id);
 
@@ -292,7 +276,6 @@ class Itinerary
                 $this->activities = [];
             }
         }
-
         return $this->activities;
     }
 }

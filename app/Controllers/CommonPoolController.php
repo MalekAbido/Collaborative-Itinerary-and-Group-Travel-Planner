@@ -57,7 +57,6 @@ class CommonPoolController extends Controller
             exit;
         }
 
-        // Authorization: Creator OR Editor/Organizer
         $isCreator = ($contribution->getTripMemberId() == $member->getId());
         $isEditor  = Auth::hasRole(TripMemberRole::EDITOR->value, $member->getRole());
 
@@ -68,7 +67,6 @@ class CommonPoolController extends Controller
         }
 
         if ($contribution->delete($member->getId())) {
-            // Subtract from balance
             $db = \Core\Database::getInstance()->getConnection();
             $sql = "UPDATE GroupFund SET currentBalance = currentBalance - :amount WHERE id = :id";
             $stmt = $db->prepare($sql);

@@ -44,7 +44,6 @@ class InventoryController extends Controller
 
         $allItems = InventoryItem::getByItineraryId($itineraryId);
         
-        // Filter activities: Only CONFIRMED and start time after Now
         $allActivities = Activity::getAllByItineraryId($itineraryId);
         $currentTime = time();
         $activities = array_filter($allActivities, function($activity) use ($currentTime) {
@@ -97,7 +96,6 @@ class InventoryController extends Controller
             exit;
         }
 
-        // Validate Activity: Must be CONFIRMED and start time after Now
         $activity = Activity::getByActivityId($activityId);
         if (!$activity || $activity->getItineraryId() != $itineraryId) {
             Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
@@ -149,7 +147,6 @@ class InventoryController extends Controller
 
         $item = new InventoryItem();
         if ($item->read($itemId)) {
-            // Check authorization: creator OR organizer/editor
             $isCreator = ($item->getCreatorMemberId() == $member->getId());
             $isManager = Auth::hasRole(TripMemberRole::EDITOR->value, $member->getRole());
 

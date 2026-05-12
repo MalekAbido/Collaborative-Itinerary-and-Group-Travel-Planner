@@ -24,14 +24,12 @@ class ItineraryController extends Controller
 
     public function store()
     {
-        // 1. Require user to be logged in
         Auth::requireLogin();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $startDate = $_POST['startDate'];
             $endDate   = $_POST['endDate'];
 
-// 2. Inline Validation Check (Dates)
             if (strtotime($endDate) < strtotime($startDate)) {
                 Session::setFlash(Session::FLASH_ERROR, Messages::ITIN_DATE_ERROR);
                 Session::setFlash('old_title', $_POST['title']);
@@ -41,29 +39,23 @@ class ItineraryController extends Controller
                 exit;
             }
 
-            // --- NEW: HANDLE IMAGE UPLOAD ---
             $coverImagePath = null;
 
             if (isset($_FILES['coverImage']) && $_FILES['coverImage']['error'] === UPLOAD_ERR_OK) {
-                // Define where the image should be saved (e.g., public/uploads/itineraries)
                 $uploadDir = __DIR__ . '/../../public/uploads/itineraries/';
 
-// Create the directory if it doesn't exist yet
                 if (! is_dir($uploadDir)) {
                     mkdir($uploadDir, 0777, true);
                 }
 
-                // Generate a unique file name so images don't overwrite each other
                 $fileName   = uniqid('trip_img_') . '_' . basename($_FILES['coverImage']['name']);
                 $targetPath = $uploadDir . $fileName;
 
-// Move the file from the temp folder to your public uploads folder
                 if (move_uploaded_file($_FILES['coverImage']['tmp_name'], $targetPath)) {
-                    $coverImagePath = 'uploads/itineraries/' . $fileName; // Path saved in DB
+                    $coverImagePath = 'uploads/itineraries/' . $fileName;
                 }
             }
 
-            // 3. Create the Itinerary (Now passing the image path!)
             $itineraryModel = new Itinerary();
             $itineraryModel->create(
                 $_POST['title'],
@@ -73,11 +65,8 @@ class ItineraryController extends Controller
                 $coverImagePath
             );
             $stringTripId = $itineraryModel->getItineraryId();
-
-            // Grab the numeric ID for database relationships
             $numericTripId = $itineraryModel->getId();
 
-            // 4. Add the Creator as the Organizer
             $tripMember = new TripMember();
             $tripMember->setItineraryId($numericTripId);
             $tripMember->setUserId(Auth::id());
@@ -85,12 +74,10 @@ class ItineraryController extends Controller
             $tripMember->setJoinedAt(date('Y-m-d H:i:s'));
             $tripMember->create();
 
-            // 5. Initialize Trip Finances
             $baseCurrency = $_POST['baseCurrency'] ?? 'USD';
             $tripFinance  = new \App\Models\TripFinance();
             $tripFinance->create($numericTripId, $baseCurrency, 0);
 
-            // 6. Handle Email Invitations
             $inviteEmailsRaw = $_POST['inviteEmails'] ?? '';
 
             if (! empty(trim($inviteEmailsRaw))) {
@@ -118,7 +105,6 @@ class ItineraryController extends Controller
                 }
             }
 
-            // 7. Redirect to the new dashboard
             Session::setFlash(Session::FLASH_SUCCESS, Messages::ITIN_CREATED);
             header("Location: /itinerary/dashboard/" . $stringTripId);
             exit;
@@ -147,7 +133,6 @@ class ItineraryController extends Controller
         Auth::requireLogin();
         $itineraryModel = new Itinerary();
 
-        // Find the trip using the string ID from the URL
         $tripData = $itineraryModel->findById($id);
 
         if (! $tripData) {
@@ -165,14 +150,11 @@ class ItineraryController extends Controller
                 exit;
             }
 
-                                                                // Require Organizer permissions
-            $member = Auth::requireMembership($tripData['id']); // uses numeric ID
+            $member = Auth::requireMembership($tripData['id']);
             $role   = $member->getRole();
             Auth::requireRole(TripMemberRole::ORGANIZER->value, $role);
 
-            // --- NEW: HANDLE IMAGE UPLOAD ON UPDATE ---
             $coverImagePath = null;
-// Stays null unless they actually uploaded a new file
 
             if (isset($_FILES['coverImage']) && $_FILES['coverImage']['error'] === UPLOAD_ERR_OK) {
                 $uploadDir = __DIR__ . '/../../public/uploads/itineraries/';
@@ -189,19 +171,17 @@ class ItineraryController extends Controller
                 }
             }
 
-// Update the database
             if ($itineraryModel->update(
                 $id,
                 $_POST['title'],
                 $_POST['description'],
                 $startDate,
                 $endDate,
-                $coverImagePath // This will be null if no new image, or the new path if uploaded!
+                $coverImagePath
             )) {
                 Session::setFlash(Session::FLASH_SUCCESS, Messages::ITIN_UPDATED);
             }
 
-            // Redirect back to settings with the success flag
             header("Location: /itinerary/settings/" . $id . "?status=updated");
             exit;
         }
@@ -248,14 +228,12 @@ class ItineraryController extends Controller
         $memberModel = new TripMember();
         $members     = $memberModel->getAllByItineraryId($tripData['id']);
 
-// --- NEW CODE: Fetch and sort the timeline activities ---
-        // This uses your existing method which already has ORDER BY startTime ASC
         $timelineActivities = Activity::getAllByStatusAndItinerary(ActivityStatus::CONFIRMED, $tripData['id']);
 
         $this->view("itinerary/dashboard", [
             'trip'        => $tripData,
             'members'     => $members,
-            'activities'  => $timelineActivities, // Pass the sorted array to the view
+            'activities'  => $timelineActivities,
             'userRole'    => $member->getRole(),
             'itineraryId' => $tripData['id'],
             'activeTab'   => 'itinerary',

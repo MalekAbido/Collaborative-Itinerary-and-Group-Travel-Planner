@@ -13,13 +13,11 @@ class TripMember
     private $db;
     private $id;
     private $membershipId;
-    /** @var TripMemberRole|null */
     private $role;
     private $joinedAt;
     private $userId;
     private $itineraryId;
     private $deletedAt;
-
     private $userObject      = null;
     private $itineraryObject = null;
 
@@ -48,7 +46,6 @@ class TripMember
         $this->membershipId = $membershipId;
     }
 
-    /** @return string|null */
     public function getRole()
     {
         return $this->role instanceof TripMemberRole ? $this->role->value : $this->role;
@@ -129,7 +126,6 @@ class TripMember
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($data) {
             $this->id           = $data['id'];
             $this->membershipId = $data['membershipId'];
@@ -140,7 +136,6 @@ class TripMember
             $this->deletedAt    = $data['deletedAt'];
             return $this;
         }
-
         return false;
     }
 
@@ -160,15 +155,12 @@ class TripMember
             return false;
         }
 
-        // 1. Physically delete attendance records (User's request)
         $stmt = $this->db->prepare("DELETE FROM AttendanceMember WHERE tripMemberId = :id");
         $stmt->execute([':id' => $this->id]);
 
-        // 2. Unassign inventory items (User's request)
         $stmt = $this->db->prepare("UPDATE InventoryItem SET tripMemberId = NULL WHERE tripMemberId = :id");
         $stmt->execute([':id' => $this->id]);
 
-        // 3. Perform Soft Delete
         $this->deletedAt = date('Y-m-d H:i:s');
         $sql  = "UPDATE TripMember SET deletedAt = :deletedAt WHERE id = :id";
         $stmt = $this->db->prepare($sql);
@@ -197,7 +189,6 @@ class TripMember
 
     public function getAllByItineraryId($itineraryId, $includeDeleted = false)
     {
-        // REAL FIX: Joining the TripMember table with the User table
         $sql = "SELECT m.id as memberId, m.role, m.joinedAt, m.itineraryId, m.deletedAt,
                        u.id as userId, u.firstName, u.lastName, u.email
                 FROM TripMember m
@@ -219,20 +210,17 @@ class TripMember
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':itineraryId' => $itineraryId]);
-
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public static function getByUserAndItinerary($userId, $itineraryId, $includeDeleted = false)
     {
         $db = \Core\Database::getInstance()->getConnection();
-
         $sql  = "SELECT * FROM TripMember WHERE userId = :userId AND itineraryId = :itineraryId";
         if (!$includeDeleted) {
             $sql .= " AND deletedAt IS NULL";
         }
         $sql .= " LIMIT 1";
-
         $stmt = $db->prepare($sql);
         $stmt->execute([
             ':userId'      => $userId,
@@ -240,7 +228,6 @@ class TripMember
         ]);
 
         $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-
         if ($row) {
             $member = new self();
             $member->setId($row['id']);
@@ -253,13 +240,11 @@ class TripMember
 
             return $member;
         }
-
         return null;
     }
 
     public function getUser()
     {
-
         if ($this->userObject === null) {
             $user = new User();
 
@@ -267,13 +252,11 @@ class TripMember
                 $this->userObject = $user;
             }
         }
-
         return $this->userObject;
     }
 
     public function getItinerary()
     {
-
         if ($this->itineraryObject === null) {
             $itinerary = new Itinerary();
 
@@ -281,7 +264,6 @@ class TripMember
                 $this->itineraryObject = $itinerary;
             }
         }
-
         return $this->itineraryObject;
     }
 
@@ -289,7 +271,6 @@ class TripMember
     {
         $user = $this->getUser();
         if (!$user) return 'Unknown User';
-        
         $name = $user->getFirstName() . ' ' . $user->getLastName();
         if ($this->deletedAt !== null) {
             $name .= ' (Former Member)';

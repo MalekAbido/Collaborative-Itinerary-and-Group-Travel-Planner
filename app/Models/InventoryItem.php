@@ -23,34 +23,24 @@ class InventoryItem
         $this->db = Database::getInstance()->getConnection();
     }
 
-    // Getters and Setters
     public function getId() { return $this->id; }
     public function setId($id) { $this->id = $id; }
-
     public function getItemId() { return $this->itemId; }
     public function setItemId($itemId) { $this->itemId = $itemId; }
-
     public function getName() { return $this->name; }
     public function setName($name) { $this->name = $name; }
-
     public function getQuantity() { return $this->quantity; }
     public function setQuantity($quantity) { $this->quantity = $quantity; }
-
     public function getDescription() { return $this->description; }
     public function setDescription($description) { $this->description = $description; }
-
     public function getIsPacked() { return (bool)$this->isPacked; }
     public function setIsPacked($isPacked) { $this->isPacked = $isPacked; }
-
     public function getActivityId() { return $this->activityId; }
     public function setActivityId($activityId) { $this->activityId = $activityId; }
-
     public function getTripMemberId() { return $this->tripMemberId; }
     public function setTripMemberId($tripMemberId) { $this->tripMemberId = $tripMemberId; }
-
     public function getCreatorMemberId() { return $this->creatorMemberId; }
     public function setCreatorMemberId($creatorMemberId) { $this->creatorMemberId = $creatorMemberId; }
-
     public function getDeletedAt() { return $this->deletedAt; }
     public function setDeletedAt($deletedAt) { $this->deletedAt = $deletedAt; }
 
@@ -97,7 +87,6 @@ class InventoryItem
             $sql .= " AND deletedAt IS NULL";
         }
         $sql .= " LIMIT 1";
-        
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);

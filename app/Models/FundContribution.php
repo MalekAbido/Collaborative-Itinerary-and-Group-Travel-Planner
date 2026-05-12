@@ -108,12 +108,10 @@ class FundContribution
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($data) {
             $this->fill($data);
             return true;
         }
-
         return false;
     }
 
@@ -122,13 +120,10 @@ class FundContribution
         $sql     = "UPDATE FundContribution SET deletedAt = NOW() WHERE id = :id";
         $stmt    = $this->db->prepare($sql);
         $success = $stmt->execute([':id' => $this->id]);
-
         if ($success) {
             $itineraryId = $this->getItineraryId();
-            // move this to fund contribution controller
             HistoryLogger::log($itineraryId, \App\Enums\TransactionType::DELETED_FUND_CONTRIBUTION, $this, $deletedByTripMemberId);
         }
-
         return $success;
     }
 

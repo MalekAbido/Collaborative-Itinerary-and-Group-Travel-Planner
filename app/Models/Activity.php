@@ -19,7 +19,6 @@ class Activity
     private $itineraryId;
     private $tripMemberId;
     private $category;
-    /** @var ActivityStatus|null */
     private $activityStatus;
     private $locationId;
     private $isAnonymous = false;
@@ -290,9 +289,7 @@ class Activity
     public static function getByIdAndItinerary($activityId, $itineraryId)
     {
         $db = Database::getInstance()->getConnection();
-
         $sql = "SELECT * FROM Activity WHERE id = :id AND itineraryId = :itineraryId LIMIT 1";
-
         $stmt = $db->prepare($sql);
         $stmt->execute([
             ':id'          => $activityId,
@@ -300,14 +297,11 @@ class Activity
         ]);
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($row) {
             $activity = new self();
             $activity->fill($row);
-
             return $activity;
         }
-
         return null;
     }
 
@@ -334,13 +328,11 @@ class Activity
         ]);
         $data            = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $activityObjects = [];
-
         foreach ($data as $row) {
             $activity = new self();
             $activity->fill($row);
             $activityObjects[] = $activity;
         }
-
         return $activityObjects;
     }
 
@@ -349,7 +341,6 @@ class Activity
         if ($status instanceof ActivityStatus) {
             $status = $status->value;
         }
-
         $db   = Database::getInstance()->getConnection();
         $sql  = "SELECT * FROM Activity WHERE status = :status AND itineraryId = :itineraryId AND status != :removedStatus ORDER BY startTime ASC";
         $stmt = $db->prepare($sql);
@@ -360,13 +351,11 @@ class Activity
         ]);
         $data            = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $activityObjects = [];
-
         foreach ($data as $row) {
             $activity = new self();
             $activity->fill($row);
             $activityObjects[] = $activity;
         }
-
         return $activityObjects;
     }
 
@@ -375,7 +364,6 @@ class Activity
         $db                   = Database::getInstance()->getConnection();
         $sql                  = "UPDATE Activity SET status = :status WHERE id = :id";
         $stmt                 = $db->prepare($sql);
-        
         if ($status instanceof ActivityStatus) {
             $this->activityStatus = $status;
             $statusValue = $status->value;
@@ -392,49 +380,39 @@ class Activity
 
     public function getItinerary()
     {
-
         if ($this->itineraryObject === null) {
             $this->itineraryObject = (new Itinerary())->read($this->itineraryId);
         }
-
         return $this->itineraryObject;
     }
 
     public function getTripMember()
     {
-
         if ($this->creatorObject === null && $this->getTripMemberId()) {
             $member = new TripMember();
-
             if ($member->read($this->getTripMemberId())) {
                 $this->creatorObject = $member;
             }
         }
-
         return $this->creatorObject;
     }
 
     public function getAttendanceList()
     {
-
         if ($this->attendanceListObject === null) {
             $this->attendanceListObject = AttendanceList::getByActivityId($this->id);
         }
-
         return $this->attendanceListObject;
     }
 
     public function getLocation()
     {
-
         if ($this->locationObject === null && $this->getLocationId()) {
             $location = new Location();
-
             if ($location->read($this->getLocationId())) {
                 $this->locationObject = $location;
             }
         }
-
         return $this->locationObject;
     }
 }
