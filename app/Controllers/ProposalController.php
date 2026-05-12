@@ -111,7 +111,7 @@ class ProposalController extends Controller
         }
 
         $pollDeadlineTime = strtotime($pollDeadline);
-        if ($pollDeadlineTime > ($startTime - 86400)) {
+        if ($pollDeadlineTime > ($startTime - 43200)) {
             Session::setFlash(Session::FLASH_ERROR, Messages::ERROR_GENERIC);
             header("Location: /itinerary/{$itineraryId}/proposals");
             exit;

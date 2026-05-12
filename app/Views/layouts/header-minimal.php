@@ -12,8 +12,9 @@
     <title><?php echo htmlspecialchars($pageTitle) ?></title>
 
     <link rel="stylesheet" href="/assets/css/tailwind.css">
-    <link rel="stylesheet" href="/assets/vendor/notyf/notyf.min.css">
-    <script src="/assets/vendor/notyf/notyf.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/fonts.css">
+    <link rel="stylesheet" href="/assets/css/notyf.min.css">
+    <script src="/assets/js/notyf.min.js"></script>
     
     <style type="text/tailwindcss">
         @layer base {
