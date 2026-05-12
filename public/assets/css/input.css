@@ -1,6 +1,30 @@
 @import "tailwindcss";
 @source "../../../app";
 @source "../../../public";
+
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 100 700;
+  src: url('../fonts/MaterialSymbolsOutlined.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../fonts/Inter.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('../fonts/PlusJakartaSans.woff2') format('woff2');
+}
+
 /* Define your custom theme variables for Tailwind v4 */
 @theme {
   /* ---- Colors ---- */
@@ -218,6 +242,7 @@
   }
 
   .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
     font-variation-settings:
       "FILL" 0,
       "wght" 400,
@@ -225,6 +250,11 @@
       "opsz" 24;
     user-select: none;
     line-height: 1;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
   }
   .material-symbols-outlined.filled {
     font-variation-settings:
