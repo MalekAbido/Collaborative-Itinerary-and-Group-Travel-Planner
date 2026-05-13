@@ -28,10 +28,10 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "mysql -u root --password=${DB_ROOT_PASSWORD} -e 'SELECT 1 FROM ${DB_NAME}.schema_setup_completed LIMIT 1;'"]
       # test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 15s
+      start_period: 90s
 
   # 3. phpMyAdmin (Optional, for you and your team)
   phpmyadmin:
