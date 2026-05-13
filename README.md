@@ -202,7 +202,7 @@ Each model class owns all SQL queries for its table. No raw SQL exists outside t
 
 ## Documentation
 
-This project was developed as part of **CS251 — Software Engineering** at Helwan University and includes full academic documentation:
+This project was developed as part of **CS251 Software Engineering** at Helwan University and includes full academic documentation:
 
 | Document | Description |
 |---|---|
@@ -218,7 +218,7 @@ This project was developed as part of **CS251 — Software Engineering** at Helw
 | White-Box Tests | PHPUnit path testing with CCM-guided coverage |
 | Black-Box Tests | Equivalence Partitioning and Boundary Value Analysis |
 
-> 📄 The full SRS document is available [here](https://drive.google.com/file/d/1vi76eRlEzswJybujJoVYiNLKtT26tBWb/view?usp=sharing) 
+** 📄 The full SRS document is available [here](https://drive.google.com/file/d/1vi76eRlEzswJybujJoVYiNLKtT26tBWb/view?usp=sharing) **
 
 ## Screenshots
 <img width="1920" height="936" alt="image" src="https://github.com/user-attachments/assets/41fb2988-f80a-4d09-9fc3-1bf0d53599d6" />
